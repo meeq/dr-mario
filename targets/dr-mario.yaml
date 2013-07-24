@@ -1,0 +1,8 @@
+meta:
+  title: 'Dr. Mario'
+wrapper:
+  template: 'test/templates/layout'
+requirejs:
+  app: 'test/app'
+style:
+  'screen, projection': 'test/screen'
