@@ -26,7 +26,7 @@ module.exports = class TableView
       for td, x in tr.childNodes
         cell = @game.getCell x, y
         if cell
-          className = Cell.colorName(cell)
+          className = Cell.getColorName(cell)
           if Cell.isVirus(cell)
             className += ' virus'
         else

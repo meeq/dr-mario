@@ -1,4 +1,5 @@
 Cell = require './cell'
+Line = require './line'
 
 defaultWidth = 10
 defaultHeight = 16
@@ -8,21 +9,12 @@ defaultMinLineLength = 4
 defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
 
-Line =
-  NONE: 0
-  X:    1
-  Y:    2
-  XY:   3
-  hasX: (line) -> line & Line.X
-  hasY: (line) -> line & Line.Y
-
 randomInRange = (start, end) ->
   start + (Math.floor Math.random() * (end - start))
 
 module.exports = class Game
   constructor: (options = {}) ->
     @ticks = 0
-    @grid = []
     @width = options.width ? defaultWidth
     @height = options.height ? defaultHeight
     @speed = options.speed ? defaultSpeed
@@ -34,8 +26,13 @@ module.exports = class Game
     @resetToLevel level
   resetToLevel: (level) ->
     # Reset and redimension game grid
-    @grid.length = 0
-    @grid.length = @width * @height
+    numCells = @width * @height
+    if window.ArrayBuffer? and window.Uint8ClampedArray?
+      gridBuffer = new ArrayBuffer numCells
+      @grid = new Uint8ClampedArray gridBuffer
+    else
+      @grid = []
+      @grid.length = numCells
     # Create an index of available cells for viruses
     yCeiling = @height - level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
@@ -57,54 +54,61 @@ module.exports = class Game
       while cellLineDir isnt Line.NONE
         cell = Cell.setVirus Cell.randomColorIndex()
         @setCell x, y, cell
-        cellLineDir = @getCellLineDirection x, y
+        cellLineDir = @getCellLineDirections x, y
       @virusesLeft += 1
     return
   getCell: (x, y) ->
     @grid[x + (y * @width)] | 0
   getCellColor: (x, y) ->
-    Cell.colorIndex (@getCell x, y)
+    Cell.getColorIndex (@getCell x, y)
   setCell: (x, y, value) ->
     @grid[x + (y * @width)] = value | 0
   markCell: (x, y) ->
     cell = @getCell x, y
     @setCell x, y, (Cell.setMark cell)
-  getCellLineDirection: (originX, originY) ->
+  getCellLineDirections: (originX, originY, markDirections = Line.NONE) ->
     cellColor = @getCellColor originX, originY
     return false if not cellColor
+    (@markCell originX, originY) if markDirections
     # Horizontal Left
     testX = originX - 1
-    left = 0
+    leftMatches = 0
     while testX >= 0 and (@getCellColor testX, originY) is cellColor
-      left += 1
+      (@markCell testX, originY) if (Line.hasX markDirections)
+      leftMatches += 1
       testX -= 1
     # Horizontal Right
     testX = originX + 1
-    right = 0
+    rightMatches = 0
     while testX < @width and (@getCellColor testX, originY) is cellColor
-      right += 1
+      (@markCell testX, originY) if (Line.hasX markDirections)
+      rightMatches += 1
       testX += 1
     # Vertical Up
     testY = originY - 1
-    up = 0
+    upMatches = 0
     while testY >= 0 and (@getCellColor originX, testY) is cellColor
-      up += 1
+      (@markCell originX, testY) if (Line.hasY markDirections)
+      upMatches += 1
       testY -= 1
     # Vertical Down
     testY = originY + 1
-    down = 0
+    downMatches = 0
     while testY < @height and (@getCellColor originX, testY) is cellColor
-      down += 1
+      (@markCell originX, testY) if (Line.hasY markDirections)
+      downMatches += 1
       testY += 1
-    isVerticalLine = 1 + left + right >= @minLineLength
-    isHorizontalLine = 1 + up + down >= @minLineLength
+    # Determine line type(s) from directional match chains
+    isVerticalLine = 1 + leftMatches + rightMatches >= @minLineLength
+    isHorizontalLine = 1 + upMatches + downMatches >= @minLineLength
     if isVerticalLine and isHorizontalLine then Line.XY
     else if isVerticalLine then Line.Y
     else if isHorizontalLine then Line.X
     else Line.NONE
   isCellOrphaned: (originX, originY) ->
+    # TODO This can't possibly work
     cell = @getCell originX, originY
-    return false if (Cell.isVirus cell) or not (Cell.colorIndex cell)
+    return false if (Cell.isVirus cell) or not (Cell.getColorIndex cell)
     # Horizontal Left
     x = originX - 1
     return false if x >= 0 and @getCellColor x, originY
@@ -141,3 +145,5 @@ module.exports = class Game
               # Clear capsule
               # If capsule write created lines
                 # Mark line cells
+    @ticks += 1
+    return
