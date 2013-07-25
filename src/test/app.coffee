@@ -1,10 +1,10 @@
-GameModel = require './game-model'
-GameTableView = require './game-table-view'
+Game = require './game'
+TableView = require './views/table'
 
 module.exports = class TestApp
   start: ->
-    @game = new GameModel
-    @view = new GameTableView @game
+    @game = new Game
+    @view = new TableView @game
     wrapper = document.getElementById 'wrap'
     wrapper.appendChild @view.render()
     return
