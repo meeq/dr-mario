@@ -9,6 +9,8 @@ module.exports = class GameTableView
       row = document.createElement 'tr'
       for x in [0...@game.width]
         cell = document.createElement 'td'
+        text = document.createTextNode "#{x}, #{y}"
+        cell.appendChild text
         row.appendChild cell
       @el.appendChild row
     @tick()

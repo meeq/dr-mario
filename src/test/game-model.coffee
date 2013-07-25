@@ -5,12 +5,14 @@ defaultHeight = 16
 defaultSpeed = 8
 defaultLevel = 10
 defaultMinLineLength = 4
+defaultMaxYCeiling = 3
+defaultLevelVirusMultiplier = 4
 
 randomInRange = (start, end) ->
   start + (Math.floor Math.random() * (end - start))
 
-getCell = (x, y) -> @[x + (y * @height)] | 0
-setCell = (x, y, value) -> @[x + (y * @height)] = value | 0
+getCell = (x, y) -> @[x + (y * @width)] | 0
+setCell = (x, y, value) -> @[x + (y * @width)] = value | 0
 
 module.exports = class Game
   constructor: (options = {}) ->
@@ -19,50 +21,73 @@ module.exports = class Game
     @height = options.height ? defaultHeight
     @speed = options.speed ? defaultSpeed
     @minLineLength = options.minLineLength ? defaultMinLineLength
+    @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
+    @levelVirusMultiplier =
+      options.levelVirusMultiplier ? defaultLevelVirusMultiplier
     level = options.level ? defaultLevel
     @resetToLevel level
   resetToLevel: (level) ->
-    yCeiling = @height - level
-    yCeiling = 2 if yCeiling < 2
-    numCells = @width * @height
     # Create game state
-    @virusesLeft = 0
     @grid = []
     @virusGrid = []
     # Mixin state helpers and dimension state arrays
     @grid.getCell = @virusGrid.getCell = getCell
     @grid.setCell = @virusGrid.setCell = setCell
-    @grid.height = @virusGrid.height = @height
-    @grid.length = @virusGrid.length = numCells
+    @grid.width = @virusGrid.width = @width
+    @grid.length = @virusGrid.length = @width * @height
     # Randomly generate the game grid
-    levelViruses = (4 * level) + 4
+    yCeiling = @height - level
+    yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
+    levelViruses = (@levelVirusMultiplier * level) + @levelVirusMultiplier
     @virusesLeft = 0
-    while @virusesLeft < levelViruses
-      x = randomInRange 0, @width - 1
-      y = randomInRange yCeiling, @height - 1
-      if not (@grid.getCell x, y) and not (@testCellForLine x, y)
-        @grid.setCell x, y, colors.randomColor()
-        @virusGrid.setCell x, y, 1
-        @virusesLeft += 1
+    topLeftOpenIndex = (yCeiling * @width)
+    bottomRightOpenIndex = @width+((@height-1) * @width)
+    openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
+    while @virusesLeft < levelViruses and openCellIndexes.length
+      randomOpenIndex = randomInRange 0, openCellIndexes.length
+      cellIndex = openCellIndexes[randomOpenIndex]
+      openCellIndexes.splice randomOpenIndex, 1
+      x = (cellIndex % @width)
+      y = (cellIndex / @width) | 0
+      doesCellMakeLine = true
+      while doesCellMakeLine
+        color = colors.randomColor()
+        @grid.setCell x, y, color
+        doesCellMakeLine = @testCellForLine x, y
+      @virusGrid.setCell x, y, 1
+      @virusesLeft += 1
     return
-  # This heuristic sucks.
   testCellForLine: (originX, originY) ->
-    # Vertical test
+    cellColor = @grid.getCell originX, originY
+    return false if not cellColor
+    # Vertical Up
     x = originX
     y = originY - 1
-    if y >= 0 and (@grid.getCell x, y) isnt 0
-      while y > 0 and (@grid.getCell x, y) is (@grid.getCell x, y - 1)
-        y -= 1
-      if originY - y >= @minLineLength - 1
-        return true
-    # Horizontal test
+    up = 0
+    while y >= 0 and (@grid.getCell x, y) is cellColor
+      up += 1
+      y -= 1
+    # Vertical Down
+    y = originY + 1
+    down = 0
+    while y < @height and (@grid.getCell x, y) is cellColor
+      down += 1
+      y += 1
+    return true if 1 + up + down >= @minLineLength
+    # Horizontal Left
     x = originX - 1
     y = originY
-    if x >= 0 and (@grid.getCell x, y) isnt 0
-      while x > 0 and (@grid.getCell x, y) is (@grid.getCell x - 1, y)
-        x -= 1
-      if originX - x >= @minLineLength - 1
-        return true
+    left = 0
+    while x >= 0 and (@grid.getCell x, y) is cellColor
+      left += 1
+      x -= 1
+    # Horizontal Right
+    x = originX + 1
+    right = 0
+    while x < @width and (@grid.getCell x, y) is cellColor
+      right += 1
+      x += 1
+    return true if 1 + left + right >= @minLineLength
     return false
   tick: ->
     # Orphans?

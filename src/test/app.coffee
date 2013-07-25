@@ -1,22 +1,23 @@
 GameModel = require './game-model'
 GameTableView = require './game-table-view'
 
-desiredFps = 60
-
 module.exports = class TestApp
   start: ->
     @game = new GameModel
     @view = new GameTableView @game
-    (document.getElementById 'wrap').appendChild @view.render()
+    wrapper = document.getElementById 'wrap'
+    wrapper.appendChild @view.render()
     return
-  clockRate: 1000 / desiredFps
+  desiredFps: 1
   clockRef: null
   unpause: ->
-    @clockRef = setInterval @tick, 1000
+    clockRate = 1000 / @desiredFps
+    @clockRef = setInterval @tick, @clockRate
     return
   pause: ->
-    clearInterval @clockRef
-    @clockRef = null
+    if @clockRef?
+      clearInterval @clockRef
+      @clockRef = null
     return
   tick: =>
     @game.tick()
