@@ -8,12 +8,21 @@ defaultMinLineLength = 4
 defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
 
+Line =
+  NONE: 0
+  X:    1
+  Y:    2
+  XY:   3
+  hasX: (line) -> line & Line.X
+  hasY: (line) -> line & Line.Y
+
 randomInRange = (start, end) ->
   start + (Math.floor Math.random() * (end - start))
 
 module.exports = class Game
   constructor: (options = {}) ->
     @ticks = 0
+    @grid = []
     @width = options.width ? defaultWidth
     @height = options.height ? defaultHeight
     @speed = options.speed ? defaultSpeed
@@ -24,29 +33,31 @@ module.exports = class Game
     level = options.level ? defaultLevel
     @resetToLevel level
   resetToLevel: (level) ->
-    # Create game state
-    @grid = []
-    # Mixin dimension state arrays
+    # Reset and redimension game grid
+    @grid.length = 0
     @grid.length = @width * @height
-    # Randomly generate the game grid
+    # Create an index of available cells for viruses
     yCeiling = @height - level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
-    levelViruses = (@levelVirusMultiplier * level) + @levelVirusMultiplier
-    @virusesLeft = 0
     topLeftOpenIndex = (yCeiling * @width)
-    bottomRightOpenIndex = @width+((@height-1) * @width)
+    bottomRightOpenIndex = @width + ((@height - 1) * @width)
     openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
+    # Randomly generate viruses on grid based on current level
+    @virusesLeft = 0
+    levelViruses = (@levelVirusMultiplier * level) + @levelVirusMultiplier
     while @virusesLeft < levelViruses and openCellIndexes.length
       randomOpenIndex = randomInRange 0, openCellIndexes.length
       cellIndex = openCellIndexes[randomOpenIndex]
       openCellIndexes.splice randomOpenIndex, 1
+      # Convert random cell index back into coordinates
       x = (cellIndex % @width)
       y = (cellIndex / @width) | 0
-      isCellInLine = true
-      while isCellInLine
+      # Generate a randomly colored virus in cell that doesn't complete a line
+      cellLineDir = Line.XY
+      while cellLineDir isnt Line.NONE
         cell = Cell.setVirus Cell.randomColorIndex()
         @setCell x, y, cell
-        isCellInLine = @isCellInLine x, y
+        cellLineDir = @getCellLineDirection x, y
       @virusesLeft += 1
     return
   getCell: (x, y) ->
@@ -58,40 +69,39 @@ module.exports = class Game
   markCell: (x, y) ->
     cell = @getCell x, y
     @setCell x, y, (Cell.setMark cell)
-  isCellInLine: (originX, originY, markCells = false) ->
+  getCellLineDirection: (originX, originY) ->
     cellColor = @getCellColor originX, originY
     return false if not cellColor
     # Horizontal Left
-    x = originX - 1
+    testX = originX - 1
     left = 0
-    while x >= 0 and (@getCellColor x, originY) is cellColor
-      (@markCell x, originY) if markCells
+    while testX >= 0 and (@getCellColor testX, originY) is cellColor
       left += 1
-      x -= 1
+      testX -= 1
     # Horizontal Right
-    x = originX + 1
+    testX = originX + 1
     right = 0
-    while x < @width and (@getCellColor x, originY) is cellColor
-      (@markCell x, originY) if markCells
+    while testX < @width and (@getCellColor testX, originY) is cellColor
       right += 1
-      x += 1
-    return true if 1 + left + right >= @minLineLength
+      testX += 1
     # Vertical Up
-    y = originY - 1
+    testY = originY - 1
     up = 0
-    while y >= 0 and (@getCellColor originX, y) is cellColor
-      (@markCell originX, y) if markCells
+    while testY >= 0 and (@getCellColor originX, testY) is cellColor
       up += 1
-      y -= 1
+      testY -= 1
     # Vertical Down
-    y = originY + 1
+    testY = originY + 1
     down = 0
-    while y < @height and (@getCellColor originX, y) is cellColor
-      (@markCell originX, y) if markCells
+    while testY < @height and (@getCellColor originX, testY) is cellColor
       down += 1
-      y += 1
-    return true if 1 + up + down >= @minLineLength
-    return false
+      testY += 1
+    isVerticalLine = 1 + left + right >= @minLineLength
+    isHorizontalLine = 1 + up + down >= @minLineLength
+    if isVerticalLine and isHorizontalLine then Line.XY
+    else if isVerticalLine then Line.Y
+    else if isHorizontalLine then Line.X
+    else Line.NONE
   isCellOrphaned: (originX, originY) ->
     cell = @getCell originX, originY
     return false if (Cell.isVirus cell) or not (Cell.colorIndex cell)
