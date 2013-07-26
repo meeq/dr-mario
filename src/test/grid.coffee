@@ -23,7 +23,7 @@ module.exports = class Grid
   mark: (x, y) -> @set x, y, (Cell.setMark @get x, y)
   findLines: (originX, originY, markLines = Line.NONE) ->
     cellColor = @getColor originX, originY
-    return false if not cellColor
+    return false if not cellColor or (@isFalling originX, originY)
     (@mark originX, originY) if markLines
     # Horizontal Left
     testX = originX - 1
@@ -60,9 +60,9 @@ module.exports = class Grid
     else if isHorizontalLine then Line.X
     else if isVerticalLine then Line.Y
     else Line.NONE
-  isOrphan: (originX, originY, checkMate = true) ->
+  isFalling: (originX, originY, checkMate = true, recurseBelow = false) ->
     cell = @get originX, originY
-    if (originY is @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
+    if (originY >= @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
       false
     else if (Cell.isEmpty (@get originX, originY + 1))
       if checkMate and (cellMate = Cell.getMate cell)
@@ -70,15 +70,44 @@ module.exports = class Grid
         # Unpack the 32-bit result into 2 16-bit integers
         mateX = mateCoordinates >>> 16
         mateY = mateCoordinates & 0xFFFF
-        @isOrphan mateX, mateY, false
+        @isFalling mateX, mateY, false
       else
         true
+    else if recurseBelow # Unused, but possibly useful
+      @isFalling originX, originY + 1
     else
-      @isOrphan originX, originY + 1
+      false
+  dropFalling: ->
+    totalDropped = 0
+    # Walk through the grid left-to-right, bottom-up
+    for x in [0...@width]
+      # Skip the bottom row, since it can never have falling cells
+      for y in [@height - 2..0]
+        if @isFalling x, y
+          cell = @get x, y
+          @clear x, y
+          @set x, y + 1, cell
+          totalDropped += 1
+          # If the cell has a mate, drop it too.
+          if (cellMate = Cell.getMate cell)
+            mateCoordinates = Mate.coordinates x, y, cellMate
+            # Unpack the 32-bit result into 2 16-bit integers
+            mateX = mateCoordinates >>> 16
+            mateY = mateCoordinates & 0xFFFF
+            mateCell = @get mateX, mateY
+            @clear mateX, mateY
+            @set mateX, mateY + 1, mateCell
+            totalDropped += 1
+          # Mark the cells if they have created lines by dropping
+          if (dropLines = @findLines x, y + 1)
+            @findLines x, y + 1, dropLines
+          if mateCell and (mateLines = @findLines mateX, mateY + 1)
+            @findLines mateX, mateY, mateLines
+    totalDropped
   clearMarked: ->
     totalMarked = 0
     totalViruses = 0
-    # Walk through through the grid
+    # Walk through through the grid left-to-right, top-down
     for x in [0...@width]
       for y in [0...@height]
         cell = @get x, y

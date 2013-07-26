@@ -10,16 +10,20 @@ module.exports = class TestApp
     return
   desiredFps: 1
   clockRef: null
+  paused: true
   unpause: ->
+    @paused = false
     clockRate = 1000 / @desiredFps
-    @clockRef = setInterval @tick, @clockRate
+    @clockRef = setTimeout @tick, clockRate
     return
   pause: ->
+    @paused = true
     if @clockRef?
-      clearInterval @clockRef
+      clearTimeout @clockRef
       @clockRef = null
     return
   tick: =>
     @game.tick()
     @view.tick()
+    @unpause() unless @paused
     return

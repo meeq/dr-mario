@@ -71,27 +71,27 @@ module.exports = class Game
         @virusesLeft += 1
     return
   tick: ->
+    @ticks += 1
+    return if @ticks % @speed
     if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
       console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
+      # TODO Check virusesLeft, win state
+    else if dropResult = @grid.dropFalling()
+      console.log "Dropped %d cells", dropResult
     # else
-      # Are there orphans?
-        # Yes
-          # For each orphan
-            # Drop orphan
-            # If orphan drop created lines
-              # Mark line cells
+      # Is there a falling capsule?
         # No
-          # Is there a falling capsule?
-            # No - Generate new capsule
-            # Yes - Drop capsule
-          # If input, try to rotate/move capsule
-          # Is capsule stacked or landed?
-            # Write capsule to grid
-            # Clear capsule
-            # If capsule write created lines
-              # Mark line cells
-    @ticks += 1
+          # Is there space to generate a new capsule?
+            # Yes - Generate new capsule
+            # No - Game over
+        # Yes - Drop capsule
+      # If input, try to rotate/move capsule
+      # Is capsule stacked or landed?
+        # Write capsule to grid
+        # Clear capsule
+        # If capsule write created lines
+          # Mark line cells
     return
