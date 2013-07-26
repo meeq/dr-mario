@@ -1,24 +1,26 @@
+# Cells are defined as an clamped unsigned 8-bit integer
+
 colorNames = [
   'red'
   'yellow'
   'blue'
+  # TODO 12 more colors! :D
 ]
 
-exports.numColors = numColors = colorNames.length
-
-exports.randomColorIndex = ->
+exports.randomColor = (numColors) ->
+  numColors ?= colorNames.length
   1 + (Math.floor Math.random() * numColors)
 
-colorMask = 0x03
+colorMask = 0b00001111 # 4-bit integer at offset 0
 
-exports.getColorIndex = getColorIndex = (cell) ->
+exports.getColor = getColor = (cell) ->
   cell & colorMask
 
 exports.getColorName = (cell) ->
-  colorNames[(getColorIndex cell) - 1]
+  colorNames[(getColor cell) - 1]
 
-virusMask = 0x80
-virusShift = Math.log(virusMask) / Math.LN2 # 1-bit flag
+virusMask = 0b10000000 # 1-bit flag at offset 7
+virusShift = Math.log(virusMask) / Math.LN2
 
 exports.isVirus = (cell) ->
   (cell & virusMask) >>> virusShift
@@ -26,8 +28,8 @@ exports.isVirus = (cell) ->
 exports.setVirus = (cell) ->
   cell | virusMask
 
-markMask = 0x40
-markShift = Math.log(markMask) / Math.LN2 # 1-bit flag
+markMask = 0b01000000 # 1-bit flag at offset 6
+markShift = Math.log(markMask) / Math.LN2
 
 exports.isMarked = (cell) ->
   (cell & markMask) >>> markShift
@@ -35,12 +37,13 @@ exports.isMarked = (cell) ->
 exports.setMark = (cell) ->
   cell | markMask
 
-neighborMask = 0x30
-neighborShift = ((Math.log neighborMask) / Math.LN2) - 1 # 2-bit integer
+mateMask = 0b00110000 # 2-bit integer at offset 4
+mateShift = ((Math.log mateMask) / Math.LN2) - 1
 
-exports.getNeighbor = (cell) ->
-  (cell & neighborMask) >>> neighborShift
+exports.getMate = (cell) ->
+  (cell & mateMask) >>> mateShift
 
-exports.setNeighbor = (cell, neighbor) ->
-  cell = cell & ~neighborMask
-  cell | (neighbor << neighborShift)
+exports.setMate = (cell, mate) ->
+  cell = cell & ~mateMask
+  return cell if not mate
+  cell | (mate << mateShift)

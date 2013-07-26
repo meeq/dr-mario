@@ -24,7 +24,7 @@ module.exports = class TableView
   tick: ->
     for tr, y in @el.childNodes
       for td, x in tr.childNodes
-        cell = @game.getCell x, y
+        cell = @game.grid.get x, y
         if cell
           className = Cell.getColorName(cell)
           if Cell.isVirus(cell)

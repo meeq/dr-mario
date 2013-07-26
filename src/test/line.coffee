@@ -1,7 +1,7 @@
-module.exports = Line =
-  NONE: 0
-  X:    1
-  Y:    2
-  XY:   3
-  hasX: (line) -> line & Line.X
-  hasY: (line) -> line & Line.Y
+exports.NONE  = 0
+exports.X = X = 1
+exports.Y = Y = 2
+exports.XY    = 3
+
+exports.hasX = (line) -> line & X
+exports.hasY = (line) -> line & Y
