@@ -7,8 +7,9 @@ defaultHeight = 16
 defaultSpeed = 8
 defaultLevel = 10
 defaultNumColors = 3
+minNumColors = 1
 maxNumColors = 15
-defaultMinLineLength = 4
+defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
 
@@ -16,45 +17,58 @@ randomInRange = (start, end) ->
   start + (Math.floor Math.random() * (end - start))
 
 module.exports = class Game
+  supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
   constructor: (options = {}) ->
+    # Timing
     @ticks = 0
+    @speed = options.speed ? defaultSpeed
+    # Dimensions
     @width = options.width ? defaultWidth
     @height = options.height ? defaultHeight
-    @speed = options.speed ? defaultSpeed
+    # Clamped number of cell colors
     @numColors = options.numColors ? defaultNumColors
+    @numColors = minNumColors if @numColors < minNumColors
     @numColors = maxNumColors if @numColors > maxNumColors
-    @minLineLength = options.minLineLength ? defaultMinLineLength
+    # Tweaks
+    @lineLength = options.lineLength ? defaultLineLength
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
     @levelVirusMultiplier =
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
-    level = options.level ? defaultLevel
-    @resetToLevel level
+    # Create the grid
+    @resetToLevel options.level ? defaultLevel
   resetToLevel: (level) ->
-    # Reset and redimension game grid
-    @grid = new Grid @width, @height
+    @grid = new Grid @
     # Create an index of available cells for viruses
     yCeiling = @height - level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
     topLeftOpenIndex = (yCeiling * @width)
     bottomRightOpenIndex = @width + ((@height - 1) * @width)
     openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
-    # Randomly generate viruses on grid based on current level
+    # Randomly generate viruses on grid
     @virusesLeft = 0
     levelViruses = (@levelVirusMultiplier * level) + @levelVirusMultiplier
     while @virusesLeft < levelViruses and openCellIndexes.length
+      # Get a random cell and remove it from the available cell list
       randomOpenIndex = randomInRange 0, openCellIndexes.length
       cellIndex = openCellIndexes[randomOpenIndex]
       openCellIndexes.splice randomOpenIndex, 1
-      # Convert random cell index back into coordinates
+      # Convert random cell index back into grid coordinates
       x = (cellIndex % @width)
       y = (cellIndex / @width) | 0
-      # Generate a randomly colored virus in cell that doesn't complete a line
+      # Generate a randomly colored virus in the cell that won't create a line
+      # Give up if it is impossible to fill the cell without creating a line
       isCellInLines = true
-      while isCellInLines
-        randomVirus = Cell.setVirus Cell.randomColor()
+      attemptsLeft = @numColors * 2
+      while isCellInLines and attemptsLeft
+        randomVirus = Cell.setVirus Cell.randomColor @numColors
         @grid.set x, y, randomVirus
         isCellInLines = @grid.findLines x, y
-      @virusesLeft += 1
+        attemptsLeft -= 1
+      if isCellInLines
+        # Skip the cell
+        @grid.clear x, y
+      else
+        @virusesLeft += 1
     return
   tick: ->
     if clearResult = @grid.clearMarked()

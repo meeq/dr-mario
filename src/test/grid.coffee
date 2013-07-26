@@ -1,15 +1,16 @@
 Cell = require './cell'
 Line = require './line'
 
-browserSupportsTypedArrays = window.ArrayBuffer? and window.Uint8ClampedArray?
-
 module.exports = class Grid
-  constructor: (@width, @height) ->
+  constructor: (@game) ->
+    {@width, @height, @lineLength} = @game
     numCells = @width * @height
-    if browserSupportsTypedArrays
+    if @game.supportsTypedArrays
+      console.log "Using TypedArray for maximum 8-bit power!"
       cellBuffer = new ArrayBuffer numCells
       @cells = new Uint8ClampedArray cellBuffer
     else
+      console.log "Falling back to regular Array for maximum normal."
       @cells = []
       @cells.length = numCells
     return
@@ -52,8 +53,8 @@ module.exports = class Grid
       downMatches += 1
       testY += 1
     # Determine line type(s) from directional match chains
-    isHorizontalLine = 1 + leftMatches + rightMatches >= @minLineLength
-    isVerticalLine = 1 + upMatches + downMatches >= @minLineLength
+    isHorizontalLine = 1 + leftMatches + rightMatches >= @lineLength
+    isVerticalLine = 1 + upMatches + downMatches >= @lineLength
     if isHorizontalLine and isVerticalLine then Line.XY
     else if isHorizontalLine then Line.X
     else if isVerticalLine then Line.Y
