@@ -1,5 +1,6 @@
 Cell = require './cell'
 Line = require './line'
+Mate = require './mate'
 
 module.exports = class Grid
   constructor: (@game) ->
@@ -60,13 +61,20 @@ module.exports = class Grid
     else if isVerticalLine then Line.Y
     else Line.NONE
   isOrphan: (originX, originY, checkMate = true) ->
-    # TODO
-    # If cell is virus or empty or on the bottom row, return false
-    # If cell below is empty
-      # If checkMate and cell is coupled and mate is orphan, return true
-      # Else return false
-    # If cell below is orphan, return true
-    return false
+    cell = @get originX, originY
+    if (originY is @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
+      false
+    else if (Cell.isEmpty (@get originX, originY + 1))
+      if checkMate and (cellMate = Cell.getMate cell)
+        mateCoordinates = Mate.coordinates originX, originY, cellMate
+        # Unpack the 32-bit result into 2 16-bit integers
+        mateX = mateCoordinates >>> 16
+        mateY = mateCoordinates & 0xFFFF
+        @isOrphan mateX, mateY, false
+      else
+        true
+    else
+      @isOrphan originX, originY + 1
   clearMarked: ->
     totalMarked = 0
     totalViruses = 0

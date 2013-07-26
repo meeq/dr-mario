@@ -11,6 +11,9 @@ exports.randomColor = (numColors) ->
   numColors ?= colorNames.length
   1 + (Math.floor Math.random() * numColors)
 
+exports.isEmpty = (cell) ->
+  cell is 0
+
 colorMask = 0b00001111 # 4-bit integer at offset 0
 
 exports.getColor = getColor = (cell) ->
