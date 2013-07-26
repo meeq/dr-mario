@@ -14,7 +14,7 @@ defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
 
 randomInRange = (start, end) ->
-  start + (Math.floor Math.random() * (end - start))
+  start + (Math.random() * (end - start)) | 0
 
 module.exports = class Game
   supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
@@ -52,19 +52,19 @@ module.exports = class Game
       randomOpenIndex = randomInRange 0, openCellIndexes.length
       cellIndex = openCellIndexes[randomOpenIndex]
       openCellIndexes.splice randomOpenIndex, 1
-      # Convert random cell index back into grid coordinates
+      # Convert the random cell index back into grid coordinates
       x = (cellIndex % @width)
       y = (cellIndex / @width) | 0
       # Generate a randomly colored virus in the cell that won't create a line
       # Give up if it is impossible to fill the cell without creating a line
-      isCellInLines = true
+      didCellCreateLines = true
       attemptsLeft = @numColors * 2
-      while isCellInLines and attemptsLeft
+      while didCellCreateLines and attemptsLeft
         randomVirus = Cell.setVirus Cell.randomColor @numColors
         @grid.set x, y, randomVirus
-        isCellInLines = @grid.findLines x, y
+        didCellCreateLines = @grid.findLines x, y
         attemptsLeft -= 1
-      if isCellInLines
+      if didCellCreateLines
         # Skip the cell
         @grid.clear x, y
       else

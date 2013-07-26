@@ -1,4 +1,5 @@
 Cell = require '../cell'
+Mate = require '../mate'
 
 module.exports = class TableView
   constructor: (@game) ->
@@ -25,12 +26,21 @@ module.exports = class TableView
     for tr, y in @el.childNodes
       for td, x in tr.childNodes
         cell = @game.grid.get x, y
-        if cell
-          className = Cell.getColorName(cell)
-          if Cell.isVirus(cell)
-            className += ' virus'
+        if Cell.isEmpty cell
+          className = 'empty'
         else
-          className = ''
+          className = Cell.getColorName cell
+          if Cell.isVirus cell
+            className += ' virus'
+          else
+            className += ' pill'
+          if Cell.isMarked cell
+            className += ' marked'
+          switch Cell.getMate cell
+            when Mate.UP    then className += ' mate-up'
+            when Mate.DOWN  then className += ' mate-down'
+            when Mate.LEFT  then className += ' mate-left'
+            when Mate.RIGHT then className += ' mate-right'
         if td.className isnt className
           td.className = className
     return

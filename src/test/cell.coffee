@@ -9,7 +9,7 @@ colorNames = [
 
 exports.randomColor = (numColors) ->
   numColors ?= colorNames.length
-  1 + (Math.floor Math.random() * numColors)
+  1 + (Math.random() * numColors) | 0
 
 exports.isEmpty = (cell) ->
   cell is 0
