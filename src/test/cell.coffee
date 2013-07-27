@@ -4,7 +4,10 @@ colorNames = [
   'red'
   'yellow'
   'blue'
-  # TODO 12 more colors! :D
+  'green'
+  'white'
+  'black'
+  'pink'
 ]
 
 exports.randomColor = (numColors) ->
@@ -14,7 +17,7 @@ exports.randomColor = (numColors) ->
 exports.isEmpty = (cell) ->
   cell is 0
 
-colorMask = 0b00001111 # 4-bit integer at offset 0
+colorMask = 0b00000111 # 3-bit integer at offset 0
 
 exports.getColor = getColor = (cell) ->
   cell & colorMask
@@ -40,8 +43,8 @@ exports.isMarked = (cell) ->
 exports.setMark = (cell) ->
   cell | markMask
 
-mateMask = 0b00110000 # 2-bit integer at offset 4
-mateShift = ((Math.log mateMask) / Math.LN2) - 1
+mateMask = 0b00111000 # 3-bit integer at offset 4
+mateShift = ((Math.log mateMask) / Math.LN2) - 2
 
 exports.getMate = (cell) ->
   (cell & mateMask) >>> mateShift
