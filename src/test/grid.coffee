@@ -3,22 +3,35 @@ Line = require './line'
 Mate = require './mate'
 
 module.exports = class Grid
-  constructor: (@game) ->
-    {@width, @height, @lineLength} = @game
+  supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
+  constructor: (options) ->
+    {@width, @height, @lineLength} = options
     numCells = @width * @height
-    if @game.supportsTypedArrays
-      console.log "Using TypedArray for maximum 8-bit power!"
+    if @supportsTypedArrays
       cellBuffer = new ArrayBuffer numCells
       @cells = new Uint8ClampedArray cellBuffer
     else
-      console.log "Falling back to regular Array for maximum normal."
       @cells = []
       @cells.length = numCells
     return
   get: (x, y) -> @cells[x + (y * @width)] | 0
   getColor: (x, y) -> Cell.getColor (@get x, y)
   set: (x, y, value) -> @cells[x + (y * @width)] = value | 0
-  clear: (x, y) -> @set x, y, 0
+  clear: (x, y) ->
+    if x? and y?
+      return @set x, y, 0
+    else
+      @cells[i] = 0 for cell, i in @cells
+      return
+  isClear: (x, y) ->
+    if x? and y?
+      Cell.isEmpty @get x, y
+    else
+      # Walk through the grid left-to-right, bottom-up
+      for x in [0...@width]
+        for y in [@height - 1..0]
+          return false if not Cell.isEmpty @get x, y
+      true
   isMarked: (x, y) -> Cell.isMarked @get x, y
   mark: (x, y) -> @set x, y, (Cell.setMark @get x, y)
   findLines: (originX, originY, markLines = Line.NONE) ->
