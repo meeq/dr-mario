@@ -1,6 +1,7 @@
 Cell = require './cell'
 Line = require './line'
 Grid = require './grid'
+Capsule = require './capsule'
 
 defaultWidth = 10
 defaultHeight = 16
@@ -8,7 +9,7 @@ defaultSpeed = 8
 defaultLevel = 10
 defaultNumColors = 3
 minNumColors = 1
-maxNumColors = 15
+maxNumColors = 7
 defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
@@ -17,7 +18,6 @@ randomInRange = (start, end) ->
   start + (Math.random() * (end - start)) | 0
 
 module.exports = class Game
-  supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
   constructor: (options = {}) ->
     # Timing
     @ticks = 0
@@ -38,6 +38,7 @@ module.exports = class Game
     @resetToLevel options.level ? defaultLevel
   resetToLevel: (level) ->
     @grid = new Grid @
+    @capsule = new Capsule @
     # Create an index of available cells for viruses
     yCeiling = @height - level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
@@ -86,7 +87,7 @@ module.exports = class Game
         # No
           # Is there space to generate a new capsule?
             # Yes - Generate new capsule
-            # No - Game over
+            # No - Game over, lose state
         # Yes - Drop capsule
       # If input, try to rotate/move capsule
       # Is capsule stacked or landed?
