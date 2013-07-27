@@ -8,7 +8,7 @@ module.exports = class TestApp
     wrapper = document.getElementById 'wrap'
     wrapper.appendChild @view.render()
     return
-  desiredFps: 1
+  desiredFps: 10
   clockRef: null
   paused: true
   unpause: ->
