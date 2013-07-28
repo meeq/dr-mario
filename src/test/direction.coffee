@@ -9,17 +9,17 @@ exports.HORIZ = HORIZ = 5
 exports.VERT  = VERT  = 6
 exports.CROSS = CROSS = 7
 
-exports.numMates = (mate) ->
-  switch mate
+exports.numDirections = (direction) ->
+  switch direction
     when UP, DOWN, LEFT, RIGHT then 1
     when HORIZ, VERT then 2
     when CROSS then 4
     else 0
 
-exports.mateAt = (mate, num) ->
-  switch mate
+exports.directionAt = (direction, num) ->
+  switch direction
     when UP, DOWN, LEFT, RIGHT
-      if num is 0 then mate
+      if num is 0 then direction
       else NONE
     when HORIZ
       switch num
@@ -40,8 +40,8 @@ exports.mateAt = (mate, num) ->
         else NONE
     else NONE
 
-exports.coordinates = (x, y, mate) ->
-  switch mate
+exports.coordinates = (x, y, direction) ->
+  switch direction
     when UP     then y -= 1
     when DOWN   then y += 1
     when LEFT   then x -= 1

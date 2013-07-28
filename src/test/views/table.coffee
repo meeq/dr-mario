@@ -1,5 +1,5 @@
 Cell = require '../cell'
-Mate = require '../mate'
+Direction = require '../direction'
 
 module.exports = class TableView
   constructor: (@game) ->
@@ -36,11 +36,11 @@ module.exports = class TableView
             className += ' pill'
           if Cell.isMarked cell
             className += ' marked'
-          switch Cell.getMate cell
-            when Mate.UP    then className += ' mate-up'
-            when Mate.DOWN  then className += ' mate-down'
-            when Mate.LEFT  then className += ' mate-left'
-            when Mate.RIGHT then className += ' mate-right'
+          switch Cell.getDirection cell
+            when Direction.UP    then className += ' up'
+            when Direction.DOWN  then className += ' down'
+            when Direction.LEFT  then className += ' left'
+            when Direction.RIGHT then className += ' right'
         if td.className isnt className
           td.className = className
     return

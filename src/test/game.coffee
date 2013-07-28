@@ -1,4 +1,6 @@
 Cell = require './cell'
+Direction = require './direction'
+# TODO Replace Line with Direction
 Line = require './line'
 Grid = require './grid'
 Capsule = require './capsule'
@@ -27,8 +29,7 @@ module.exports = class Game
     @height = options.height ? defaultHeight
     # Clamped number of cell colors
     @numColors = options.numColors ? defaultNumColors
-    @numColors = minNumColors if @numColors < minNumColors
-    @numColors = maxNumColors if @numColors > maxNumColors
+    @numColors = (Math.min (Math.max @numColors, minNumColors), maxNumColors)
     # Tweaks
     @lineLength = options.lineLength ? defaultLineLength
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling

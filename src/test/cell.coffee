@@ -43,13 +43,13 @@ exports.isMarked = (cell) ->
 exports.setMark = (cell) ->
   cell | markMask
 
-mateMask = 0b00111000 # 3-bit integer at offset 4
-mateShift = ((Math.log mateMask) / Math.LN2) - 2
+directionMask = 0b00111000 # 3-bit integer at offset 4
+directionShift = ((Math.log directionMask) / Math.LN2) - 2
 
-exports.getMate = (cell) ->
-  (cell & mateMask) >>> mateShift
+exports.getDirection = (cell) ->
+  (cell & directionMask) >>> directionShift
 
-exports.setMate = (cell, mate) ->
-  cell = cell & ~mateMask
-  return cell if not mate
-  cell | (mate << mateShift)
+exports.setDirection = (cell, direction) ->
+  cell = cell & ~directionMask
+  return cell if not direction
+  cell | (direction << directionShift)

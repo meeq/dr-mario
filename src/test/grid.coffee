@@ -1,6 +1,6 @@
 Cell = require './cell'
 Line = require './line'
-Mate = require './mate'
+Direction = require './direction'
 
 module.exports = class Grid
   supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
@@ -73,17 +73,17 @@ module.exports = class Grid
     else if isHorizontalLine then Line.X
     else if isVerticalLine then Line.Y
     else Line.NONE
-  isFalling: (originX, originY, checkMate = true, recurseBelow = false) ->
+  isFalling: (originX, originY, checkDirection = true, recurseBelow = false) ->
     cell = @get originX, originY
     if (originY >= @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
       false
     else if (Cell.isEmpty (@get originX, originY + 1))
-      if checkMate and (cellMate = Cell.getMate cell)
-        mateCoordinates = Mate.coordinates originX, originY, cellMate
+      if checkDirection and (direction = Cell.getDirection cell)
+        coordinates = Direction.coordinates originX, originY, direction
         # Unpack the 32-bit result into 2 16-bit integers
-        mateX = mateCoordinates >>> 16
-        mateY = mateCoordinates & 0xFFFF
-        @isFalling mateX, mateY, false
+        directionX = coordinates >>> 16
+        directionY = coordinates & 0xFFFF
+        @isFalling directionX, directionY, false
       else
         true
     else if recurseBelow # Unused, but possibly useful
@@ -101,21 +101,22 @@ module.exports = class Grid
           @clear x, y
           @set x, y + 1, cell
           totalDropped += 1
-          # If the cell has a mate, drop it too.
-          if (cellMate = Cell.getMate cell)
-            mateCoordinates = Mate.coordinates x, y, cellMate
+          # If the cell has a direction, drop it too.
+          if (direction = Cell.getDirection cell)
+            coordinates = Direction.coordinates x, y, direction
             # Unpack the 32-bit result into 2 16-bit integers
-            mateX = mateCoordinates >>> 16
-            mateY = mateCoordinates & 0xFFFF
-            mateCell = @get mateX, mateY
-            @clear mateX, mateY
-            @set mateX, mateY + 1, mateCell
+            directionX = coordinates >>> 16
+            directionY = coordinates & 0xFFFF
+            directionCell = @get directionX, directionY
+            @clear directionX, directionY
+            @set directionX, directionY + 1, directionCell
             totalDropped += 1
+            # Mark the cells if they have created lines by dropping
+            if (directionLines = @findLines directionX, directionY + 1)
+              @findLines directionX, directionY, directionLines
           # Mark the cells if they have created lines by dropping
           if (dropLines = @findLines x, y + 1)
             @findLines x, y + 1, dropLines
-          if mateCell and (mateLines = @findLines mateX, mateY + 1)
-            @findLines mateX, mateY, mateLines
     totalDropped
   clearMarked: ->
     totalMarked = 0

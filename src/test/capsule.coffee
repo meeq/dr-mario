@@ -1,11 +1,6 @@
 Cell = require './cell'
-Mate = require './mate'
+Direction = require './direction'
 Grid = require './grid'
-
-Direction =
-  LEFT: 0
-  RIGHT: 1
-  reverse: (direction) -> ~direction
 
 module.exports = class Capsule
   constructor: (game) ->
@@ -38,23 +33,24 @@ module.exports = class Capsule
           buffer.clear x, y
         else
           switch x
-            when 0          then mate = Mate.RIGHT
-            when @width - 1 then mate = Mate.LEFT
-            else                 mate = Mate.HORIZ
-          cell = Cell.setMate Cell.randomColor(), mate
+            when 0          then direction = Direction.RIGHT
+            when @width - 1 then direction = Direction.LEFT
+            else                 direction = Direction.HORIZ
+          cell = Cell.setDirection Cell.randomColor(), direction
           buffer.set x, y, cell
     return
   flip: (buffer = @frontBuffer, direction = Direction.RIGHT) ->
+    numCells = @width * @height
     switch direction
       when Direction.RIGHT
-        for x in [0...@width - 1]
-          for y in [x + 1...@width]
+        for x in [0...@numCells - 1]
+          for y in [x + 1...@numCells]
             temp = buffer.get x, y
             buffer.set x, y, buffer.get y, x
             buffer.set y, x, temp
       when Direction.LEFT
-        for x in [@width - 2..0]
-          for y in [@width - 1..x + 1]
+        for x in [@numCells - 2..0]
+          for y in [@numCells - 1..x + 1]
             temp = buffer.get x, y
             buffer.set x, y, buffer.get y, x
             buffer.set y, x, temp
