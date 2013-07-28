@@ -1,5 +1,4 @@
 Cell = require './cell'
-Line = require './line'
 Direction = require './direction'
 
 module.exports = class Grid
@@ -34,45 +33,45 @@ module.exports = class Grid
       true
   isMarked: (x, y) -> Cell.isMarked @get x, y
   mark: (x, y) -> @set x, y, (Cell.setMark @get x, y)
-  findLines: (originX, originY, markLines = Line.NONE) ->
+  checkLineDirections: (originX, originY, markDirections = Direction.NONE) ->
     cellColor = @getColor originX, originY
     return false if not cellColor or (@isFalling originX, originY)
-    (@mark originX, originY) if markLines
+    (@mark originX, originY) if markDirections
     # Horizontal Left
     testX = originX - 1
     leftMatches = 0
     while testX >= 0 and (@getColor testX, originY) is cellColor
-      (@mark testX, originY) if (Line.hasX markLines)
+      (@mark testX, originY) if (Direction.isX markDirections)
       leftMatches += 1
       testX -= 1
     # Horizontal Right
     testX = originX + 1
     rightMatches = 0
     while testX < @width and (@getColor testX, originY) is cellColor
-      (@mark testX, originY) if (Line.hasX markLines)
+      (@mark testX, originY) if (Direction.isX markDirections)
       rightMatches += 1
       testX += 1
     # Vertical Up
     testY = originY - 1
     upMatches = 0
     while testY >= 0 and (@getColor originX, testY) is cellColor
-      (@mark originX, testY) if (Line.hasY markLines)
+      (@mark originX, testY) if (Direction.isY markDirections)
       upMatches += 1
       testY -= 1
     # Vertical Down
     testY = originY + 1
     downMatches = 0
     while testY < @height and (@getColor originX, testY) is cellColor
-      (@mark originX, testY) if (Line.hasY markLines)
+      (@mark originX, testY) if (Direction.isY markDirections)
       downMatches += 1
       testY += 1
     # Determine line type(s) from directional match chains
     isHorizontalLine = 1 + leftMatches + rightMatches >= @lineLength
     isVerticalLine = 1 + upMatches + downMatches >= @lineLength
-    if isHorizontalLine and isVerticalLine then Line.XY
-    else if isHorizontalLine then Line.X
-    else if isVerticalLine then Line.Y
-    else Line.NONE
+    if isHorizontalLine and isVerticalLine then Direction.CROSS
+    else if isHorizontalLine then Direction.HORIZ
+    else if isVerticalLine then Direction.VERT
+    else Direction.NONE
   isFalling: (originX, originY, checkDirection = true, recurseBelow = false) ->
     cell = @get originX, originY
     if (originY >= @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
@@ -112,11 +111,11 @@ module.exports = class Grid
             @set directionX, directionY + 1, directionCell
             totalDropped += 1
             # Mark the cells if they have created lines by dropping
-            if (directionLines = @findLines directionX, directionY + 1)
-              @findLines directionX, directionY, directionLines
+            if (lines = @checkLineDirections directionX, directionY + 1)
+              @checkLineDirections directionX, directionY, lines
           # Mark the cells if they have created lines by dropping
-          if (dropLines = @findLines x, y + 1)
-            @findLines x, y + 1, dropLines
+          if (lines = @checkLineDirections x, y + 1)
+            @checkLineDirections x, y + 1, lines
     totalDropped
   clearMarked: ->
     totalMarked = 0

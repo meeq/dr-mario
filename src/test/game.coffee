@@ -1,7 +1,5 @@
 Cell = require './cell'
 Direction = require './direction'
-# TODO Replace Line with Direction
-Line = require './line'
 Grid = require './grid'
 Capsule = require './capsule'
 
@@ -59,14 +57,14 @@ module.exports = class Game
       y = (cellIndex / @width) | 0
       # Generate a randomly colored virus in the cell that won't create a line
       # Give up if it is impossible to fill the cell without creating a line
-      didCellCreateLines = true
+      lineDirection = Direction.CROSS
       attemptsLeft = @numColors * 2
-      while didCellCreateLines and attemptsLeft
+      while lineDirection and attemptsLeft
         randomVirus = Cell.setVirus Cell.randomColor @numColors
         @grid.set x, y, randomVirus
-        didCellCreateLines = @grid.findLines x, y
+        lineDirection = @grid.checkLineDirections x, y
         attemptsLeft -= 1
-      if didCellCreateLines
+      if lineDirection
         # Skip the cell
         @grid.clear x, y
       else

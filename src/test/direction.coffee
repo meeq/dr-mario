@@ -9,6 +9,16 @@ exports.HORIZ = HORIZ = 5
 exports.VERT  = VERT  = 6
 exports.CROSS = CROSS = 7
 
+exports.isX = (direction) ->
+  switch direction
+    when LEFT, RIGHT, HORIZ, CROSS then true
+    else false
+
+exports.isY = (direction) ->
+  switch direction
+    when UP, DOWN, VERT, CROSS then true
+    else false
+
 exports.numDirections = (direction) ->
   switch direction
     when UP, DOWN, LEFT, RIGHT then 1
