@@ -66,6 +66,28 @@ exports.reverse = (direction) ->
     when VERT   then HORIZ
     else direction
 
+exports.unset = (directions, direction) ->
+  if directions is direction then NONE
+  else
+    switch directions
+      when HORIZ
+        switch direction
+          when LEFT  then RIGHT
+          when RIGHT then LEFT
+          else directions
+      when VERT
+        switch direction
+          when UP    then DOWN
+          when DOWN  then UP
+          else directions
+      when CROSS
+        switch direction
+          when HORIZ then VERT
+          when VERT  then HORIZ
+          else directions
+      else
+        directions
+
 exports.coordinates = (x, y, direction) ->
   switch direction
     when LEFT   then x -= 1

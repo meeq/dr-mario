@@ -75,22 +75,8 @@ module.exports = class Game
   tick: ->
     @ticks += 1
     return if @ticks % @speed
-    if clearResult = @grid.clearMarked()
-      # Unpack the 32-bit result into 2 16-bit integers
-      virusesCleared = clearResult >>> 16
-      cellsCleared = clearResult & 0xFFFF
-      console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
-      @virusesLeft -= virusesCleared
-      if @virusesLeft is 0
-        console.log "You win!"
-    else if dropResult = @grid.dropFalling()
-      console.log "Dropped %d cells", dropResult
-      if markResult = @grid.markLines()
-        console.log 'Marked %d lines', markResult
-    else
-      unless @capsule.isFalling()
-        console.log "Generating new capsule"
-        @capsule.generate()
+    if @capsule.isFalling()
+      console.log "Dropping capsule"
       @capsule.drop()
       @capsule.applyInput @input
       if @capsule.isLanded()
@@ -102,4 +88,20 @@ module.exports = class Game
           @capsule.writeToGrid()
           if markResult = @grid.markLines()
             console.log 'Marked %d lines', markResult
+    else
+      if dropResult = @grid.dropFalling()
+        console.log "Dropped %d cells", dropResult
+        if markResult = @grid.markLines()
+          console.log 'Marked %d lines', markResult
+      else if clearResult = @grid.clearMarked()
+        # Unpack the 32-bit result into 2 16-bit integers
+        virusesCleared = clearResult >>> 16
+        cellsCleared = clearResult & 0xFFFF
+        console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
+        @virusesLeft -= virusesCleared
+        if @virusesLeft is 0
+          console.log "You win!"
+      else
+        console.log "Generating new capsule"
+        @capsule.generate()
     return

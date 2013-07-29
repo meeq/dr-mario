@@ -1,4 +1,5 @@
 # Cells are defined as an clamped unsigned 8-bit integer
+exports.EMPTY = EMPTY = 0
 
 colorNames = [
   'red'
@@ -15,7 +16,7 @@ exports.randomColor = (numColors) ->
   1 + (Math.random() * numColors) | 0
 
 exports.isEmpty = (cell) ->
-  cell is 0
+  cell is EMPTY
 
 colorMask = 0b00000111 # 3-bit integer at offset 0
 

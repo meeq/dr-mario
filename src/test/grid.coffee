@@ -17,9 +17,9 @@ module.exports = class Grid
   set: (x, y, value) -> @cells[x + (y * @width)] = value | 0
   clear: (x, y) ->
     if x? and y?
-      return @set x, y, 0
+      return @set x, y, Cell.EMPTY
     else
-      @cells[i] = 0 for cell, i in @cells
+      @cells[i] = Cell.EMPTY for cell, i in @cells
       return
   isClear: (x, y) ->
     if x? and y?
@@ -42,7 +42,8 @@ module.exports = class Grid
     leftMatches = 0
     while testX >= 0
       testCell = @get testX, originY
-      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
+      break if cellColor isnt Cell.getColor testCell
+      break if Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       leftMatches += 1
       testX -= 1
@@ -51,7 +52,8 @@ module.exports = class Grid
     rightMatches = 0
     while testX < @width
       testCell = @get testX, originY
-      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
+      break if cellColor isnt Cell.getColor testCell
+      break if Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       rightMatches += 1
       testX += 1
@@ -60,7 +62,8 @@ module.exports = class Grid
     upMatches = 0
     while testY >= 0
       testCell = @get testX, originY
-      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
+      break if cellColor isnt Cell.getColor testCell
+      break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       upMatches += 1
       testY -= 1
@@ -69,7 +72,8 @@ module.exports = class Grid
     downMatches = 0
     while testY < @height
       testCell = @get testX, originY
-      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
+      break if cellColor isnt Cell.getColor testCell
+      break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       downMatches += 1
       testY += 1
@@ -80,21 +84,25 @@ module.exports = class Grid
     else if isHorizontalLine then Direction.HORIZ
     else if isVerticalLine then Direction.VERT
     else Direction.NONE
-  isFalling: (originX, originY, checkDirection = true, recurseBelow = false) ->
+  isFalling: (originX, originY, checkDirection = true) ->
     cell = @get originX, originY
     if (originY >= @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
       false
     else if (Cell.isEmpty (@get originX, originY + 1))
-      if checkDirection and (direction = Cell.getDirection cell)
-        coordinates = Direction.coordinates originX, originY, direction
-        # Unpack the 32-bit result into 2 16-bit integers
-        directionX = coordinates >>> 16
-        directionY = coordinates & 0xFFFF
-        @isFalling directionX, directionY, false
+      if checkDirection and (directions = Cell.getDirection cell)
+        isFalling = true
+        for i in [0...Direction.numDirections directions]
+          direction = Direction.directionAt directions, i
+          # The cell above origin can't have an empty cell below it; skip it.
+          continue if direction is Direction.UP
+          coordinates = Direction.coordinates originX, originY, direction
+          # Unpack the 32-bit result into 2 16-bit integers
+          neighborX = coordinates >>> 16
+          neighborY = coordinates & 0xFFFF
+          isFalling = isFalling and @isFalling neighborX, neighborY, false
+        isFalling
       else
         true
-    else if recurseBelow # Unused, but possibly useful
-      @isFalling originX, originY + 1
     else
       false
   drop: (x, y) ->
@@ -111,15 +119,15 @@ module.exports = class Grid
         if @isFalling x, y
           @drop x, y
           totalDropped += 1
-          # If the cell has a direction, drop it too.
+          # If the cell has a directional neighbor, drop it too.
           if (direction = Cell.getDirection cell)
             # TODO Handle HORIZ and VERT directions (probably recursively)
             coordinates = Direction.coordinates x, y, direction
             # Unpack the 32-bit result into 2 16-bit integers
-            directionX = coordinates >>> 16
-            directionY = coordinates & 0xFFFF
-            if directionX isnt x or directionY isnt y
-              @drop directionX, directionY
+            neighborX = coordinates >>> 16
+            neighborY = coordinates & 0xFFFF
+            if neighborX isnt x or neighborY isnt y
+              @drop neighborX, neighborY
               totalDropped += 1
     totalDropped
   markLines: ->
@@ -133,17 +141,18 @@ module.exports = class Grid
     totalMarked
   reshape: (x, y) ->
     cell = @get x, y
-    directions = Cell.getDirection cell
+    newDirection = directions = Cell.getDirection cell
     for i in [0...Direction.numDirections directions]
       direction = Direction.directionAt directions, i
       coordinates = Direction.coordinates x, y, direction
       # Unpack the 32-bit result into 2 16-bit integers
-      directionX = coordinates >>> 16
-      directionY = coordinates & 0xFFFF
-      unless neighborCell = @get directionX, directionY
-        # TODO Handle HORIZ and VERT directions
-        newDirection = Direction.NONE
-    @set x, y, Cell.setDirection cell, newDirection if newDirection
+      neighborX = coordinates >>> 16
+      neighborY = coordinates & 0xFFFF
+      if not neighborCell = @get neighborX, neighborY
+        newDirection = Direction.unset newDirection, direction
+    if newDirection isnt directions
+      cell = Cell.setDirection cell, newDirection
+      @set x, y, cell
     return
   clearMarked: ->
     totalCleared = 0
@@ -156,14 +165,14 @@ module.exports = class Grid
           @clear x, y
           totalCleared += 1
           totalViruses += 1 if Cell.isVirus cell
-          # Re-shape neighbor(s)
+          # Re-shape directional neighbor(s)
           directions = Cell.getDirection cell
           for i in [0...Direction.numDirections directions]
             direction = Direction.directionAt directions, i
             coordinates = Direction.coordinates x, y, direction
             # Unpack the 32-bit result into 2 16-bit integers
-            directionX = coordinates >>> 16
-            directionY = coordinates & 0xFFFF
-            @grid.reshape directionX, directionY
+            neighborX = coordinates >>> 16
+            neighborY = coordinates & 0xFFFF
+            @grid.reshape neighborX, neighborY
     # Pack the number of viruses and cells cleared into a single 32-bit integer
     ((totalViruses & 0xFFFF) << 16) | (totalCleared & 0xFFFF)

@@ -3,11 +3,11 @@ Direction = require './direction'
 Grid = require './grid'
 
 module.exports = class Capsule
-  constructor: (game) ->
-    {@grid} = game
-    @width = @height = game.capsuleSize
-    @startX = (game.width / 2) - (@width / 2) | 0
-    @startY = -@height
+  constructor: (@game) ->
+    {@grid} = @game
+    @width = @height = @game.capsuleSize
+    @x = @startX = (@game.width / 2) - (@width / 2) | 0
+    @y = @startY = -@height
     @fallingBuffer = new Grid @
     @nextBuffer = new Grid @
     return
@@ -15,6 +15,7 @@ module.exports = class Capsule
     not @fallingBuffer.isClear()
   isLanded: ->
   isOutsideGrid: ->
+    @y >= (-@height + 1)
   generate: ->
     @x = @startX
     @y = @startY
@@ -24,6 +25,13 @@ module.exports = class Capsule
       @copy @nextBuffer, @fallingBuffer
     @random @nextBuffer
     return
+  get: (x, y) ->
+    isInX = x >= @x and x < (@x + @width)
+    isInY = y >= @y and y < (@y + @height)
+    if isInX and isInY
+      @fallingBuffer.get x - @x, y - @y
+    else
+      Cell.EMPTY
   drop: ->
   applyInput: (input) ->
   writeToGrid: ->
@@ -35,6 +43,7 @@ module.exports = class Capsule
           dest.set destOffsetX + x, destOffsetY + y, cell
     return
   random: (buffer = @nextBuffer) ->
+    numColors = @game.numColors
     for x in [0...@width]
       for y in [0...@height]
         # Clear everything except the bottom row
@@ -46,7 +55,7 @@ module.exports = class Capsule
             when 0          then direction = Direction.RIGHT
             when @width - 1 then direction = Direction.LEFT
             else                 direction = Direction.HORIZ
-          cell = Cell.setDirection Cell.randomColor(), direction
+          cell = Cell.setDirection (Cell.randomColor numColors), direction
           buffer.set x, y, cell
     return
   flip: (buffer = @fallingBuffer, direction = Direction.RIGHT) ->

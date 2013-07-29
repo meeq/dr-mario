@@ -1,6 +1,24 @@
 Cell = require '../cell'
 Direction = require '../direction'
 
+getCellClassName = (cell) ->
+  if Cell.isEmpty cell
+    className = 'empty'
+  else
+    className = Cell.getColorName cell
+    if Cell.isVirus cell
+      className += ' virus'
+    else
+      className += ' pill'
+    if Cell.isMarked cell
+      className += ' marked'
+    switch Cell.getDirection cell
+      when Direction.UP    then className += ' up'
+      when Direction.DOWN  then className += ' down'
+      when Direction.LEFT  then className += ' left'
+      when Direction.RIGHT then className += ' right'
+  className
+
 module.exports = class TableView
   constructor: (@game) ->
     return
@@ -27,20 +45,8 @@ module.exports = class TableView
       for td, x in tr.childNodes
         cell = @game.grid.get x, y
         if Cell.isEmpty cell
-          className = 'empty'
-        else
-          className = Cell.getColorName cell
-          if Cell.isVirus cell
-            className += ' virus'
-          else
-            className += ' pill'
-          if Cell.isMarked cell
-            className += ' marked'
-          switch Cell.getDirection cell
-            when Direction.UP    then className += ' up'
-            when Direction.DOWN  then className += ' down'
-            when Direction.LEFT  then className += ' left'
-            when Direction.RIGHT then className += ' right'
+          cell = @game.capsule.get x, y
+        className = getCellClassName cell
         if td.className isnt className
           td.className = className
     return
