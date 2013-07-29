@@ -61,7 +61,7 @@ module.exports = class Grid
     testY = originY - 1
     upMatches = 0
     while testY >= 0
-      testCell = @get testX, originY
+      testCell = @get originX, testY
       break if cellColor isnt Cell.getColor testCell
       break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
@@ -71,7 +71,7 @@ module.exports = class Grid
     testY = originY + 1
     downMatches = 0
     while testY < @height
-      testCell = @get testX, originY
+      testCell = @get originX, testY
       break if cellColor isnt Cell.getColor testCell
       break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
@@ -117,6 +117,7 @@ module.exports = class Grid
       # Skip the bottom row, since it can never have falling cells
       for y in [@height - 2..0]
         if @isFalling x, y
+          cell = @get x, y
           @drop x, y
           totalDropped += 1
           # If the cell has a directional neighbor, drop it too.
@@ -173,6 +174,6 @@ module.exports = class Grid
             # Unpack the 32-bit result into 2 16-bit integers
             neighborX = coordinates >>> 16
             neighborY = coordinates & 0xFFFF
-            @grid.reshape neighborX, neighborY
+            @reshape neighborX, neighborY
     # Pack the number of viruses and cells cleared into a single 32-bit integer
     ((totalViruses & 0xFFFF) << 16) | (totalCleared & 0xFFFF)

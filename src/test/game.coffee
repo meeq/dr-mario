@@ -40,6 +40,7 @@ module.exports = class Game
   resetToLevel: (level) ->
     @grid = new Grid @
     @capsule = new Capsule @
+    @isGameOver = false
     # Create an index of available cells for viruses
     yCeiling = @height - level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
@@ -74,7 +75,7 @@ module.exports = class Game
     return
   tick: ->
     @ticks += 1
-    return if @ticks % @speed
+    return if @isGameOver or @ticks % @speed
     if @capsule.isFalling()
       console.log "Dropping capsule"
       @capsule.drop()
@@ -83,6 +84,7 @@ module.exports = class Game
         console.log "Capsule landed"
         if @capsule.isOutsideGrid()
           console.log "Game over!"
+          @isGameOver = true
         else
           console.log "Writing capsule to grid"
           @capsule.writeToGrid()
@@ -101,6 +103,7 @@ module.exports = class Game
         @virusesLeft -= virusesCleared
         if @virusesLeft is 0
           console.log "You win!"
+          @isGameOver = true
       else
         console.log "Generating new capsule"
         @capsule.generate()

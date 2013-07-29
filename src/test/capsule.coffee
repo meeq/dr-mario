@@ -11,11 +11,6 @@ module.exports = class Capsule
     @fallingBuffer = new Grid @
     @nextBuffer = new Grid @
     return
-  isFalling: ->
-    not @fallingBuffer.isClear()
-  isLanded: ->
-  isOutsideGrid: ->
-    @y >= (-@height + 1)
   generate: ->
     @x = @startX
     @y = @startY
@@ -32,9 +27,25 @@ module.exports = class Capsule
       @fallingBuffer.get x - @x, y - @y
     else
       Cell.EMPTY
+  isFalling: ->
+    not @fallingBuffer.isClear()
+  isLanded: ->
+    if @y >= @game.height - 1
+      true
+    else
+      @checkCollision @x, @y + 1
+  isOutsideGrid: ->
+    @y < (-@height + 1)
   drop: ->
+    @y += 1 if not @isLanded()
+    return
   applyInput: (input) ->
+    # TODO
+    return
   writeToGrid: ->
+    @copy @fallingBuffer, @grid, @x, @y
+    @fallingBuffer.clear()
+    return
   copy: (source, dest, destOffsetX = 0, destOffsetY = 0, copyEmpty = false) ->
     for x in [0...@width]
       for y in [0...@height]
@@ -68,6 +79,7 @@ module.exports = class Capsule
             temp = buffer.get x, y
             buffer.set x, y, buffer.get y, x
             buffer.set y, x, temp
+        # TODO Rotate the directions of the cells
       when Direction.LEFT
         # Rotate the square 1-dimensional array counter-clockwise
         for x in [numCells - 2..0]
@@ -75,6 +87,7 @@ module.exports = class Capsule
             temp = buffer.get x, y
             buffer.set x, y, buffer.get y, x
             buffer.set y, x, temp
+        # TODO Rotate the directions of the cells
     return
   checkCollision: (originX = @x, originY = @y) ->
     for x in [0...@width]
@@ -82,5 +95,5 @@ module.exports = class Capsule
         capsuleCell = @fallingBuffer.get x, y
         continue if Cell.isEmpty capsuleCell
         gridCell = @grid.get originX + x, originY + y
-        return false unless Cell.isEmpty gridCell
-    return true
+        return true unless Cell.isEmpty gridCell
+    return false
