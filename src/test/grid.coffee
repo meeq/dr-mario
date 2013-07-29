@@ -14,7 +14,6 @@ module.exports = class Grid
       @cells.length = numCells
     return
   get: (x, y) -> @cells[x + (y * @width)] | 0
-  getColor: (x, y) -> Cell.getColor (@get x, y)
   set: (x, y, value) -> @cells[x + (y * @width)] = value | 0
   clear: (x, y) ->
     if x? and y?
@@ -31,37 +30,46 @@ module.exports = class Grid
         for y in [@height - 1..0]
           return false if not Cell.isEmpty @get x, y
       true
-  isMarked: (x, y) -> Cell.isMarked @get x, y
   mark: (x, y) -> @set x, y, (Cell.setMark @get x, y)
   checkLineDirections: (originX, originY, markDirections = Direction.NONE) ->
-    cellColor = @getColor originX, originY
-    return false if not cellColor or (@isFalling originX, originY)
+    cell = @get originX, originY
+    cellColor = Cell.getColor cell
+    if not cellColor or (@isFalling originX, originY) or Cell.isMarked cell
+      return false
     (@mark originX, originY) if markDirections
     # Horizontal Left
     testX = originX - 1
     leftMatches = 0
-    while testX >= 0 and (@getColor testX, originY) is cellColor
+    while testX >= 0
+      testCell = @get testX, originY
+      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       leftMatches += 1
       testX -= 1
     # Horizontal Right
     testX = originX + 1
     rightMatches = 0
-    while testX < @width and (@getColor testX, originY) is cellColor
+    while testX < @width
+      testCell = @get testX, originY
+      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       rightMatches += 1
       testX += 1
     # Vertical Up
     testY = originY - 1
     upMatches = 0
-    while testY >= 0 and (@getColor originX, testY) is cellColor
+    while testY >= 0
+      testCell = @get testX, originY
+      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       upMatches += 1
       testY -= 1
     # Vertical Down
     testY = originY + 1
     downMatches = 0
-    while testY < @height and (@getColor originX, testY) is cellColor
+    while testY < @height
+      testCell = @get testX, originY
+      break if (Cell.getColor testCell) isnt cellColor or Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       downMatches += 1
       testY += 1
@@ -89,6 +97,11 @@ module.exports = class Grid
       @isFalling originX, originY + 1
     else
       false
+  drop: (x, y) ->
+    cell = @get x, y
+    @clear x, y
+    @set x, y + 1, cell
+    return
   dropFalling: ->
     totalDropped = 0
     # Walk through the grid left-to-right, bottom-up
@@ -96,37 +109,61 @@ module.exports = class Grid
       # Skip the bottom row, since it can never have falling cells
       for y in [@height - 2..0]
         if @isFalling x, y
-          cell = @get x, y
-          @clear x, y
-          @set x, y + 1, cell
+          @drop x, y
           totalDropped += 1
           # If the cell has a direction, drop it too.
           if (direction = Cell.getDirection cell)
+            # TODO Handle HORIZ and VERT directions (probably recursively)
             coordinates = Direction.coordinates x, y, direction
             # Unpack the 32-bit result into 2 16-bit integers
             directionX = coordinates >>> 16
             directionY = coordinates & 0xFFFF
-            directionCell = @get directionX, directionY
-            @clear directionX, directionY
-            @set directionX, directionY + 1, directionCell
-            totalDropped += 1
-            # Mark the cells if they have created lines by dropping
-            if (lines = @checkLineDirections directionX, directionY + 1)
-              @checkLineDirections directionX, directionY, lines
-          # Mark the cells if they have created lines by dropping
-          if (lines = @checkLineDirections x, y + 1)
-            @checkLineDirections x, y + 1, lines
+            if directionX isnt x or directionY isnt y
+              @drop directionX, directionY
+              totalDropped += 1
     totalDropped
-  clearMarked: ->
+  markLines: ->
     totalMarked = 0
+    # Walk through through the grid left-to-right, top-down
+    for x in [0...@width]
+      for y in [0...@height]
+        if (lines = @checkLineDirections x, y)
+          @checkLineDirections x, y, lines
+          totalMarked += Direction.numLines lines
+    totalMarked
+  reshape: (x, y) ->
+    cell = @get x, y
+    directions = Cell.getDirection cell
+    for i in [0...Direction.numDirections directions]
+      direction = Direction.directionAt directions, i
+      coordinates = Direction.coordinates x, y, direction
+      # Unpack the 32-bit result into 2 16-bit integers
+      directionX = coordinates >>> 16
+      directionY = coordinates & 0xFFFF
+      unless neighborCell = @get directionX, directionY
+        # TODO Handle HORIZ and VERT directions
+        newDirection = Direction.NONE
+    @set x, y, Cell.setDirection cell, newDirection if newDirection
+    return
+  clearMarked: ->
+    totalCleared = 0
     totalViruses = 0
     # Walk through through the grid left-to-right, top-down
     for x in [0...@width]
       for y in [0...@height]
         cell = @get x, y
         if Cell.isMarked cell
-          totalMarked += 1
-          totalViruses += 1 if Cell.isVirus cell
           @clear x, y
+          totalCleared += 1
+          totalViruses += 1 if Cell.isVirus cell
+          # Re-shape neighbor(s)
+          directions = Cell.getDirection cell
+          for i in [0...Direction.numDirections directions]
+            direction = Direction.directionAt directions, i
+            coordinates = Direction.coordinates x, y, direction
+            # Unpack the 32-bit result into 2 16-bit integers
+            directionX = coordinates >>> 16
+            directionY = coordinates & 0xFFFF
+            @grid.reshape directionX, directionY
     # Pack the number of viruses and cells cleared into a single 32-bit integer
-    ((totalViruses & 0xFFFF) << 16) | (totalMarked & 0xFFFF)
+    ((totalViruses & 0xFFFF) << 16) | (totalCleared & 0xFFFF)

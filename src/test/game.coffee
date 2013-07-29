@@ -10,6 +10,7 @@ defaultLevel = 10
 defaultNumColors = 3
 minNumColors = 1
 maxNumColors = 7
+defaultCapsuleSize = 2
 defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultLevelVirusMultiplier = 4
@@ -30,6 +31,7 @@ module.exports = class Game
     @numColors = (Math.min (Math.max @numColors, minNumColors), maxNumColors)
     # Tweaks
     @lineLength = options.lineLength ? defaultLineLength
+    @capsuleSize = options.capsuleSize ? defaultCapsuleSize
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
     @levelVirusMultiplier =
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
@@ -78,20 +80,26 @@ module.exports = class Game
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
       console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
-      # TODO Check virusesLeft, win state
+      @virusesLeft -= virusesCleared
+      if @virusesLeft is 0
+        console.log "You win!"
     else if dropResult = @grid.dropFalling()
       console.log "Dropped %d cells", dropResult
-    # else
-      # Is there a falling capsule?
-        # No
-          # Is there space to generate a new capsule?
-            # Yes - Generate new capsule
-            # No - Game over, lose state
-        # Yes - Drop capsule
-      # If input, try to rotate/move capsule
-      # Is capsule stacked or landed?
-        # Write capsule to grid
-        # Clear capsule
-        # If capsule write created lines
-          # Mark line cells
+      if markResult = @grid.markLines()
+        console.log 'Marked %d lines', markResult
+    else
+      unless @capsule.isFalling()
+        console.log "Generating new capsule"
+        @capsule.generate()
+      @capsule.drop()
+      @capsule.applyInput @input
+      if @capsule.isLanded()
+        console.log "Capsule landed"
+        if @capsule.isOutsideGrid()
+          console.log "Game over!"
+        else
+          console.log "Writing capsule to grid"
+          @capsule.writeToGrid()
+          if markResult = @grid.markLines()
+            console.log 'Marked %d lines', markResult
     return

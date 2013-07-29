@@ -25,7 +25,7 @@ exports.getColor = getColor = (cell) ->
 exports.getColorName = (cell) ->
   colorNames[(getColor cell) - 1]
 
-virusMask = 0b10000000 # 1-bit flag at offset 7
+virusMask = 0b10000000 # 1-bit flag at offset 8
 virusShift = Math.log(virusMask) / Math.LN2
 
 exports.isVirus = (cell) ->
@@ -34,7 +34,7 @@ exports.isVirus = (cell) ->
 exports.setVirus = (cell) ->
   cell | virusMask
 
-markMask = 0b01000000 # 1-bit flag at offset 6
+markMask = 0b01000000 # 1-bit flag at offset 7
 markShift = Math.log(markMask) / Math.LN2
 
 exports.isMarked = (cell) ->

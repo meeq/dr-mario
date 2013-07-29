@@ -19,6 +19,12 @@ exports.isY = (direction) ->
     when UP, DOWN, VERT, CROSS then true
     else false
 
+exports.numLines = (direction) ->
+  switch direction
+    when HORIZ, VERT then 1
+    when CROSS then 2
+    else 0
+
 exports.numDirections = (direction) ->
   switch direction
     when UP, DOWN, LEFT, RIGHT then 1
@@ -50,11 +56,21 @@ exports.directionAt = (direction, num) ->
         else NONE
     else NONE
 
+exports.reverse = (direction) ->
+  switch direction
+    when LEFT   then RIGHT
+    when RIGHT  then LEFT
+    when UP     then DOWN
+    when DOWN   then UP
+    when HORIZ  then VERT
+    when VERT   then HORIZ
+    else direction
+
 exports.coordinates = (x, y, direction) ->
   switch direction
-    when UP     then y -= 1
-    when DOWN   then y += 1
     when LEFT   then x -= 1
     when RIGHT  then x += 1
+    when UP     then y -= 1
+    when DOWN   then y += 1
   # Pack the X and Y coordinates into a single 32-bit integer
   ((x & 0xFFFF) << 16) | (y & 0xFFFF)
