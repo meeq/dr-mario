@@ -1,5 +1,6 @@
 Game = require './game'
 TableView = require './views/table'
+Timer = require './timer'
 
 module.exports = class TestApp
   start: ->
@@ -7,23 +8,35 @@ module.exports = class TestApp
     @view = new TableView @game
     wrapper = document.getElementById 'wrap'
     wrapper.appendChild @view.render()
+    frameRate = 1000 / @desiredFramesPerSecond
+    @renderRef = Timer.start @renderType, @render, frameRate
     return
-  desiredFps: 10
-  clockRef: null
   paused: true
+  desiredTicksPerSecond: 20
+  clockType: Timer.INTERVAL # REQUEST_FRAME not suggested for clock ticks
+  clockRef: null
+  desiredFramesPerSecond: 20
+  renderType: Timer.REQUEST_FRAME
+  renderRef: null
   unpause: ->
     @paused = false
-    clockRate = 1000 / @desiredFps
-    @clockRef = setTimeout @tick, clockRate
+    clockRate = 1000 / @desiredTicksPerSecond
+    @clockRef = Timer.start @clockType, @tick, clockRate
     return
   pause: ->
     @paused = true
-    if @clockRef?
-      clearTimeout @clockRef
-      @clockRef = null
+    Timer.stop @clockType, @clockRef if @clockRef?
+    @clockRef = null
     return
   tick: =>
+    return if @paused
     @game.tick()
-    @view.tick()
-    @unpause() unless @paused
+    unless Timer.isRepeating @clockType
+      clockRate = 1000 / @desiredTicksPerSecond
+      @clockRef = Timer.start @clockType, @tick, clockRate
     return
+  render: =>
+    @view.update()
+    unless Timer.isRepeating @clockType
+      frameRate = 1000 / @desiredFramesPerSecond
+      @renderRef = Timer.start @renderType, @render, frameRate

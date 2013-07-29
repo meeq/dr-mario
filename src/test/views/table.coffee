@@ -32,7 +32,7 @@ module.exports = class TableView
         td.appendChild text
         tr.appendChild td
       @el.appendChild tr
-    @tick()
+    @update()
     @el
   destroy: ->
     if @el?
@@ -40,7 +40,7 @@ module.exports = class TableView
         @el.parentNode.removeChild @el
       @el = null
     return
-  tick: ->
+  update: ->
     for tr, y in @el.childNodes
       for td, x in tr.childNodes
         cell = @game.grid.get x, y
