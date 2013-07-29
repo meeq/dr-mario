@@ -1,5 +1,5 @@
-Cell = require '../cell'
-Direction = require '../direction'
+Cell = require '../models/cell'
+Direction = require '../models/direction'
 
 getCellClassName = (cell) ->
   if Cell.isEmpty cell
@@ -28,8 +28,7 @@ module.exports = class TableView
       tr = document.createElement 'tr'
       for x in [0...@game.width]
         td = document.createElement 'td'
-        text = document.createTextNode "#{x}, #{y}"
-        td.appendChild text
+        td.title = "#{x}, #{y}"
         tr.appendChild td
       @el.appendChild tr
     @update()
