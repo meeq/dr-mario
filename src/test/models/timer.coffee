@@ -26,12 +26,21 @@ exports.isRepeating = (method) ->
 
 exports.start = (method, callback, interval) ->
   switch method
-    when TIMEOUT        then setTimeout callback, interval
-    when INTERVAL       then setInterval callback, interval
-    when REQUEST_FRAME  then requestAnimationFrame callback
+    when TIMEOUT
+      setTimeout callback, interval
+    when INTERVAL
+      setInterval callback, interval
+    when REQUEST_FRAME
+      if requestAnimationFrame? then requestAnimationFrame callback
+      else setTimeout callback, interval
 
 exports.stop = (method, ref) ->
   switch method
-    when TIMEOUT        then clearTimeout ref
-    when INTERVAL       then clearInterval ref
-    when REQUEST_FRAME  then clearAnimationFrame ref
+    when TIMEOUT
+      clearTimeout ref
+    when INTERVAL
+      clearInterval ref
+    when REQUEST_FRAME
+      if cancelAnimationFrame? then cancelAnimationFrame ref
+      else clearTimeout ref
+  return

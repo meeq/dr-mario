@@ -3,44 +3,43 @@ Game = require './models/game'
 TableView = require './views/table'
 
 module.exports = class TestApp
+  paused: true
+  lastTick: null
+  tickRate: 1000 / 20 # 50 ms/tick
+  tickEpsilon: 1000 # 1 second
+  clockType: Timer.INTERVAL
+  clockRef: null
   start: ->
     @game = new Game
     @view = new TableView @game
     wrapper = document.getElementById 'wrap'
     wrapper.appendChild @view.render()
-    @startRendering()
     return
-  desiredFramesPerSecond: 20
-  renderType: Timer.REQUEST_FRAME
-  renderRef: null
-  startRendering: ->
-    frameRate = 1000 / @desiredFramesPerSecond
-    @renderRef = Timer.start @renderType, @render, frameRate
+  stop: ->
+    @pause()
+    delete @game
+    @view.destroy() if @view?
+    delete @view
     return
-  stopRendering: ->
-    Timer.stop @renderType, @renderRef if @renderRef?
-    @renderRef = null
-    return
-  render: =>
-    @view.update()
-    @startRendering() unless Timer.isRepeating @renderType
-    return
-  paused: true
-  desiredTicksPerSecond: 20
-  clockType: Timer.INTERVAL # REQUEST_FRAME not suggested for clock ticks
-  clockRef: null
   unpause: ->
     @paused = false
-    clockRate = 1000 / @desiredTicksPerSecond
-    @clockRef = Timer.start @clockType, @tick, clockRate
+    @lastTick = +new Date unless @lastTick?
+    @clockRef = Timer.start @clockType, @loop, @tickRate
     return
   pause: ->
     @paused = true
+    @lastTick = null
     Timer.stop @clockType, @clockRef if @clockRef?
     @clockRef = null
     return
-  tick: =>
+  loop: =>
     return if @paused
-    @game.tick()
+    now = +new Date
+    delta = now - @lastTick
+    if delta < @tickEpsilon
+      numTicks = delta / @tickRate | 0
+      @game.tick() for i in [0...numTicks]
+    @view.update()
+    @lastTick = now if numTicks? and numTicks > 0
     @unpause() unless Timer.isRepeating @clockType
     return
