@@ -59,7 +59,6 @@ module.exports = class Game
       x = (cellIndex % @width)
       y = (cellIndex / @width) | 0
       # Generate a randomly colored virus in the cell that won't create a line
-      # Give up if it is impossible to fill the cell without creating a line
       lineDirection = Direction.CROSS
       attemptsLeft = @numColors * 2
       while lineDirection and attemptsLeft
@@ -67,8 +66,8 @@ module.exports = class Game
         @grid.set x, y, randomVirus
         lineDirection = @grid.checkLineDirections x, y
         attemptsLeft -= 1
+      # Give up if it is impossible to fill the cell without creating a line
       if lineDirection
-        # Skip the cell
         @grid.clear x, y
       else
         @virusesLeft += 1

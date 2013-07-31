@@ -1,30 +1,36 @@
 Timer = require './models/timer'
-Player = require './models/player'
-
-COMMAND_KEYCODE = 91
+Player = require './player'
 
 module.exports = class TestApp
+  el: document.getElementById 'wrap'
   paused: true
   lastTick: null
   tickRate: 1000 / 20 # 50 ms/tick
   tickEpsilon: 2 # Max ticks per loop
   clockType: Timer.REQUEST_FRAME
   clockRef: null
-  eventListenerTypes: ['keydown', 'keyup']
+  eventListenerHandlers:
+    'keydown': 'handleKeyDown'
+    'keyup': 'handleKeyUp'
   start: ->
-    @players = [new Player 1]
-    wrapper = document.getElementById 'wrap'
+    @players = [(new Player 1)]
     for player in @players
-      wrapper.appendChild player.view.render()
-    for eventType in @eventListenerTypes
+      @el.appendChild player.view.render()
+    for eventType, handler of @eventListenerHandlers
       window.addEventListener eventType, @handleEvent, false
     return
   stop: ->
     @pause()
-    player.destroy() for player in @players
+    for player in @players
+      player.destroy()
     @players.length = 0
-    for eventType in @eventListenerTypes
+    for eventType, handler of @eventListenerHandlers
       window.removeEventListener eventType, @handleEvent, false
+    return
+  restart: ->
+    @stop()
+    @start()
+    @unpause()
     return
   unpause: ->
     @paused = false
@@ -51,17 +57,16 @@ module.exports = class TestApp
   handleEvent: (event) =>
     return if event.metaKey # Gotta preserve the important browser hotkeys.
     isEventHandled = false
-    eventTypeHandlerKey = null
-    switch event.type
-      when 'keydown'
-        eventTypeHandlerKey = 'handleKeyDown'
-      when 'keyup'
-        eventTypeHandlerKey = 'handleKeyUp'
-    if eventTypeHandlerKey?
+    if eventTypeHandlerKey = @eventListenerHandlers[event.type]
+      console.log eventTypeHandlerKey, event.which
       isEventHandled = @[eventTypeHandlerKey]?(event) ? false
       for player in @players when not isEventHandled
         isEventHandled = player[eventTypeHandlerKey]?(event) ? false
-      event.preventDefault() if isEventHandled
+      if isEventHandled
+        event.preventDefault()
+        return false
     return
   handleKeyDown: (event) ->
+    # TODO
   handleKeyUp: (event) ->
+    # TODO

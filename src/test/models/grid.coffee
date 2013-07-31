@@ -13,8 +13,10 @@ module.exports = class Grid
       @cells = []
       @cells.length = numCells
     return
-  get: (x, y) -> @cells[x + (y * @width)] | 0
-  set: (x, y, value) -> @cells[x + (y * @width)] = value | 0
+  get: (x, y) ->
+    @cells[x + (y * @width)] | 0
+  set: (x, y, value) ->
+    @cells[x + (y * @width)] = value | 0
   clear: (x, y) ->
     if x? and y?
       return @set x, y, Cell.EMPTY
@@ -144,6 +146,7 @@ module.exports = class Grid
     cell = @get x, y
     newDirection = directions = Cell.getDirection cell
     for i in [0...Direction.numDirections directions]
+      # TODO Handle long HORIZ and VERT directions (probably recursively)
       direction = Direction.directionAt directions, i
       coordinates = Direction.coordinates x, y, direction
       # Unpack the 32-bit result into 2 16-bit integers
