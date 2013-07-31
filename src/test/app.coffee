@@ -1,25 +1,30 @@
 Timer = require './models/timer'
-Game = require './models/game'
-TableView = require './views/table'
+Player = require './models/player'
+
+COMMAND_KEYCODE = 91
 
 module.exports = class TestApp
   paused: true
   lastTick: null
   tickRate: 1000 / 20 # 50 ms/tick
-  tickEpsilon: 1000 # 1 second
-  clockType: Timer.INTERVAL
+  tickEpsilon: 2 # Max ticks per loop
+  clockType: Timer.REQUEST_FRAME
   clockRef: null
+  eventListenerTypes: ['keydown', 'keyup']
   start: ->
-    @game = new Game
-    @view = new TableView @game
+    @players = [new Player 1]
     wrapper = document.getElementById 'wrap'
-    wrapper.appendChild @view.render()
+    for player in @players
+      wrapper.appendChild player.view.render()
+    for eventType in @eventListenerTypes
+      window.addEventListener eventType, @handleEvent, false
     return
   stop: ->
     @pause()
-    delete @game
-    @view.destroy() if @view?
-    delete @view
+    player.destroy() for player in @players
+    @players.length = 0
+    for eventType in @eventListenerTypes
+      window.removeEventListener eventType, @handleEvent, false
     return
   unpause: ->
     @paused = false
@@ -35,11 +40,28 @@ module.exports = class TestApp
   loop: =>
     return if @paused
     now = +new Date
-    delta = now - @lastTick
-    if delta < @tickEpsilon
-      numTicks = delta / @tickRate | 0
-      @game.tick() for i in [0...numTicks]
-    @view.update()
-    @lastTick = now if numTicks? and numTicks > 0
+    deltaTicks = (now - @lastTick) / @tickRate | 0
+    if deltaTicks and deltaTicks <= @tickEpsilon
+      for tick in [0...deltaTicks]
+        for player in @players
+          player.tick()
+      @lastTick = now
     @unpause() unless Timer.isRepeating @clockType
     return
+  handleEvent: (event) =>
+    return if event.metaKey # Gotta preserve the important browser hotkeys.
+    isEventHandled = false
+    eventTypeHandlerKey = null
+    switch event.type
+      when 'keydown'
+        eventTypeHandlerKey = 'handleKeyDown'
+      when 'keyup'
+        eventTypeHandlerKey = 'handleKeyUp'
+    if eventTypeHandlerKey?
+      isEventHandled = @[eventTypeHandlerKey]?(event) ? false
+      for player in @players when not isEventHandled
+        isEventHandled = player[eventTypeHandlerKey]?(event) ? false
+      event.preventDefault() if isEventHandled
+    return
+  handleKeyDown: (event) ->
+  handleKeyUp: (event) ->

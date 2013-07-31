@@ -22,6 +22,7 @@ module.exports = class Game
   constructor: (options = {}) ->
     # Timing
     @ticks = 0
+    @level = options.level ? defaultLevel
     @speed = options.speed ? defaultSpeed
     # Dimensions
     @width = options.width ? defaultWidth
@@ -35,21 +36,20 @@ module.exports = class Game
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
     @levelVirusMultiplier =
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
-    # Create the grid
-    @resetToLevel options.level ? defaultLevel
-  resetToLevel: (level) ->
+  reset: (level) ->
+    @level = level ? @level ? defaultLevel
     @grid = new Grid @
     @capsule = new Capsule @
     @isGameOver = false
     # Create an index of available cells for viruses
-    yCeiling = @height - level
+    yCeiling = @height - @level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
     topLeftOpenIndex = (yCeiling * @width)
     bottomRightOpenIndex = @width + ((@height - 1) * @width)
     openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
     # Randomly generate viruses on grid
     @virusesLeft = 0
-    levelViruses = (@levelVirusMultiplier * level) + @levelVirusMultiplier
+    levelViruses = (@levelVirusMultiplier * @level) + @levelVirusMultiplier
     while @virusesLeft < levelViruses and openCellIndexes.length
       # Get a random cell and remove it from the available cell list
       randomOpenIndex = randomInRange 0, openCellIndexes.length
@@ -73,13 +73,13 @@ module.exports = class Game
       else
         @virusesLeft += 1
     return
-  tick: ->
+  tick: (input) ->
     @ticks += 1
-    return if @isGameOver or @ticks % @speed
+    return false if @isGameOver or @ticks % @speed
     if @capsule.isFalling()
       console.log "Dropping capsule"
       @capsule.drop()
-      @capsule.applyInput @input
+      @capsule.applyInput input
       if @capsule.isLanded()
         console.log "Capsule landed"
         if @capsule.isOutsideGrid()
@@ -107,4 +107,4 @@ module.exports = class Game
       else
         console.log "Generating new capsule"
         @capsule.generate()
-    return
+    return true

@@ -2,6 +2,7 @@ Cell = require '../models/cell'
 Direction = require '../models/direction'
 
 getCellClassName = (cell) ->
+  return 'empty' unless cell?
   if Cell.isEmpty cell
     className = 'empty'
   else
@@ -42,9 +43,9 @@ module.exports = class TableView
   update: ->
     for tr, y in @el.childNodes
       for td, x in tr.childNodes
-        cell = @game.grid.get x, y
+        cell = @game.grid?.get x, y
         if Cell.isEmpty cell
-          cell = @game.capsule.get x, y
+          cell = @game.capsule?.get x, y
         className = getCellClassName cell
         if td.className isnt className
           td.className = className
