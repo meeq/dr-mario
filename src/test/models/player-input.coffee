@@ -16,6 +16,9 @@ exports.HOLD_ACTIONS =
 exports.TICK_ACTIONS =
   INSTANT_DROP | HOLD_NEXT | FLIP_ATTACK
 
+exports.isNone = (input) ->
+  input is NONE
+
 exports.get = get = (input, actionMask) ->
   # Calculating shifts is irrelevant; we just need a flag
   if input & (actionMask | 0) then 1 else 0

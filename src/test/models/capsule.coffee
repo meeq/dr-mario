@@ -1,6 +1,7 @@
 Cell = require './cell'
 Direction = require './direction'
 Grid = require './grid'
+PlayerInput = require './player-input'
 
 module.exports = class Capsule
   constructor: (@game) ->
@@ -40,7 +41,19 @@ module.exports = class Capsule
     @y += 1 if not @isLanded()
     return
   applyInput: (input) ->
-    # TODO
+    return if PlayerInput.isNone input
+    if PlayerInput.get input, PlayerInput.MOVE_LEFT
+      @move @fallingBuffer, Direction.LEFT
+    if PlayerInput.get input, PlayerInput.MOVE_RIGHT
+      @move @fallingBuffer, Direction.RIGHT
+    if PlayerInput.get input, PlayerInput.FLIP_LEFT
+      @flip @fallingBuffer, Direction.LEFT
+    if PlayerInput.get input, PlayerInput.FLIP_RIGHT
+      @flip @fallingBuffer, Direction.RIGHT
+    if PlayerInput.get input, PlayerInput.FAST_DROP
+      @drop()
+    if PlayerInput.get input, PlayerInput.INSTANT_DROP
+      @drop() while not @isLanded()
     return
   writeToGrid: ->
     @copy @fallingBuffer, @grid, @x, @y
@@ -69,25 +82,34 @@ module.exports = class Capsule
           cell = Cell.setDirection (Cell.randomColor numColors), direction
           buffer.set x, y, cell
     return
-  flip: (buffer = @fallingBuffer, direction = Direction.RIGHT) ->
+  move: (buffer, direction) ->
+    # TODO
+  flip: (buffer, direction) ->
+    # TODO
     numCells = @width * @height
     switch direction
       when Direction.RIGHT
         # Rotate the square 1-dimensional array clockwise
         for x in [0...numCells - 1]
           for y in [x + 1...numCells]
-            temp = buffer.get x, y
+            cell = buffer.get x, y
             buffer.set x, y, buffer.get y, x
-            buffer.set y, x, temp
-        # TODO Rotate the directions of the cells
+            buffer.set y, x, cell
       when Direction.LEFT
         # Rotate the square 1-dimensional array counter-clockwise
         for x in [numCells - 2..0]
           for y in [numCells - 1..x + 1]
-            temp = buffer.get x, y
+            cell = buffer.get x, y
             buffer.set x, y, buffer.get y, x
-            buffer.set y, x, temp
-        # TODO Rotate the directions of the cells
+            buffer.set y, x, cell
+    # Rotate the directions of the cells
+    for x in [0...@width]
+      for y in [0...@height]
+        cell = buffer.get x, y
+        cellDirection = Cell.getDirection cell
+        rotatedDirection = Direction.rotate cellDirection, direction
+        cell = Cell.setDirection rotatedDirection
+        buffer.set x, y, cell
     return
   checkCollision: (originX = @x, originY = @y) ->
     for x in [0...@width]

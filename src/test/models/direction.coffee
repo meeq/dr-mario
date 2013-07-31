@@ -56,7 +56,7 @@ exports.directionAt = (direction, num) ->
         else NONE
     else NONE
 
-exports.reverse = (direction) ->
+exports.reverse = reverse = (direction) ->
   switch direction
     when LEFT   then RIGHT
     when RIGHT  then LEFT
@@ -64,6 +64,30 @@ exports.reverse = (direction) ->
     when DOWN   then UP
     when HORIZ  then VERT
     when VERT   then HORIZ
+    else direction
+
+exports.rotateLeft = rotateLeft = (direction) ->
+  switch direction
+    when LEFT   then DOWN
+    when RIGHT  then UP
+    when UP     then LEFT
+    when DOWN   then UP
+    else reverse direction
+
+exports.rotateRight = rotateRight = (direction) ->
+  switch direction
+    when LEFT   then UP
+    when RIGHT  then DOWN
+    when UP     then RIGHT
+    when DOWN   then LEFT
+    else reverse direction
+
+exports.rotate = (direction, rotateDirection) ->
+  switch rotateDirection
+    when LEFT   then rotateLeft direction
+    when RIGHT  then rotateRight direction
+    when UP     then rotateLeft (rotateLeft direction)
+    when DOWN   then rotateRight (rotateRight direction)
     else direction
 
 exports.unset = (directions, direction) ->

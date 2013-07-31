@@ -3,20 +3,20 @@ Player = require './player'
 
 module.exports = class TestApp
   el: document.getElementById 'wrap'
+  events:
+    'keydown': 'handleKeyDown'
+    'keyup': 'handleKeyUp'
   paused: true
   lastTick: null
   tickRate: 1000 / 20 # 50 ms/tick
-  tickEpsilon: 2 # Max ticks per loop
+  tickEpsilon: 5 # Max ticks per loop
   clockType: Timer.REQUEST_FRAME
   clockRef: null
-  eventListenerHandlers:
-    'keydown': 'handleKeyDown'
-    'keyup': 'handleKeyUp'
   start: ->
     @players = [(new Player 1)]
     for player in @players
       @el.appendChild player.view.render()
-    for eventType, handler of @eventListenerHandlers
+    for eventType, handler of @events
       window.addEventListener eventType, @handleEvent, false
     return
   stop: ->
@@ -24,7 +24,7 @@ module.exports = class TestApp
     for player in @players
       player.destroy()
     @players.length = 0
-    for eventType, handler of @eventListenerHandlers
+    for eventType, handler of @events
       window.removeEventListener eventType, @handleEvent, false
     return
   restart: ->
@@ -56,12 +56,10 @@ module.exports = class TestApp
     return
   handleEvent: (event) =>
     return if event.metaKey # Gotta preserve the important browser hotkeys.
-    isEventHandled = false
-    if eventTypeHandlerKey = @eventListenerHandlers[event.type]
-      console.log eventTypeHandlerKey, event.which
-      isEventHandled = @[eventTypeHandlerKey]?(event) ? false
+    if eventHandlerKey = @events[event.type]
+      isEventHandled = @[eventHandlerKey]?(event) ? false
       for player in @players when not isEventHandled
-        isEventHandled = player[eventTypeHandlerKey]?(event) ? false
+        isEventHandled = player[eventHandlerKey]?(event) ? false
       if isEventHandled
         event.preventDefault()
         return false
