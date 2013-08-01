@@ -1,23 +1,24 @@
-# Standard press-and-hold actions
 exports.NONE          = NONE          = 0b00000000
 exports.MOVE_LEFT     = MOVE_LEFT     = 0b10000000
 exports.MOVE_RIGHT    = MOVE_RIGHT    = 0b01000000
 exports.FLIP_LEFT     = FLIP_LEFT     = 0b00100000
 exports.FLIP_RIGHT    = FLIP_RIGHT    = 0b00010000
 exports.FAST_DROP     = FAST_DROP     = 0b00001000
-# Fancy single-tick actions
 exports.INSTANT_DROP  = INSTANT_DROP  = 0b00000100
 exports.HOLD_NEXT     = HOLD_NEXT     = 0b00000010
 exports.FLIP_ATTACK   = FLIP_ATTACK   = 0b00000001
+
+exports.INSTANT_ACTIONS =
+  MOVE_LEFT | MOVE_RIGHT | FLIP_LEFT | FLIP_RIGHT | INSTANT_DROP | HOLD_NEXT
 
 exports.HOLD_ACTIONS =
   MOVE_LEFT | MOVE_RIGHT | FLIP_LEFT | FLIP_RIGHT | FAST_DROP
 
 exports.TICK_ACTIONS =
-  INSTANT_DROP | HOLD_NEXT | FLIP_ATTACK
+  FAST_DROP | HOLD_NEXT | FLIP_ATTACK
 
 exports.isNone = (input) ->
-  input is NONE
+  (input | 0) is NONE
 
 exports.get = get = (input, actionMask) ->
   # Calculating shifts is irrelevant; we just need a flag

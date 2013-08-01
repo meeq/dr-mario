@@ -21,8 +21,6 @@ module.exports = class Player
     @game = new Game
     @game.reset()
     @controls = controls ? defaultControls()
-    @input = PlayerInput.clear()
-    @clearInput = PlayerInput.TICK_ACTIONS
     @view.destroy() if @view?
     @view = new TableView @game
     return
@@ -32,11 +30,7 @@ module.exports = class Player
     delete @game
     return
   tick: ->
-    if @game.tick @input
-      inputString = PlayerInput.inputToString @input
-      console.log "Player %d input: %s", @number, inputString
-      @input = PlayerInput.clear @input, @clearInput
-      @clearInput = PlayerInput.TICK_ACTIONS
+    @game.tick()
     @view.update()
     return
   actionFromEvent: (event) ->
@@ -44,11 +38,9 @@ module.exports = class Player
     PlayerInput.actionFromString control if control?
   handleKeyDown: (event) ->
     if action = @actionFromEvent event
-      denormalizedInput = PlayerInput.set @input, action
-      normalizedInput = PlayerInput.normalize denormalizedInput
-      @input = PlayerInput.set normalizedInput, action
-    return
+      if action & PlayerInput.INSTANT_ACTIONS
+        @game.capsule.applyInput action
+      true
+    else false
   handleKeyUp: (event) ->
-    if action = @actionFromEvent event
-      @clearInput = PlayerInput.set @clearInput, action
     return

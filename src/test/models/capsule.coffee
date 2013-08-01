@@ -40,7 +40,7 @@ module.exports = class Capsule
   drop: ->
     @y += 1 if not @isLanded()
     return
-  applyInput: (input) ->
+  applyInput: (input = PlayerInput.NONE) ->
     return if PlayerInput.isNone input
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
       @move @fallingBuffer, Direction.LEFT
@@ -83,12 +83,13 @@ module.exports = class Capsule
           buffer.set x, y, cell
     return
   move: (buffer, direction) ->
-    # TODO
     switch direction
       when Direction.LEFT
-        @x -= 1
+        newX = @x - 1
       when Direction.RIGHT
-        @x += 1
+        newX = @x + 1
+    @x = newX if newX? and not @checkCollision newX, @y
+    return
   flip: (buffer, direction) ->
     dim = @size - 1
     floor = Math.floor @size / 2
@@ -132,7 +133,7 @@ module.exports = class Capsule
         isRow = true if x is 0
         isRow = isRow and not isEmpty
         rowY = y if x is dim and isRow
-        continue unless isEmpty
+        continue if isEmpty
         # Rotate the directions of the cells
         cellDirection = Cell.getDirection cell
         rotatedDirection = Direction.rotate cellDirection, direction
@@ -150,6 +151,10 @@ module.exports = class Capsule
       for y in [0...@size]
         capsuleCell = @fallingBuffer.get x, y
         continue if Cell.isEmpty capsuleCell
-        gridCell = @grid.get originX + x, originY + y
+        gridX = originX + x
+        gridY = originY + y
+        return true if gridX < 0 or gridX >= @grid.width
+        return true if gridY >= @grid.height
+        gridCell = @grid.get gridX, gridY
         return true unless Cell.isEmpty gridCell
     return false
