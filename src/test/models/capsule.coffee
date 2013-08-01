@@ -6,9 +6,9 @@ PlayerInput = require './player-input'
 module.exports = class Capsule
   constructor: (@game) ->
     {@grid} = @game
-    @width = @height = @game.capsuleSize
-    @x = @startX = (@game.width / 2) - (@width / 2) | 0
-    @y = @startY = -@height
+    @width = @height = @size = @game.capsuleSize
+    @x = @startX = Math.round (@game.width / 2) - (@size / 2)
+    @y = @startY = -@size
     @fallingBuffer = new Grid @
     @nextBuffer = new Grid @
     return
@@ -22,8 +22,8 @@ module.exports = class Capsule
     @random @nextBuffer
     return
   get: (x, y) ->
-    isInX = x >= @x and x < (@x + @width)
-    isInY = y >= @y and y < (@y + @height)
+    isInX = x >= @x and x < (@x + @size)
+    isInY = y >= @y and y < (@y + @size)
     if isInX and isInY
       @fallingBuffer.get x - @x, y - @y
     else
@@ -36,7 +36,7 @@ module.exports = class Capsule
     else
       @checkCollision @x, @y + 1
   isOutsideGrid: ->
-    @y < (-@height + 1)
+    @y < (-@size + 1)
   drop: ->
     @y += 1 if not @isLanded()
     return
@@ -60,60 +60,94 @@ module.exports = class Capsule
     @fallingBuffer.clear()
     return
   copy: (source, dest, destOffsetX = 0, destOffsetY = 0, copyEmpty = false) ->
-    for x in [0...@width]
-      for y in [0...@height]
+    for x in [0...@size]
+      for y in [0...@size]
         cell = source.get x, y
         if (not copyEmpty and cell) or copyEmpty
           dest.set destOffsetX + x, destOffsetY + y, cell
     return
   random: (buffer = @nextBuffer) ->
     numColors = @game.numColors
-    for x in [0...@width]
-      for y in [0...@height]
+    for x in [0...@size]
+      for y in [0...@size]
         # Clear everything except the bottom row
-        if y < @height - 1
+        if y < @size - 1
           buffer.clear x, y
         else
           # Randomly colored cells across the whole row facing each other.
           switch x
             when 0          then direction = Direction.RIGHT
-            when @width - 1 then direction = Direction.LEFT
+            when @size - 1  then direction = Direction.LEFT
             else                 direction = Direction.HORIZ
           cell = Cell.setDirection (Cell.randomColor numColors), direction
           buffer.set x, y, cell
     return
   move: (buffer, direction) ->
     # TODO
-  flip: (buffer, direction) ->
-    # TODO
-    numCells = @width * @height
     switch direction
-      when Direction.RIGHT
-        # Rotate the square 1-dimensional array clockwise
-        for x in [0...numCells - 1]
-          for y in [x + 1...numCells]
-            cell = buffer.get x, y
-            buffer.set x, y, buffer.get y, x
-            buffer.set y, x, cell
       when Direction.LEFT
-        # Rotate the square 1-dimensional array counter-clockwise
-        for x in [numCells - 2..0]
-          for y in [numCells - 1..x + 1]
-            cell = buffer.get x, y
-            buffer.set x, y, buffer.get y, x
-            buffer.set y, x, cell
-    # Rotate the directions of the cells
-    for x in [0...@width]
-      for y in [0...@height]
+        @x -= 1
+      when Direction.RIGHT
+        @x += 1
+  flip: (buffer, direction) ->
+    dim = @size - 1
+    floor = Math.floor @size / 2
+    ceil = Math.ceil @size / 2
+    switch direction
+      when Direction.LEFT
+        # Rotate the square matrix counter-clockwise in-place
+        for x in [floor - 1..0]
+          for y in [ceil - 1..0]
+            tx = dim - x
+            ty = dim - y
+            temp1 = buffer.get x, y
+            temp2 = buffer.get y, tx
+            temp3 = buffer.get tx, ty
+            temp4 = buffer.get ty, x
+            buffer.set x, y, temp4
+            buffer.set y, tx, temp1
+            buffer.set tx, ty, temp2
+            buffer.set ty, x, temp3
+      when Direction.RIGHT
+        # Rotate the square matrix clockwise in-place
+        for x in [0...floor]
+          for y in [0...ceil]
+            tx = dim - x
+            ty = dim - y
+            temp1 = buffer.get x, y
+            temp2 = buffer.get y, tx
+            temp3 = buffer.get tx, ty
+            temp4 = buffer.get ty, x
+            buffer.set x, y, temp2
+            buffer.set y, tx, temp3
+            buffer.set tx, ty, temp4
+            buffer.set ty, x, temp1
+    rowY = null
+    isRow = false
+    for y in [0..dim]
+      for x in [0..dim]
         cell = buffer.get x, y
+        isEmpty = Cell.isEmpty cell
+        # Determine if the capsule is horizontal and which row it is on.
+        isRow = true if x is 0
+        isRow = isRow and not isEmpty
+        rowY = y if x is dim and isRow
+        continue unless isEmpty
+        # Rotate the directions of the cells
         cellDirection = Cell.getDirection cell
         rotatedDirection = Direction.rotate cellDirection, direction
-        cell = Cell.setDirection rotatedDirection
-        buffer.set x, y, cell
+        rotatedCell = Cell.setDirection cell, rotatedDirection
+        buffer.set x, y, rotatedCell
+    # Ensure that a horizontal capsule is always at the bottom of its buffer
+    if rowY?
+      for x in [0..dim]
+        cell = buffer.get x, rowY
+        buffer.clear x, rowY
+        buffer.set x, dim, cell
     return
   checkCollision: (originX = @x, originY = @y) ->
-    for x in [0...@width]
-      for y in [0...@height]
+    for x in [0...@size]
+      for y in [0...@size]
         capsuleCell = @fallingBuffer.get x, y
         continue if Cell.isEmpty capsuleCell
         gridCell = @grid.get originX + x, originY + y
