@@ -21,7 +21,6 @@ module.exports = class Player
     @game = new Game
     @game.reset()
     @controls = controls ? defaultControls()
-    @view.destroy() if @view?
     @view = new TableView @game
     return
   destroy: ->
