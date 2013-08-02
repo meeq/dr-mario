@@ -18,7 +18,7 @@ module.exports = class Capsule
     if @nextBuffer.isClear()
       @random @fallingBuffer
     else
-      @copy @nextBuffer, @fallingBuffer
+      @blit @nextBuffer, @fallingBuffer
     @random @nextBuffer
     return
   get: (x, y) ->
@@ -35,35 +35,62 @@ module.exports = class Capsule
       true
     else
       @checkCollision @x, @y + 1
-  isOutsideGrid: ->
+  isOutOfBounds: ->
     @y < (-@size + 1)
   drop: ->
-    @y += 1 if not @isLanded()
+    if not @isLanded()
+      @y += 1
+      if @isLanded()
+        @landedTick = @game.ticks
+      else
+        delete @landedTick
     return
   applyInput: (input = PlayerInput.NONE) ->
-    return if PlayerInput.isNone input
+    return if @fallingBuffer.isClear() or PlayerInput.isNone input
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
-      @move @fallingBuffer, Direction.LEFT
+      @move Direction.LEFT
     if PlayerInput.get input, PlayerInput.MOVE_RIGHT
-      @move @fallingBuffer, Direction.RIGHT
+      @move Direction.RIGHT
     if PlayerInput.get input, PlayerInput.FLIP_LEFT
-      @flip @fallingBuffer, Direction.LEFT
+      @rotate Direction.LEFT
     if PlayerInput.get input, PlayerInput.FLIP_RIGHT
-      @flip @fallingBuffer, Direction.RIGHT
+      @rotate Direction.RIGHT
     if PlayerInput.get input, PlayerInput.FAST_DROP
       @drop()
     if PlayerInput.get input, PlayerInput.INSTANT_DROP
       @drop() while not @isLanded()
+    if PlayerInput.get input, PlayerInput.SWAP_HOLD
+      @swapHold()
+    return
+  move: (direction) ->
+    switch direction
+      when Direction.LEFT
+        newX = @x - 1
+      when Direction.RIGHT
+        newX = @x + 1
+    @x = newX if newX? and not @checkCollision newX, @y
+    return
+  rotate: (direction) ->
+    @flip @fallingBuffer, direction
+    if @checkCollision()
+      @flip @fallingBuffer, Direction.reverse direction
+    return
+  swapHold: ->
+    swapBuffer = @fallingBuffer
+    @fallingBuffer = @holdBuffer
+    @holdBuffer = swapBuffer
+    @x = @startX
+    @y = @startY
     return
   writeToGrid: ->
-    @copy @fallingBuffer, @grid, @x, @y
+    @blit @fallingBuffer, @grid, @x, @y
     @fallingBuffer.clear()
     return
-  copy: (source, dest, destOffsetX = 0, destOffsetY = 0, copyEmpty = false) ->
+  blit: (source, dest, destOffsetX = 0, destOffsetY = 0) ->
+    # Copy the non-empty cells of source to dest
     for x in [0...@size]
       for y in [0...@size]
-        cell = source.get x, y
-        if (not copyEmpty and cell) or copyEmpty
+        unless (Cell.isEmpty cell = source.get x, y)
           dest.set destOffsetX + x, destOffsetY + y, cell
     return
   random: (buffer = @nextBuffer) ->
@@ -81,14 +108,6 @@ module.exports = class Capsule
             else                 direction = Direction.HORIZ
           cell = Cell.setDirection (Cell.randomColor numColors), direction
           buffer.set x, y, cell
-    return
-  move: (buffer, direction) ->
-    switch direction
-      when Direction.LEFT
-        newX = @x - 1
-      when Direction.RIGHT
-        newX = @x + 1
-    @x = newX if newX? and not @checkCollision newX, @y
     return
   flip: (buffer, direction) ->
     dim = @size - 1
@@ -139,7 +158,7 @@ module.exports = class Capsule
         rotatedDirection = Direction.rotate cellDirection, direction
         rotatedCell = Cell.setDirection cell, rotatedDirection
         buffer.set x, y, rotatedCell
-    # Ensure that a horizontal capsule is always at the bottom of its buffer
+    # Push horizontal capsules to the bottom of the buffer
     if rowY?
       for x in [0..dim]
         cell = buffer.get x, rowY
@@ -153,6 +172,7 @@ module.exports = class Capsule
         continue if Cell.isEmpty capsuleCell
         gridX = originX + x
         gridY = originY + y
+        # Treat grid boundaries (except top) as collisions
         return true if gridX < 0 or gridX >= @grid.width
         return true if gridY >= @grid.height
         gridCell = @grid.get gridX, gridY

@@ -78,9 +78,9 @@ module.exports = class Game
     if @capsule.isFalling()
       @capsule.drop()
       @capsule.applyInput input
-      if @capsule.isLanded()
+      if @capsule.isLanded() and @ticks isnt @capsule.landedTick
         console.log "Capsule landed"
-        if @capsule.isOutsideGrid()
+        if @capsule.isOutOfBounds()
           console.log "Game over!"
           @isGameOver = true
         else

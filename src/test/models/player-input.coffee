@@ -5,17 +5,17 @@ exports.FLIP_LEFT     = FLIP_LEFT     = 0b00100000
 exports.FLIP_RIGHT    = FLIP_RIGHT    = 0b00010000
 exports.FAST_DROP     = FAST_DROP     = 0b00001000
 exports.INSTANT_DROP  = INSTANT_DROP  = 0b00000100
-exports.HOLD_NEXT     = HOLD_NEXT     = 0b00000010
+exports.SWAP_HOLD     = SWAP_HOLD     = 0b00000010
 exports.FLIP_ATTACK   = FLIP_ATTACK   = 0b00000001
 
 exports.INSTANT_ACTIONS =
-  MOVE_LEFT | MOVE_RIGHT | FLIP_LEFT | FLIP_RIGHT | INSTANT_DROP | HOLD_NEXT
+  MOVE_LEFT | MOVE_RIGHT | FLIP_LEFT | FLIP_RIGHT | INSTANT_DROP | SWAP_HOLD
 
 exports.HOLD_ACTIONS =
   MOVE_LEFT | MOVE_RIGHT | FLIP_LEFT | FLIP_RIGHT | FAST_DROP
 
 exports.TICK_ACTIONS =
-  FAST_DROP | HOLD_NEXT | FLIP_ATTACK
+  FAST_DROP | SWAP_HOLD | FLIP_ATTACK
 
 exports.isNone = (input) ->
   (input | 0) is NONE
@@ -46,7 +46,7 @@ actionStringsToMasks =
   'Flip Right':   FLIP_RIGHT
   'Fast Drop':    FAST_DROP
   'Instant Drop': INSTANT_DROP
-  'Hold Next':    HOLD_NEXT
+  'Hold Next':    SWAP_HOLD
   'Flip Attack':  FLIP_ATTACK
 
 actionMasksToStrings = {}
