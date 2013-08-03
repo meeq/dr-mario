@@ -45,7 +45,7 @@ module.exports = class Capsule
       else
         delete @landedTick
     return
-  applyInput: (input = PlayerInput.NONE) ->
+  applyInput: (input) ->
     return if @fallingBuffer.isClear() or PlayerInput.isNone input
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
       @move Direction.LEFT

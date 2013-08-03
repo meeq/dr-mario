@@ -76,22 +76,17 @@ module.exports = class Game
     @ticks += 1
     return false if @isGameOver or @ticks % @speed
     if @capsule.isFalling()
-      @capsule.drop()
       @capsule.applyInput input
-      if @capsule.isLanded() and @ticks isnt @capsule.landedTick
-        console.log "Capsule landed"
+      @capsule.drop()
+      if @capsule.isLanded()
         if @capsule.isOutOfBounds()
           console.log "Game over!"
           @isGameOver = true
-        else
+        else if @ticks isnt @capsule.landedTick
           console.log "Writing capsule to grid"
           @capsule.writeToGrid()
           if markResult = @grid.markLines()
             console.log 'Marked %d lines', markResult
-    else if dropResult = @grid.dropFalling()
-      console.log "Dropped %d cells", dropResult
-      if markResult = @grid.markLines()
-        console.log 'Marked %d lines', markResult
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
@@ -101,6 +96,10 @@ module.exports = class Game
       if @virusesLeft is 0
         console.log "You win!"
         @isGameOver = true
+    else if dropResult = @grid.dropFalling()
+      console.log "Dropped %d cells", dropResult
+      if markResult = @grid.markLines()
+        console.log 'Marked %d lines', markResult
     else
       console.log "Generating new capsule"
       @capsule.generate()
