@@ -152,11 +152,10 @@ module.exports = class Grid
       # Unpack the 32-bit result into 2 16-bit integers
       neighborX = coordinates >>> 16
       neighborY = coordinates & 0xFFFF
-      if not neighborCell = @get neighborX, neighborY
+      if (Cell.isEmpty @get neighborX, neighborY)
         newDirection = Direction.unset newDirection, direction
     if newDirection isnt directions
-      cell = Cell.setDirection cell, newDirection
-      @set x, y, cell
+      @set x, y, Cell.setDirection cell, newDirection
     return
   clearMarked: ->
     totalCleared = 0
