@@ -71,7 +71,7 @@ exports.rotateLeft = rotateLeft = (direction) ->
     when LEFT   then DOWN
     when RIGHT  then UP
     when UP     then LEFT
-    when DOWN   then UP
+    when DOWN   then RIGHT
     else reverse direction
 
 exports.rotateRight = rotateRight = (direction) ->
