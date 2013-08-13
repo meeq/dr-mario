@@ -55,12 +55,11 @@ module.exports = class TestApp
     @unpause() unless Timer.isRepeating @clockType
     return
   handleEvent: (event) =>
-    return if event.metaKey # Gotta preserve the important browser hotkeys.
     if eventHandlerKey = @events[event.type]
       isEventHandled = @[eventHandlerKey]?(event) ? false
       for player in @players when not isEventHandled
         isEventHandled = player[eventHandlerKey]?(event) ? false
-      if isEventHandled
+      if isEventHandled and not event.metaKey # Preserve browser hotkeys
         event.preventDefault()
         return false
     return
