@@ -10,6 +10,7 @@ module.exports = class Capsule
     @x = @startX = Math.round (@game.width / 2) - (@size / 2)
     @y = @startY = -@size
     @fallingBuffer = new Grid @
+    @rotateBuffer = new Grid @
     @nextBuffer = new Grid @
     return
   generate: ->
@@ -111,37 +112,17 @@ module.exports = class Capsule
     return
   flip: (buffer, direction) ->
     dim = @size - 1
-    floor = Math.floor @size / 2
-    ceil = Math.ceil @size / 2
     switch direction
       when Direction.LEFT
-        # Rotate the square matrix counter-clockwise in-place
-        for x in [floor - 1..0]
-          for y in [ceil - 1..0]
-            tx = dim - x
-            ty = dim - y
-            temp1 = buffer.get x, y
-            temp2 = buffer.get y, tx
-            temp3 = buffer.get tx, ty
-            temp4 = buffer.get ty, x
-            buffer.set x, y, temp4
-            buffer.set y, tx, temp1
-            buffer.set tx, ty, temp2
-            buffer.set ty, x, temp3
+        for x in [0..dim]
+          for y in [0..dim]
+            @rotateBuffer.set x, y, buffer.get dim - y, x
       when Direction.RIGHT
-        # Rotate the square matrix clockwise in-place
-        for x in [0...floor]
-          for y in [0...ceil]
-            tx = dim - x
-            ty = dim - y
-            temp1 = buffer.get x, y
-            temp2 = buffer.get y, tx
-            temp3 = buffer.get tx, ty
-            temp4 = buffer.get ty, x
-            buffer.set x, y, temp2
-            buffer.set y, tx, temp3
-            buffer.set tx, ty, temp4
-            buffer.set ty, x, temp1
+        for x in [0..dim]
+          for y in [0..dim]
+            @rotateBuffer.set x, y, buffer.get y, dim - x
+    buffer.clear()
+    @blit @rotateBuffer, buffer
     rowY = null
     isRow = false
     for y in [0..dim]
