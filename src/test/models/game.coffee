@@ -98,8 +98,8 @@ module.exports = class Game
         @isGameOver = true
     else if dropResult = @grid.dropFalling()
       console.log "Dropped %d cells", dropResult
-      if markResult = @grid.markLines()
-        console.log 'Marked %d lines', markResult
+    else if markResult = @grid.markLines()
+      console.log 'Marked %d lines', markResult
     else
       console.log "Generating new capsule"
       @capsule.generate()
