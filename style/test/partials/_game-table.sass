@@ -1,19 +1,58 @@
+@mixin pill-gradient($color)
+  $gradient: left top, farthest-side, $color 10px, darken($color, 10%) 30px
+  @include background-image(radial-gradient($gradient...))
+
+@mixin virus-gradient($color)
+  $gradient: left bottom, farthest-side, $color 10px, darken($color, 10%) 30px
+  @include background-image(radial-gradient($gradient...))
+
+$blue-color: #0082E5
+$yellow-color: #FCF400
+$red-color: #DD0700
+
 table
   margin: 0 auto
   border-collapse: separate
+  border-spacing: 0
+  background-color: #CCCCCC
+  border: 4px outset #666666
+  border-top: 1px solid #FFFFFF
+  padding: 1px
 
 td
   font-size: 10px
   text-align: center
-  width: 35px
-  height: 35px
-  background-color: #CCCCCC
-  border: 1px solid #DDDDDD
-  &.blue
-    background-color: blue
-  &.yellow
-    background-color: yellow
-  &.red
-    background-color: red
+  width: 30px
+  height: 30px
+  background-color: transparent
+  border: 1px inset rgba(255, 255, 255, 0.5)
   &.virus
-    border: 1px solid black
+    border-color: #222222
+    border-radius: 5px
+    &.blue
+      +virus-gradient($blue-color)
+    &.yellow
+      +virus-gradient($yellow-color)
+    &.red
+      +virus-gradient($red-color)
+  &.pill
+    border-color: #333333
+    border-radius: 15px
+    &.blue
+      +pill-gradient($blue-color)
+    &.yellow
+      +pill-gradient($yellow-color)
+    &.red
+      +pill-gradient($red-color)
+    &.left
+      border-top-left-radius: 0
+      border-bottom-left-radius: 0
+    &.down
+      border-bottom-left-radius: 0
+      border-bottom-right-radius: 0
+    &.right
+      border-top-right-radius: 0
+      border-bottom-right-radius: 0
+    &.up
+      border-top-left-radius: 0
+      border-top-right-radius: 0
