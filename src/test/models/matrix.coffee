@@ -1,7 +1,7 @@
 Cell = require './cell'
 Direction = require './direction'
 
-module.exports = class Grid
+module.exports = class Matrix
   supportsTypedArrays: window.ArrayBuffer? and window.Uint8ClampedArray?
   constructor: (options) ->
     {@width, @height, @lineLength} = options

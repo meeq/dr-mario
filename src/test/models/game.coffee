@@ -1,6 +1,6 @@
 Cell = require './cell'
 Direction = require './direction'
-Grid = require './grid'
+Matrix = require './matrix'
 Capsule = require './capsule'
 
 defaultWidth = 10
@@ -38,7 +38,7 @@ module.exports = class Game
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
   reset: (level) ->
     @level = level ? @level ? defaultLevel
-    @grid = new Grid @
+    @grid = new Matrix @
     @capsule = new Capsule @
     @isGameOver = false
     # Create an index of available cells for viruses

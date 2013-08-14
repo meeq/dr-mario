@@ -1,6 +1,6 @@
 Cell = require './cell'
 Direction = require './direction'
-Grid = require './grid'
+Matrix = require './matrix'
 PlayerInput = require './player-input'
 
 module.exports = class Capsule
@@ -9,9 +9,9 @@ module.exports = class Capsule
     @width = @height = @size = @game.capsuleSize
     @x = @startX = Math.round (@game.width / 2) - (@size / 2)
     @y = @startY = -@size
-    @fallingBuffer = new Grid @
-    @rotateBuffer = new Grid @
-    @nextBuffer = new Grid @
+    @fallingBuffer = new Matrix @
+    @rotateBuffer = new Matrix @
+    @nextBuffer = new Matrix @
     return
   generate: ->
     @x = @startX
