@@ -2,7 +2,7 @@ Timer = require './models/timer'
 Player = require './player'
 
 module.exports = class TestApp
-  el: document.getElementById 'wrap'
+  el: document.getElementById 'player-1'
   events:
     'keydown': 'handleKeyDown'
     'keyup': 'handleKeyUp'
