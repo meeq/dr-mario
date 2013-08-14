@@ -45,7 +45,6 @@ module.exports = class Matrix
     while testX >= 0
       testCell = @get testX, originY
       break if cellColor isnt Cell.getColor testCell
-      break if Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       leftMatches += 1
       testX -= 1
@@ -55,7 +54,6 @@ module.exports = class Matrix
     while testX < @width
       testCell = @get testX, originY
       break if cellColor isnt Cell.getColor testCell
-      break if Cell.isMarked testCell
       (@mark testX, originY) if (Direction.isX markDirections)
       rightMatches += 1
       testX += 1
@@ -65,7 +63,6 @@ module.exports = class Matrix
     while testY >= 0
       testCell = @get originX, testY
       break if cellColor isnt Cell.getColor testCell
-      break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       upMatches += 1
       testY -= 1
@@ -75,7 +72,6 @@ module.exports = class Matrix
     while testY < @height
       testCell = @get originX, testY
       break if cellColor isnt Cell.getColor testCell
-      break if Cell.isMarked testCell
       (@mark originX, testY) if (Direction.isY markDirections)
       downMatches += 1
       testY += 1
