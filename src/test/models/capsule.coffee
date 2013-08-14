@@ -74,7 +74,7 @@ module.exports = class Capsule
   rotate: (direction) ->
     @flip @fallingBuffer, direction
     if @checkCollision()
-      # TODO Try to fudge it before reversing
+      # TODO Wall kicks
       @flip @fallingBuffer, Direction.reverse direction
     return
   swapHold: ->
@@ -113,43 +113,33 @@ module.exports = class Capsule
     return
   flip: (buffer, direction) ->
     dim = @size - 1
-    # Rotate the buffer into a scratch buffer
-    switch direction
-      when Direction.LEFT
-        for x in [0..dim]
-          for y in [0..dim]
-            @rotateBuffer.set x, y, buffer.get dim - y, x
-      when Direction.RIGHT
-        for x in [0..dim]
-          for y in [0..dim]
-            @rotateBuffer.set x, y, buffer.get y, dim - x
-    # Copy the scratch buffer back into the capsule buffer
-    buffer.clear()
-    @blit @rotateBuffer, buffer
-    # Walk through the buffer to rotate the cell directions and do a row check
-    rowY = null
-    isRow = false
-    for y in [0..dim]
-      for x in [0..dim]
-        cell = buffer.get x, y
-        isEmpty = Cell.isEmpty cell
-        # Determine if the capsule is horizontal and which row it is on.
-        isRow = true if x is 0
-        isRow = isRow and not isEmpty
-        rowY = y if x is dim and isRow
-        continue if isEmpty
-        # Rotate the directions of the cells
+    # Rotate the cells and their positions into a scratch buffer
+    for x in [0..dim]
+      for y in [0..dim]
+        if direction is Direction.LEFT
+          cell = buffer.get dim - y, x
+        else if direction is Direction.RIGHT
+          cell = buffer.get y, dim - x
         cellDirection = Cell.getDirection cell
         rotatedDirection = Direction.rotate cellDirection, direction
         rotatedCell = Cell.setDirection cell, rotatedDirection
-        buffer.set x, y, rotatedCell
-    # Push horizontal capsules to the bottom of the buffer
-    # TODO Integrate this into fudging?
-    if rowY?
+        @rotateBuffer.set x, y, rotatedCell
+    # Anchor rotation around bottom-left corner
+    topRight = @rotateBuffer.get dim, 0
+    btmRight = @rotateBuffer.get dim, dim
+    if (not Cell.isEmpty topRight) and (not Cell.isEmpty btmRight)
+      for y in [0..dim]
+        cell = @rotateBuffer.get dim, y
+        @rotateBuffer.clear dim, y
+        @rotateBuffer.set 0, y, cell
+    else if (not Cell.isEmpty topRight)
       for x in [0..dim]
-        cell = buffer.get x, rowY
-        buffer.clear x, rowY
-        buffer.set x, dim, cell
+        cell = @rotateBuffer.get x, 0
+        @rotateBuffer.clear x, 0
+        @rotateBuffer.set x, dim, cell
+    # Copy the scratch buffer back into the capsule buffer
+    buffer.clear()
+    @blit @rotateBuffer, buffer
     return
   checkCollision: (originX = @x, originY = @y) ->
     for x in [0...@size]
