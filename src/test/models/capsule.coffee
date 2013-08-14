@@ -74,6 +74,7 @@ module.exports = class Capsule
   rotate: (direction) ->
     @flip @fallingBuffer, direction
     if @checkCollision()
+      # TODO Try to fudge it before reversing
       @flip @fallingBuffer, Direction.reverse direction
     return
   swapHold: ->
@@ -112,6 +113,7 @@ module.exports = class Capsule
     return
   flip: (buffer, direction) ->
     dim = @size - 1
+    # Rotate the buffer into a scratch buffer
     switch direction
       when Direction.LEFT
         for x in [0..dim]
@@ -121,8 +123,10 @@ module.exports = class Capsule
         for x in [0..dim]
           for y in [0..dim]
             @rotateBuffer.set x, y, buffer.get y, dim - x
+    # Copy the scratch buffer back into the capsule buffer
     buffer.clear()
     @blit @rotateBuffer, buffer
+    # Walk through the buffer to rotate the cell directions and do a row check
     rowY = null
     isRow = false
     for y in [0..dim]
@@ -140,6 +144,7 @@ module.exports = class Capsule
         rotatedCell = Cell.setDirection cell, rotatedDirection
         buffer.set x, y, rotatedCell
     # Push horizontal capsules to the bottom of the buffer
+    # TODO Integrate this into fudging?
     if rowY?
       for x in [0..dim]
         cell = buffer.get x, rowY
