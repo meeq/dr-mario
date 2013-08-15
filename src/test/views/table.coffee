@@ -21,7 +21,10 @@ getCellClassName = (cell) ->
   className
 
 module.exports = class TableView
+  lastTick: null
+  tickRate: 250
   constructor: (@game) ->
+    @lastTick = Date.now()
     return
   render: ->
     @el = document.createElement 'table'
@@ -32,7 +35,6 @@ module.exports = class TableView
         td.title = "#{x}, #{y}"
         tr.appendChild td
       @el.appendChild tr
-    @lastTick = @game.ticks
     @update()
     @el
   destroy: ->
@@ -42,9 +44,10 @@ module.exports = class TableView
       @el = null
     return
   update: ->
-    if @lastTick < @game.ticks
-      @lastTick = @game.ticks
-      if @lastTick % 6 >= 3
+    now = Date.now()
+    if @lastTick + @tickRate < now
+      @lastTick = now
+      if @el.className isnt 'tick'
         @el.className = "tick"
       else
         @el.className = "tock"
