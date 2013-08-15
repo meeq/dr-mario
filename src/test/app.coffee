@@ -34,7 +34,7 @@ module.exports = class TestApp
     return
   unpause: ->
     @paused = false
-    @lastTick = +new Date unless @lastTick?
+    @lastTick = Date.now() unless @lastTick?
     @clockRef = Timer.start @clockType, @loop, @tickRate
     return
   pause: ->
@@ -45,7 +45,7 @@ module.exports = class TestApp
     return
   loop: =>
     return if @paused
-    now = +new Date
+    now = Date.now()
     deltaTicks = (now - @lastTick) / @tickRate | 0
     if deltaTicks and deltaTicks <= @tickEpsilon
       for tick in [0...deltaTicks]
