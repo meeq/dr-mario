@@ -32,6 +32,7 @@ module.exports = class TableView
         td.title = "#{x}, #{y}"
         tr.appendChild td
       @el.appendChild tr
+    @lastTick = @game.ticks
     @update()
     @el
   destroy: ->
@@ -41,6 +42,12 @@ module.exports = class TableView
       @el = null
     return
   update: ->
+    if @lastTick < @game.ticks
+      @lastTick = @game.ticks
+      if @lastTick % 6 >= 3
+        @el.className = "tick"
+      else
+        @el.className = "tock"
     for tr, y in @el.childNodes
       for td, x in tr.childNodes
         cell = @game.grid?.get x, y
