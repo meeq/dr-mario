@@ -1,0 +1,27 @@
+<!-- Global Setup
+<h2>Music</h2>
+<input type="radio" name="music" value="fever" checked />
+<input type="radio" name="music" value="chill" />
+<input type="radio" name="music" value="off" />
+-->
+<ul>
+  <% for player in @players: %>
+    <li>
+      <form name="P<%= @player.number %>">
+        <h2>Level</h2>
+        <input type="range" name="level" min="0" max="20" value="10">
+        <h2>Speed</h2>
+        <input type="radio" name="speed" value="lo" />
+        <input type="radio" name="speed" value="med" checked />
+        <input type="radio" name="speed" value="hi" />
+        <h2>Controls</h2>
+        <input type="text" class="bind" name="Move Left" />
+        <input type="text" class="bind" name="Move Right" />
+        <input type="text" class="bind" name="Flip Left" />
+        <input type="text" class="bind" name="Flip Right" />
+        <input type="text" class="bind" name="Fast Drop" />
+        <input type="text" class="bind" name="Instant Drop" />
+      </form>
+    </li>
+  <% end %>
+</ul>
