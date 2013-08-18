@@ -18,7 +18,7 @@ defaultLevelVirusMultiplier = 4
 randomInRange = (start, end) ->
   start + (Math.random() * (end - start)) | 0
 
-module.exports = class Game
+module.exports = class GameState
   constructor: (options = {}) ->
     # Timing
     @ticks = 0

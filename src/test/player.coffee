@@ -1,7 +1,7 @@
 # Core libs
 {stringKeyCode} = require 'core/events'
 # App models
-Game = require './models/game'
+GameState = require './models/game-state'
 PlayerInput = require './models/player-input'
 # App views
 TableView = require './views/table'
@@ -18,18 +18,25 @@ defaultControls = ->
 
 module.exports = class Player
   constructor: (@number, controls) ->
-    @game = new Game
-    @game.reset()
+    @state = new GameState
+    @state.reset()
     @controls = controls ? defaultControls()
-    @view = new TableView @game
+    @view = new TableView @state
     return
+  render: ->
+    @el = document.createElement 'li'
+    @el.className = 'player'
+    @el.appendChild @view.render()
+    @el
   destroy: ->
-    @view.destroy() if @view?
+    @view?.destroy()
     delete @view
-    delete @game
+    @el?.parentNode?.removeChild @el
+    delete @el
+    delete @state
     return
   tick: ->
-    @game.tick()
+    @state.tick()
     @view.update()
     return
   actionFromEvent: (event) ->
@@ -38,7 +45,7 @@ module.exports = class Player
   handleKeyDown: (event) ->
     if action = @actionFromEvent event
       if action & PlayerInput.INSTANT_ACTIONS
-        @game.capsule.applyInput action
+        @state.capsule.applyInput action
       true
     else false
   handleKeyUp: (event) ->

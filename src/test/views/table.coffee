@@ -38,10 +38,8 @@ module.exports = class TableView
     @update()
     @el
   destroy: ->
-    if @el?
-      if @el.parentNode?
-        @el.parentNode.removeChild @el
-      @el = null
+    @el?.parentNode?.removeChild @el
+    delete @el
     return
   update: ->
     now = Date.now()
