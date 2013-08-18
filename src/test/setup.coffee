@@ -5,7 +5,7 @@ module.exports = class Setup
   render: ->
     @el = document.createElement 'div'
     @el.id = 'setup'
-    @el.innerHTML = @template()
+    @el.innerHTML = @template @
     # TODO Control inputs, events
     @el
   destroy: ->

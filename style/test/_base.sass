@@ -7,11 +7,13 @@
 
 // Font
 @include font-face("8bit", font-files("Joystix.ttf"))
+$base-font-family: "8bit", sans-serif
 
 // Base styles
 html
-  font-family: "8bit", sans-serif
+  font-family: $base-font-family
   background-color: #000000
+  color: #FFFFFF
 
 body
   @include user-select(none)
