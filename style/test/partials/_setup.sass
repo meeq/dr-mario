@@ -1,5 +1,4 @@
 #setup
-  display: table
   position: absolute
   top: 0
   left: 0
@@ -7,9 +6,11 @@
   height: 100%
   background-image: inline-image("test/bg-setup.png")
   text-align: center
+  // TODO vertical and horizontal centering
 
   li
     font-size: 0
+    margin: 0 25px
     border:
       width: 16px
       style: solid
@@ -17,7 +18,7 @@
       image: inline-image("test/setup-border.png") 16 stretch
 
   form
-    margin-top: -5px // I have no idea why this doesn't line up
+    margin-top: -5px // WTF: I have no idea why this doesn't line up
     padding: 10px
     background-color: black
 
@@ -36,6 +37,7 @@
     background-color: transparent
     border-top: 2px solid #FFFFFF
     border-bottom: 2px solid #B90D7D
+
     &::-webkit-slider-thumb
       -webkit-appearance: none
       width: 14px
@@ -46,6 +48,20 @@
         size: 7px 7px
         repeat: no-repeat
         position: top center
+
+    $color-stops: ()
+    @each $color in white, transparent
+      $color-stops: append($color-stops, $color 4px, comma)
+    @each $stop in 36px, 78px, 120px
+      @each $color in transparent, white
+        $color-stops: append($color-stops, $color $stop, comma)
+      @each $color in white, transparent
+        $color-stops: append($color-stops, $color $stop + 2px, comma)
+    @each $color in transparent, white
+      $color-stops: append($color-stops, $color 154px, comma)
+    $webkit-gradient: join((left), $color-stops, comma)
+    $css3-gradient: join((90deg), $color-stops, comma)
+
     &::before
       content: ''
       position: absolute
@@ -53,18 +69,11 @@
       top: -8px
       right: 0
       height: 16px
-      background-color: transparent
-      $gradient: 90deg
-      @each $color in white, transparent
-        $gradient: append($gradient, $color 4px, comma)
-      @each $stop in 36px, 78px, 120px
-        @each $color in transparent, white
-          $gradient: append($gradient, $color $stop, comma)
-        @each $color in white, transparent
-          $gradient: append($gradient, $color $stop + 2px, comma)
-      @each $color in transparent, white
-        $gradient: append($gradient, $color 154px, comma)
-      background-image: linear-gradient($gradient...)
+      background:
+        color: transparent
+        image: -webkit-linear-gradient($webkit-gradient...)
+        image: linear-gradient($css3-gradient...)
+
     &::after
       content: attr(value)
       color: #FFFFFF
@@ -78,6 +87,7 @@
 
   $speed-width: 42px
   $speed-height: 20px
+  $speed-checked-width: 21px
   $speed-checked-height: 6px
   $speed-margin-top: $speed-checked-height + 2px
 
@@ -89,7 +99,7 @@
     height: $speed-height
     margin-top: $speed-margin-top
 
-    &:before
+    &::before
       content: attr(value)
       color: #FFFFFF
       font-size: 14px
@@ -107,6 +117,53 @@
       height: $speed-checked-height
       background:
         image: inline-image('test/setup-speed-checked.png')
-        size: 21px 6px
+        size: $speed-checked-width $speed-checked-height
         repeat: no-repeat
         position: top center
+
+  .controls
+    margin: 0 auto
+    width: 250px
+
+    button
+      -webkit-appearance: none
+      display: block
+      position: relative
+      width: 100px
+      height: 24px
+      margin-left: 150px
+      margin-bottom: 5px
+      color: #FFFFFF
+      background-color: transparent
+      border: 2px solid #0D5FDA
+
+      &:active
+        background-color: #0D5FDA
+
+      &.bind
+        border-color: #8AD800
+
+        &:active
+          background-color: #8AD800
+
+      &::before
+        content: attr(name)
+        color: #FFFFFF
+        font-size: 12px
+        position: absolute
+        top: 0
+        left: -150px
+        width: 150px
+        line-height: 24px
+        text-align: left
+
+  button[type=submit]
+    -webkit-appearance: none
+    margin-top: 15px
+    font-size: 16px
+    padding: 4px
+    color: #000000
+    background-color: #E99D00
+    border: 0 none transparent
+    &:active
+      color: #FFFFFF
