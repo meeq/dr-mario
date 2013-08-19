@@ -7,7 +7,7 @@ table
     width: 16px
     style: solid
     color: transparent
-  border-image: inline-image("test/bottle.png") 16 stretch
+    image: inline-image("test/bottle.png") 16 stretch
   &::before
     content: ''
     position: absolute
@@ -16,9 +16,10 @@ table
     margin-left: -48px
     width: 96px
     height: 80px
-    background-image: inline-image("test/bottle-top.png")
-    background-position: center center
-    background-repeat: no-repeat
+    background:
+      image: inline-image("test/bottle-top.png")
+      position: center center
+      repeat: no-repeat
 
 td
   width: 14px

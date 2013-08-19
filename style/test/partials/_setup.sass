@@ -1,0 +1,112 @@
+#setup
+  display: table
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background-image: inline-image("test/bg-setup.png")
+  text-align: center
+
+  li
+    font-size: 0
+    border:
+      width: 16px
+      style: solid
+      color: transparent
+      image: inline-image("test/setup-border.png") 16 stretch
+
+  form
+    margin-top: -5px // I have no idea why this doesn't line up
+    padding: 10px
+    background-color: black
+
+  h2
+    margin: 10px
+    font-size: 16px
+    text-align: left
+
+
+  input[name=level]
+    -webkit-appearance: none
+    position: relative
+    width: 158px
+    height: 0px
+    margin: 10px 0
+    background-color: transparent
+    border-top: 2px solid #FFFFFF
+    border-bottom: 2px solid #B90D7D
+    &::-webkit-slider-thumb
+      -webkit-appearance: none
+      width: 14px
+      height: 32px
+      background:
+        color: transparent
+        image: inline-image('test/setup-level-slider.png')
+        size: 7px 7px
+        repeat: no-repeat
+        position: top center
+    &::before
+      content: ''
+      position: absolute
+      left: 0
+      top: -8px
+      right: 0
+      height: 16px
+      background-color: transparent
+      $gradient: 90deg
+      @each $color in white, transparent
+        $gradient: append($gradient, $color 4px, comma)
+      @each $stop in 36px, 78px, 120px
+        @each $color in transparent, white
+          $gradient: append($gradient, $color $stop, comma)
+        @each $color in white, transparent
+          $gradient: append($gradient, $color $stop + 2px, comma)
+      @each $color in transparent, white
+        $gradient: append($gradient, $color 154px, comma)
+      background-image: linear-gradient($gradient...)
+    &::after
+      content: attr(value)
+      color: #FFFFFF
+      font-size: 14px
+      position: absolute
+      right: -45px
+      top: -12px
+      border: 2px solid #8AD800
+      padding: 4px
+      padding-right: 5px
+
+  $speed-width: 42px
+  $speed-height: 20px
+  $speed-checked-height: 6px
+  $speed-margin-top: $speed-checked-height + 2px
+
+  input[name=speed]
+    -webkit-appearance: none
+    position: relative
+    display: inline-block
+    width: $speed-width
+    height: $speed-height
+    margin-top: $speed-margin-top
+
+    &:before
+      content: attr(value)
+      color: #FFFFFF
+      font-size: 14px
+      position: absolute
+      width: $speed-width
+      height: $speed-height
+      text-align: center
+      line-height: $speed-height
+
+    &:checked::after
+      content: ''
+      position: absolute
+      top: -$speed-margin-top
+      width: $speed-width
+      height: $speed-checked-height
+      background:
+        image: inline-image('test/setup-speed-checked.png')
+        size: 21px 6px
+        repeat: no-repeat
+        position: top center
