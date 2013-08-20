@@ -29,8 +29,10 @@ module.exports = class Player
     @el.appendChild @view.render()
     @el
   destroy: ->
+    # Clean up child view
     @view?.destroy()
     delete @view
+    # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el
     delete @state
