@@ -1,36 +1,77 @@
+# Core libs
 {eventCharacter} = require 'core/events'
+# App data
+defaults = require './defaults'
 
 module.exports = class Setup
   template: require './templates/setup'
-  rangeSelector: '[type=range]'
+  eventCharacter: eventCharacter
+  speedOptions: ['lo', 'med', 'hi']
+  formSelector: 'form'
+  levelSelector: '[name=level]'
+  speedSelector: '[name=speed]'
   controlSelector: '.controls button'
-  constructor: ({@players}) ->
+  constructor: ({@app, numPlayers}) ->
+    @players = {}
+    for i in [1..numPlayers]
+      playerName = 'P'+i
+      @players[playerName] = defaults playerName
     return
   render: ->
     @el = document.createElement 'div'
     @el.id = 'setup'
     @el.innerHTML = @template @
-    # Update range elements when value changes
-    for rangeEl in @el.querySelectorAll @rangeSelector
+    # Capture form submission events
+    for formEl in @el.querySelectorAll @formSelector
+      formEl.addEventListener 'submit', @formSubmitted
+    for rangeEl in @el.querySelectorAll @levelSelector
       rangeEl.addEventListener 'change', @levelChanged
-    # Set initial key bindings, bind events
+    for radioEl in @el.querySelectorAll @speedSelector
+      radioEl.addEventListener 'change', @speedChanged
     for buttonEl in @el.querySelectorAll @controlSelector
-      playerNum = buttonEl.form.name[1..]
-      player = @players[playerNum - 1]
-      keyCode = player.controls[buttonEl.name]
-      keyChar = eventCharacter keyCode
-      buttonEl.textContent = keyChar
+      # TODO Listen for and handle button clicks
+      buttonEl.addEventListener
     @el
   destroy: ->
     # Unregister event handlers
-    for rangeEl in @el.querySelectorAll @rangeSelector
+    for formEl in @el.querySelectorAll @formSelector
+      formEl.removeEventListener 'submit', @formSubmitted
+    for rangeEl in @el.querySelectorAll @levelSelector
       rangeEl.removeEventListener 'change', @levelChanged
+    for radioEl in @el.querySelectorAll @speedSelector
+      radioEl.removeEventListener 'change', @speedChanged
+    for buttonEl in @el.querySelectorAll @controlSelector
+      # TODO Remove button click listener
+      buttonEl.removeEventListener
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el
     return
-  levelChanged: (event) ->
-    el = event.target
+  levelChanged: (event) =>
+    rangeEl = event.target
     # Set the attribute so that the pseduo-element content changes
-    el.setAttribute 'value', el.value
+    rangeEl.setAttribute 'value', rangeEl.value
+    # Update the player options
+    player = @players[rangeEl.form.name]
+    player.level = rangeEl.value | 0
+    return
+  speedChanged: (event) =>
+    if (radioEl = event.target).checked
+      # Update the player options
+      player = @players[radioEl.form.name]
+      player.speed = radioEl.value
+    return
+  formSubmitted: (event) =>
+    formEl = event.target
+    player = @players[formEl.name]
+    player.isReady = true
+    @startRef = setTimeout @maybeStartGame unless @startRef?
+    event.preventDefault()
+    false
+  maybeStartGame: =>
+    delete @startRef
+    isReady = true
+    for playerName, player of @players
+      isReady = isReady and player.isReady
+    @app.startGame {@players} if isReady
     return

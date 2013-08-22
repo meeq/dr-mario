@@ -5,23 +5,31 @@
 <input type="radio" name="music" value="off" />
 -->
 <ul>
-  <% for player in @players: %>
+  <% for playerName, player of @players: %>
     <li>
-      <form name="P<%= player.number %>">
+      <form name="<%= playerName %>">
         <h2>Level</h2>
-        <input type="range" name="level" min="0" max="20" value="10">
+        <input type="range"
+               name="level"
+               min="0"
+               max="20"
+               value="<%= player.level %>"
+               />
         <h2>Speed</h2>
-        <input type="radio" name="speed" value="lo" />
-        <input type="radio" name="speed" value="med" checked />
-        <input type="radio" name="speed" value="hi" />
+        <% for speed in @speedOptions: %>
+          <input type="radio"
+                 name="speed"
+                 value="<%= speed %>"
+                 <%= 'checked' if speed is player.speed %>
+                 />
+        <% end %>
         <h2>Controls</h2>
         <div class="controls">
-          <button type="button" name="Move Left"></button>
-          <button type="button" name="Move Right"></button>
-          <button type="button" name="Flip Left"></button>
-          <button type="button" name="Flip Right"></button>
-          <button type="button" name="Fast Drop"></button>
-          <button type="button" name="Instant Drop"></button>
+          <% for controlName, keyCode of player.controls: %>
+            <button type="button" name="<%= controlName %>">
+              <%= @eventCharacter keyCode %>
+            </button>
+          <% end %>
         </div>
         <button type="submit">Ready?</button>
       </form>

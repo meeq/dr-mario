@@ -1,31 +1,19 @@
-# Core libs
-{stringKeyCode} = require 'core/events'
 # App models
 GameState = require './models/game-state'
 PlayerInput = require './models/player-input'
 # App views
 TableView = require './views/table'
 
-defaultControls = ->
-  'Move Left':      stringKeyCode 'left'
-  'Move Right':     stringKeyCode 'right'
-  'Flip Left':      stringKeyCode 'Z'
-  'Flip Right':     stringKeyCode 'X'
-  'Fast Drop':      stringKeyCode 'down'
-  'Instant Drop':   stringKeyCode 'up'
-  'Hold Next':      stringKeyCode 'shift'
-  'Flip Attack':    stringKeyCode 'ctrl'
-
 module.exports = class Player
-  constructor: (@number, controls) ->
-    @state = new GameState
-    @state.reset()
-    @controls = controls ? defaultControls()
-    @view = new TableView @state
+  constructor: (options) ->
+    {@controls} = options
+    debugger
+    @state = new GameState options
     return
   render: ->
     @el = document.createElement 'li'
     @el.className = 'player'
+    @view = new TableView @state
     @el.appendChild @view.render()
     @el
   destroy: ->
@@ -38,8 +26,8 @@ module.exports = class Player
     delete @state
     return
   tick: ->
-    @state.tick()
-    @view.update()
+    @state?.tick()
+    @view?.update()
     return
   actionFromEvent: (event) ->
     control = key for key, val of @controls when val is event.which

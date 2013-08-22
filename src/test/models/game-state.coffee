@@ -5,7 +5,8 @@ Capsule = require './capsule'
 
 defaultWidth = 10
 defaultHeight = 16
-defaultSpeed = 8
+defaultSpeed = 'med'
+defaultTickRate = 8
 defaultLevel = 10
 defaultNumColors = 3
 minNumColors = 1
@@ -21,9 +22,8 @@ randomInRange = (start, end) ->
 module.exports = class GameState
   constructor: (options = {}) ->
     # Timing
-    @ticks = 0
-    @level = options.level ? defaultLevel
     @speed = options.speed ? defaultSpeed
+    @tickRate = options.tickRate ? defaultTickRate
     # Dimensions
     @width = options.width ? defaultWidth
     @height = options.height ? defaultHeight
@@ -36,7 +36,10 @@ module.exports = class GameState
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
     @levelVirusMultiplier =
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
+    # Setup grid
+    @reset options.level ? defaultLevel
   reset: (level) ->
+    @ticks = 0
     @level = level ? @level ? defaultLevel
     @grid = new Matrix @
     @capsule = new Capsule @
@@ -74,7 +77,7 @@ module.exports = class GameState
     return
   tick: (input) ->
     @ticks += 1
-    return false if @isGameOver or @ticks % @speed
+    return false if @isGameOver or @ticks % @tickRate
     if @capsule.isFalling()
       @capsule.applyInput input
       @capsule.drop()
