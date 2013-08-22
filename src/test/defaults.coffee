@@ -11,5 +11,5 @@ module.exports = (playerName) ->
     'Flip Right':     stringKeyCode 'X'
     'Fast Drop':      stringKeyCode 'down'
     'Instant Drop':   stringKeyCode 'up'
-    'Hold Next':      stringKeyCode 'shift'
-    'Flip Attack':    stringKeyCode 'ctrl'
+    # 'Hold Next':      stringKeyCode 'shift'
+    # 'Flip Attack':    stringKeyCode 'ctrl'
