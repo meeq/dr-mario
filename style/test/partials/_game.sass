@@ -35,30 +35,37 @@
         position: center center
         repeat: no-repeat
 
-  td
-    width: 14px
-    height: 14px
-    border: 1px solid transparent
-    background:
-      color: #000000
-      size: 100% 100%
-      repeat: no-repeat
-    +crisp-resizing
-    &.virus
-      @each $color in "blue", "red", "yellow"
-        &.#{$color}
-          // .tick &
-          $image_url: "test/virus-#{$color}-1.png"
-          background-image: inline-image($image_url)
-          .tock &
-            $image_url: "test/virus-#{$color}-2.png"
+    $pill-colors: "blue", "red", "yellow"
+    $pill-directions: "left", "down", "right", "up"
+
+    td
+      width: 14px
+      height: 14px
+      border: 1px solid transparent
+      background:
+        color: #000000
+        size: 100% 100%
+        repeat: no-repeat
+      +crisp-resizing
+
+      &.pill
+        @each $color in $pill-colors
+          &.#{$color}
+            $image_url: "test/pill-#{$color}-round.png"
             background-image: inline-image($image_url)
-    &.pill
-      @each $color in "blue", "red", "yellow"
+            @each $direction in $pill-directions
+              &.#{$direction}
+                $image_url: "test/pill-#{$color}-#{$direction}.png"
+                background-image: inline-image($image_url)
+
+      &.virus
+        @each $color in $pill-colors
+          &.#{$color}
+            $image_url: "test/virus-#{$color}-1.png"
+            background-image: inline-image($image_url)
+
+    &.tock td.virus
+      @each $color in $pill-colors
         &.#{$color}
-          $image_url: "test/pill-#{$color}-round.png"
+          $image_url: "test/virus-#{$color}-2.png"
           background-image: inline-image($image_url)
-          @each $direction in "left", "down", "right", "up"
-            &.#{$direction}
-              $image_url: "test/pill-#{$color}-#{$direction}.png"
-              background-image: inline-image($image_url)
