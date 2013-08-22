@@ -7,7 +7,6 @@ TableView = require './views/table'
 module.exports = class Player
   constructor: (options) ->
     {@controls} = options
-    debugger
     @state = new GameState options
     return
   render: ->
