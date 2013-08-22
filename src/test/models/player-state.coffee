@@ -3,6 +3,7 @@ Direction = require './direction'
 Matrix = require './matrix'
 Capsule = require './capsule'
 
+# TODO Refactor this into defaults
 defaultWidth = 10
 defaultHeight = 16
 defaultSpeed = 'med'

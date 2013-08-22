@@ -1,4 +1,5 @@
 Timer = require '../models/timer'
+Player = require './player'
 
 module.exports = class Game
   events:
@@ -10,7 +11,12 @@ module.exports = class Game
   tickEpsilon: 5 # Max ticks per loop
   clockType: Timer.REQUEST_FRAME
   clockRef: null
-  constructor: ({@app, @players}) ->
+  constructor: ({@app, players}) ->
+    # Create players from options
+    @players = []
+    for playerName, options of players
+      options.game = @
+      @players.push new Player options
     # Register event handlers
     for eventType, handler of @events
       window.addEventListener eventType, @handleEvent, false

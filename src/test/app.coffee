@@ -1,5 +1,4 @@
 Setup = require './views/setup'
-Player = require './views/player'
 Game = require './views/game'
 
 module.exports = class TestApp
@@ -24,12 +23,8 @@ module.exports = class TestApp
     return
   startGame: (options) ->
     @cleanup()
-    players = []
-    for playerName, playerOptions of options.players
-      players.push new Player playerOptions
-    @game = new Game
-      app: @
-      players: players
+    options.app = @
+    @game = new Game options
     @wrapper.appendChild @game.render()
     @game.unpause()
     return
