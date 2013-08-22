@@ -1,13 +1,13 @@
 # App models
-GameState = require './models/game-state'
-PlayerInput = require './models/player-input'
+PlayerInput = require '../models/player-input'
+PlayerState = require '../models/player-state'
 # App views
-TableView = require './views/table'
+TableView = require './table'
 
 module.exports = class Player
   constructor: (options) ->
     {@controls} = options
-    @state = new GameState options
+    @state = new PlayerState options
     return
   render: ->
     @el = document.createElement 'li'

@@ -1,10 +1,10 @@
 # Core libs
 {eventCharacter} = require 'core/events'
 # App data
-defaults = require './defaults'
+defaults = require '../defaults'
 
 module.exports = class Setup
-  template: require './templates/setup'
+  template: require '../templates/setup'
   eventCharacter: eventCharacter
   speedOptions: ['lo', 'med', 'hi']
   formSelector: 'form'

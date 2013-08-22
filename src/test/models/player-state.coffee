@@ -19,7 +19,7 @@ defaultLevelVirusMultiplier = 4
 randomInRange = (start, end) ->
   start + (Math.random() * (end - start)) | 0
 
-module.exports = class GameState
+module.exports = class PlayerState
   constructor: (options = {}) ->
     # Timing
     @speed = options.speed ? defaultSpeed
