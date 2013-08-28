@@ -1,11 +1,45 @@
 #setup
-  display: table
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
-  height: 100%
-  background-image: inline-image("test/bg-setup.png")
+
+  $small-font-size: 12px
+  $medium-font-size: 14px
+  $large-font-size: 16px
+
+  $base-margin: 10px
+  $border-width: 16px
+  $border-image-width: strip-units($border-width)
+
+  $level-width: 158px
+  $level-height: 16px
+  $level-thumb-image-size: 7px
+  $level-thumb-width: 14px
+  $level-thumb-height: $level-height * 2
+
+  $level-color-stops: ()
+  @each $color in white, transparent
+    $level-color-stops: append($level-color-stops, $color 4px, comma)
+  @each $stop in 36px, 78px, 120px
+    @each $color in transparent, white
+      $level-color-stops: append($level-color-stops, $color $stop, comma)
+    @each $color in white, transparent
+      $level-color-stops: append($level-color-stops, $color $stop + 2px, comma)
+  @each $color in transparent, white
+    $level-color-stops: append($level-color-stops, $color 154px, comma)
+  $level-webkit-gradient: join((left), $level-color-stops, comma)
+  $level-css3-gradient: join((90deg), $level-color-stops, comma)
+
+  $speed-width: 72px
+  $speed-height: 20px
+  $speed-checked-width: 21px
+  $speed-checked-height: 6px
+
+  &
+    display: table
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-image: inline-image("test/bg-setup.png")
 
   .center
     display: table-cell
@@ -14,76 +48,63 @@
 
   .global, .player
     font-size: 0
-    margin: 10px 25px
+    margin: $base-margin 25px
     border:
-      width: 16px
+      width: $border-width
       style: solid
       color: transparent
-      image: inline-image("test/setup-border.png") 16 stretch
+      image: inline-image("test/setup-border.png") $border-image-width stretch
 
   .global
     display: none // TODO
 
   form
     margin-top: -5px // WTF: I have no idea why this doesn't line up
-    padding: 10px
-    background-color: black
+    padding: $base-margin
+    background-color: #000000
 
   h2
-    margin: 10px
-    font-size: 16px
+    margin: $base-margin
+    font-size: $large-font-size
     text-align: left
 
   input[name=level]
-    -webkit-appearance: none
+    +appearance('none')
     position: relative
-    width: 158px
+    width: $level-width
     height: 0px
-    margin: 10px 0
+    margin: $base-margin 0
     background-color: transparent
     border-top: 2px solid #FFFFFF
     border-bottom: 2px solid #B90D7D
 
     &::-webkit-slider-thumb
-      -webkit-appearance: none
-      width: 14px
-      height: 32px
+      +appearance('none')
+      width: $level-thumb-width
+      height: $level-thumb-height
       background:
         color: transparent
         image: inline-image('test/setup-level-slider.png')
-        size: 7px 7px
+        size: $level-thumb-image-size $level-thumb-image-size
         repeat: no-repeat
         position: top center
-
-    $color-stops: ()
-    @each $color in white, transparent
-      $color-stops: append($color-stops, $color 4px, comma)
-    @each $stop in 36px, 78px, 120px
-      @each $color in transparent, white
-        $color-stops: append($color-stops, $color $stop, comma)
-      @each $color in white, transparent
-        $color-stops: append($color-stops, $color $stop + 2px, comma)
-    @each $color in transparent, white
-      $color-stops: append($color-stops, $color 154px, comma)
-    $webkit-gradient: join((left), $color-stops, comma)
-    $css3-gradient: join((90deg), $color-stops, comma)
 
     &::before
       content: ''
       position: absolute
       left: 0
-      top: -8px
+      top: -($level-height / 2)
       right: 0
-      height: 16px
+      height: $level-height
       background:
         color: transparent
-        image: -webkit-linear-gradient($webkit-gradient...)
-        image: linear-gradient($css3-gradient...)
+        image: -webkit-linear-gradient($level-webkit-gradient...)
+        image: linear-gradient($level-css3-gradient...)
 
     &::after
       content: attr(value)
       color: #FFFFFF
-      font-size: 14px
+      font-size: $medium-font-size
       position: absolute
       right: -45px
       top: -14px
@@ -92,37 +113,29 @@
       text-align: center
       border: 2px solid #8AD800
 
-  $speed-width: 72px
-  $speed-height: 20px
-  $speed-checked-width: 21px
-  $speed-checked-height: 6px
-  $speed-margin-top: $speed-checked-height + 2px
-
   input[name=speed], input[name=music]
-    -webkit-appearance: none
+    +appearance('none')
+    border: 0px none transparent
+    background-color: transparent
     position: relative
     display: inline-block
     width: $speed-width
     height: $speed-height
-    margin-top: $speed-margin-top
+    padding-top: $speed-checked-height
 
     &::before
       content: attr(value)
       color: #FFFFFF
-      font-size: 14px
+      font-size: $medium-font-size
       position: absolute
       width: $speed-width
       height: $speed-height
       text-align: center
       line-height: $speed-height
 
-    &:checked::after
-      content: ''
-      position: absolute
-      top: -$speed-margin-top
-      width: $speed-width
-      height: $speed-checked-height
+    &:checked
       background:
+        color: transparent
         image: inline-image('test/setup-speed-checked.png')
         size: $speed-checked-width $speed-checked-height
         repeat: no-repeat
@@ -133,7 +146,7 @@
     width: 250px
 
     button
-      -webkit-appearance: none
+      +appearance('none')
       display: block
       position: relative
       width: 100px
@@ -156,7 +169,7 @@
       &::before
         content: attr(name)
         color: #FFFFFF
-        font-size: 12px
+        font-size: $small-font-size
         position: absolute
         top: 0
         left: -150px
@@ -165,9 +178,9 @@
         text-align: left
 
   button[type=submit]
-    -webkit-appearance: none
+    +appearance('none')
     margin-top: 15px
-    font-size: 16px
+    font-size: $large-font-size
     padding: 4px
     color: #000000
     background-color: #E99D00
