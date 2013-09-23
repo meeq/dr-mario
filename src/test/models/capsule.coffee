@@ -7,7 +7,8 @@ module.exports = class Capsule
   constructor: (@game) ->
     {@grid} = @game
     @width = @height = @size = @game.capsuleSize
-    @x = @startX = Math.round (@game.width / 2) - (@size / 2)
+    @x = @startX = @startMinX = Math.round (@game.width / 2) - (@size / 2)
+    @startMaxX = @startMinX + (@size - 1)
     @y = @startY = -@size
     @fallingBuffer = new Matrix @
     @rotateBuffer = new Matrix @
@@ -143,7 +144,7 @@ module.exports = class Capsule
     return
   checkCollision: (originX = @x, originY = @y) ->
     for x in [0...@size]
-      for y in [0...@size]
+      for y in [@startY...@size]
         capsuleCell = @fallingBuffer.get x, y
         continue if Cell.isEmpty capsuleCell
         gridX = originX + x
@@ -151,6 +152,8 @@ module.exports = class Capsule
         # Treat grid boundaries (except top) as collisions
         return true if gridX < 0 or gridX >= @grid.width
         return true if gridY >= @grid.height
+        # Only allow movement outside grid boundary within start block
+        return true if gridY < 0 and (gridX < @startMinX or gridX > @startMaxX)
         gridCell = @grid.get gridX, gridY
         return true unless Cell.isEmpty gridCell
     return false
