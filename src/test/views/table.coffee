@@ -2,7 +2,6 @@ Cell = require '../models/cell'
 Direction = require '../models/direction'
 
 getCellClassName = (cell) ->
-  return 'empty' unless cell?
   if Cell.isEmpty cell
     className = 'empty'
   else
@@ -23,23 +22,41 @@ getCellClassName = (cell) ->
 module.exports = class TableView
   lastTick: null
   tickRate: 250
-  constructor: (@game) ->
+  constructor: (@state) ->
     @lastTick = Date.now()
     return
   render: ->
     @el = document.createElement 'table'
-    for y in [0...@game.height]
+    @cellEls = []
+    # Render the drop zone
+    thead = document.createElement 'thead'
+    for y in [-@state.capsuleSize...0]
       tr = document.createElement 'tr'
-      for x in [0...@game.width]
-        td = document.createElement 'td'
-        td.title = "#{x}, #{y}"
-        tr.appendChild td
-      @el.appendChild tr
+      for x in [0...@state.width]
+        tr.appendChild @renderCell x, y
+      thead.appendChild tr
+    @el.appendChild thead
+    # Render playable grid
+    tbody = document.createElement 'tbody'
+    for y in [0...@state.height]
+      tr = document.createElement 'tr'
+      for x in [0...@state.width]
+        tr.appendChild @renderCell x, y
+      tbody.appendChild tr
+    @el.appendChild tbody
     @update()
     @el
+  renderCell: (x, y) ->
+    cellEl = document.createElement 'td'
+    cellEl.dataset.x = x
+    cellEl.dataset.y = y
+    cellEl.title = "#{x}, #{y}"
+    @cellEls?.push cellEl
+    cellEl
   destroy: ->
     @el?.parentNode?.removeChild @el
     delete @el
+    delete @cellEls
     return
   update: ->
     now = Date.now()
@@ -49,12 +66,13 @@ module.exports = class TableView
         @el.className = "tick"
       else
         @el.className = "tock"
-    for tr, y in @el.childNodes
-      for td, x in tr.childNodes
-        cell = @game.grid?.get x, y
-        if Cell.isEmpty cell
-          cell = @game.capsule?.get x, y
-        className = getCellClassName cell
-        if td.className isnt className
-          td.className = className
+    for td in @cellEls
+      x = td.dataset.x | 0
+      y = td.dataset.y | 0
+      cell = @state.grid?.get x, y
+      if Cell.isEmpty cell
+        cell = @state.capsule?.get x, y
+      className = getCellClassName cell
+      if td.className isnt className
+        td.className = className
     return

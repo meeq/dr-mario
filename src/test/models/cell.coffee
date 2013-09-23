@@ -16,7 +16,7 @@ exports.randomColor = (numColors) ->
   1 + (Math.random() * numColors) | 0
 
 exports.isEmpty = (cell) ->
-  cell is EMPTY
+  (cell | 0) is EMPTY
 
 colorMask = 0b00000111 # 3-bit integer at offset 0
 
