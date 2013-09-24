@@ -26,7 +26,12 @@ module.exports = class TableView
     @lastTick = Date.now()
     return
   render: ->
-    @el = document.createElement 'table'
+    @el = document.createElement 'div'
+    @el.className = 'game-state table'
+    borderEl = document.createElement 'div'
+    borderEl.className = 'border'
+    @el.appendChild borderEl
+    @tableEl = document.createElement 'table'
     @cellEls = []
     # Render the drop zone
     thead = document.createElement 'thead'
@@ -35,7 +40,7 @@ module.exports = class TableView
       for x in [0...@state.width]
         tr.appendChild @renderCell x, y
       thead.appendChild tr
-    @el.appendChild thead
+    @tableEl.appendChild thead
     # Render playable grid
     tbody = document.createElement 'tbody'
     for y in [0...@state.height]
@@ -43,7 +48,8 @@ module.exports = class TableView
       for x in [0...@state.width]
         tr.appendChild @renderCell x, y
       tbody.appendChild tr
-    @el.appendChild tbody
+    @tableEl.appendChild tbody
+    @el.appendChild @tableEl
     @update()
     @el
   renderCell: (x, y) ->
@@ -62,10 +68,10 @@ module.exports = class TableView
     now = Date.now()
     if @lastTick + @tickRate < now
       @lastTick = now
-      if @el.className isnt 'tick'
-        @el.className = "tick"
+      if @tableEl.className isnt 'tick'
+        @tableEl.className = 'tick'
       else
-        @el.className = "tock"
+        @tableEl.className = 'tock'
     for td in @cellEls
       x = td.dataset.x | 0
       y = td.dataset.y | 0
