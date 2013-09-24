@@ -28,6 +28,7 @@ module.exports = class TableView
   render: ->
     @el = document.createElement 'div'
     @el.className = 'game-state table'
+    # Render borders behind table
     borderEl = document.createElement 'div'
     borderEl.className = 'border'
     @el.appendChild borderEl
@@ -66,12 +67,14 @@ module.exports = class TableView
     return
   update: ->
     now = Date.now()
+    # Update animations
     if @lastTick + @tickRate < now
       @lastTick = now
       if @tableEl.className isnt 'tick'
         @tableEl.className = 'tick'
       else
         @tableEl.className = 'tock'
+    # Update cell states
     for td in @cellEls
       x = td.dataset.x | 0
       y = td.dataset.y | 0
