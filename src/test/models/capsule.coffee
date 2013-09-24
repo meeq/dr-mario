@@ -7,8 +7,7 @@ module.exports = class Capsule
   constructor: (@game) ->
     {@grid} = @game
     @width = @height = @size = @game.capsuleSize
-    @x = @startX = @startMinX = Math.round (@game.width / 2) - (@size / 2)
-    @startMaxX = @startMinX + (@size - 1)
+    @x = @startX = Math.round (@game.width / 2) - (@size / 2)
     @y = @startY = -@size
     @fallingBuffer = new Matrix @
     @rotateBuffer = new Matrix @
@@ -65,6 +64,7 @@ module.exports = class Capsule
       @swapHold()
     return
   move: (direction) ->
+    return if @y is @startY
     switch direction
       when Direction.LEFT
         newX = @x - 1
@@ -94,7 +94,12 @@ module.exports = class Capsule
     for x in [0...@size]
       for y in [0...@size]
         unless (Cell.isEmpty cell = source.get x, y)
-          dest.set destOffsetX + x, destOffsetY + y, cell
+          destX = destOffsetX + x
+          destY = destOffsetY + y
+          dest.set destX, destY, cell
+          # Correct for top-of-grid cut-off
+          if y isnt 0 and destY is 0 and Direction.UP is Cell.getDirection cell
+            dest.reshape destX, destY
     return
   random: (buffer = @nextBuffer) ->
     numColors = @game.numColors

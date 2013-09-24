@@ -14,8 +14,10 @@ module.exports = class Matrix
       @cells.length = numCells
     return
   get: (x, y) ->
+    return if x < 0 or y < 0
     @cells[x + (y * @width)] | 0
   set: (x, y, value) ->
+    return if x < 0 or y < 0
     @cells[x + (y * @width)] = value | 0
   clear: (x, y) ->
     if x? and y?
