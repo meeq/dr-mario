@@ -22,6 +22,7 @@ randomInRange = (start, end) ->
 
 module.exports = class PlayerState
   constructor: (options = {}) ->
+    @game = options.game
     # Timing
     @speed = options.speed ? defaultSpeed
     @tickRate = options.tickRate ? defaultTickRate
@@ -79,18 +80,24 @@ module.exports = class PlayerState
   tick: (input) ->
     @ticks += 1
     return false if @isGameOver or @ticks % @tickRate
+    # Drop falling capsule
     if @capsule.isFalling()
       @capsule.applyInput input
       @capsule.drop()
       if @capsule.isLanded()
+        # If the capsule can't fit in the grid, it's over.
         if @capsule.isOutOfBounds()
-          console.log "Game over!"
           @isGameOver = true
+          console.log "Game over!"
+          @game.playerDidEndGame @
+        # Allow the capsule to "slide" for a tick
         else if @ticks isnt @capsule.landedTick
-          console.log "Writing capsule to grid"
           @capsule.writeToGrid()
+          console.log "Wrote capsule to grid"
           if markResult = @grid.markLines()
             console.log 'Marked %d lines', markResult
+            @game.playerDidMarkLines @ if markResult > 1
+    # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
@@ -98,12 +105,17 @@ module.exports = class PlayerState
       console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
       @virusesLeft -= virusesCleared
       if @virusesLeft is 0
-        console.log "You win!"
         @isGameOver = true
+        console.log "You win!"
+        @game.playerDidEndGame @
+    # Drop any loose, falling cells
     else if dropResult = @grid.dropFalling()
       console.log "Dropped %d cells", dropResult
+    # Mark any falling cells that have landed
     else if markResult = @grid.markLines()
       console.log 'Marked %d lines', markResult
+      @game.playerDidMarkLines @ if markResult > 1
+    # Generate a new capsule
     else
       console.log "Generating new capsule"
       @capsule.generate()

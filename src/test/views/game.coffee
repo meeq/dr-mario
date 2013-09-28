@@ -63,6 +63,10 @@ module.exports = class Game
       @lastTick = now
     @unpause() unless Timer.isRepeating @clockType
     return
+  playerDidEndGame: (player) ->
+    return
+  playerDidMarkLines: (player) ->
+    return
   handleEvent: (event) =>
     if eventHandlerKey = @events[event.type]
       isEventHandled = @[eventHandlerKey]?(event) ? false
