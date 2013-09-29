@@ -76,17 +76,33 @@ module.exports = class Game
     # TODO
   handleKeyUp: (event) ->
     # TODO
+  playerDidSpawnCapsule: (player) ->
+    console.log "Spawned new capsule"
+    # TODO
   playerDidMoveCapsule: (player) ->
+    console.log "Moved capsule"
     # TODO
   playerDidRotateCapsule: (player) ->
+    console.log "Rotated capsule"
     # TODO
-  playerDidDropCapsule: (player) ->
+  playerDidDropCapsule: (player, numDropped) ->
+    if numDropped?
+      console.log "Dropped %d capsules", numDropped
+    else
+      console.log "Dropped capsule"
     # TODO
   playerDidSpeedUp: (player) ->
+    console.log "Speed up: %d frames per tick", player.tickRate
     # TODO
   playerDidMarkLines: (player, numLines) ->
+    console.log 'Marked %d lines', numLines
     # TODO
   playerDidClearMarked: (player, numCells, numViruses) ->
+    console.log "Cleared %d cells, %d viruses", numCells, numViruses
     # TODO
-  playerDidEndGame: (player) ->
+  playerDidEndGame: (player, isVictory) ->
+    if isVictory
+      console.log 'You win!'
+    else
+      console.log 'Game over!'
     # TODO

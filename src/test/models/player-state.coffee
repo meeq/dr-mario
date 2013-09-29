@@ -118,45 +118,39 @@ module.exports = class PlayerState
         # If the capsule can't fit in the grid, it's over.
         if @capsule.isOutOfBounds()
           @isGameOver = true
-          console.log "Game over!"
-          @game.playerDidEndGame @
+          @game.playerDidEndGame @, false
         # Allow the capsule to "slide" for a tick
         else if @ticks isnt @capsule.landedTick
           @capsule.writeToGrid()
-          console.log "Wrote capsule to grid"
+          # Switch to "falling speed"
           @tickRate = @fallingTickRate if @fallingTickRate?
           if markResult = @grid.markLines()
-            console.log 'Marked %d lines', markResult
             @game.playerDidMarkLines @, markResult
     # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
-      console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
       @game.playerDidClearMarked @, cellsCleared, virusesCleared
-      @virusesLeft -= virusesCleared
-      if @virusesLeft is 0
+      # Check if the game is over because we are out of viruses.
+      if 0 is @virusesLeft -= virusesCleared
         @isGameOver = true
-        console.log "You win!"
-        @game.playerDidEndGame @
+        @game.playerDidEndGame @, true
     # Drop any loose, falling cells
     else if dropResult = @grid.dropFalling()
-      console.log "Dropped %d pills", dropResult
       @game.playerDidDropCapsule @, dropResult
     # Mark any falling cells that have landed
     else if markResult = @grid.markLines()
-      console.log 'Marked %d lines', markResult
       @game.playerDidMarkLines @, markResult
     # Generate a new capsule
     else
       @capsule.generate()
-      console.log "Generated new capsule"
+      @game.playerDidSpawnCapsule @
       @capsuleCount += 1
       # Speed up
       if 0 is @capsuleCount % @speedUpRate and @speedCount < maxSpeedCount
         @speedCount += 1
-        console.log "Speed up: %d frames per tick", @tickRate
         @game.playerDidSpeedUp @
+      # Switch back to "player speed"
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true
