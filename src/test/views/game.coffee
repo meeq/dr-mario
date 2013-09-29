@@ -7,7 +7,7 @@ module.exports = class Game
     'keyup': 'handleKeyUp'
   paused: true
   lastTick: null
-  tickRate: 1000 / 20 # 50 ms/tick
+  tickRate: 1000 / 30 # 30 frames/sec
   tickEpsilon: 5 # Max ticks per loop
   clockType: Timer.REQUEST_FRAME
   clockRef: null
@@ -66,6 +66,8 @@ module.exports = class Game
   playerDidEndGame: (player) ->
     return
   playerDidMarkLines: (player) ->
+    return
+  playerDidSpeedUp: (player) ->
     return
   handleEvent: (event) =>
     if eventHandlerKey = @events[event.type]
