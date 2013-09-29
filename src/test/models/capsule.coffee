@@ -4,10 +4,10 @@ Matrix = require './matrix'
 PlayerInput = require './player-input'
 
 module.exports = class Capsule
-  constructor: (@game) ->
-    {@grid} = @game
-    @width = @height = @size = @game.capsuleSize
-    @x = @startX = Math.round (@game.width / 2) - (@size / 2)
+  constructor: (@player) ->
+    {@grid, @game} = @player
+    @width = @height = @size = @player.capsuleSize
+    @x = @startX = Math.round (@player.width / 2) - (@size / 2)
     @y = @startY = -@size
     @fallingBuffer = new Matrix @
     @rotateBuffer = new Matrix @
@@ -32,7 +32,7 @@ module.exports = class Capsule
   isFalling: ->
     not @fallingBuffer.isClear()
   isLanded: ->
-    if @y >= @game.height - 1
+    if @y >= @player.height - 1
       true
     else
       @checkCollision @x, @y + 1
@@ -42,7 +42,7 @@ module.exports = class Capsule
     if not @isLanded()
       @y += 1
       if @isLanded()
-        @landedTick = @game.ticks
+        @landedTick = @player.ticks
       else
         delete @landedTick
     return
@@ -70,13 +70,17 @@ module.exports = class Capsule
         newX = @x - 1
       when Direction.RIGHT
         newX = @x + 1
-    @x = newX if newX? and not @checkCollision newX, @y
+    if newX? and not @checkCollision newX, @y
+      @x = newX
+      @game.playerDidMoveCapsule @player
     return
   rotate: (direction) ->
     @flip @fallingBuffer, direction
     if @checkCollision()
       # TODO Wall kicks
       @flip @fallingBuffer, Direction.reverse direction
+    else
+      @game.playerDidRotateCapsule @player
     return
   swapHold: ->
     swapBuffer = @fallingBuffer
@@ -102,7 +106,7 @@ module.exports = class Capsule
             dest.reshape destX, destY
     return
   random: (buffer = @nextBuffer) ->
-    numColors = @game.numColors
+    numColors = @player.numColors
     for x in [0...@size]
       for y in [0...@size]
         # Clear everything except the bottom row

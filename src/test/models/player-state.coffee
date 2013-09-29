@@ -16,6 +16,7 @@ defaultCapsuleSize = 2
 defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultSpeedUpRate = 10
+defaultFallingTickRate = 15
 defaultLevelVirusMultiplier = 4
 
 speedToBaseIndex = (speed) ->
@@ -24,7 +25,7 @@ speedToBaseIndex = (speed) ->
     when 'med' then 25
     when 'hi'  then 31
 
-speedIndexToRate = (index) ->
+speedIndexToTickRate = (index) ->
   if      index <= 25 then (35 - index) * 2 - 1
   else if index <= 34 then 44 - index
   else if index <= 36 then 9
@@ -59,6 +60,7 @@ module.exports = class PlayerState
     @lineLength = options.lineLength ? defaultLineLength
     @capsuleSize = options.capsuleSize ? defaultCapsuleSize
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
+    @fallingTickRate = options.fallingTickRate ? defaultFallingTickRate
     @speedUpRate = options.speedUpRate ? defaultSpeedUpRate
     @levelVirusMultiplier =
       options.levelVirusMultiplier ? defaultLevelVirusMultiplier
@@ -67,7 +69,7 @@ module.exports = class PlayerState
   reset: (level) ->
     @speedCount = 0
     @capsuleCount = 0
-    @tickRate = speedIndexToRate (@baseSpeed + @speedCount)
+    @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     @ticks = 0
     @level = level ? @level ? defaultLevel
     @grid = new Matrix @
@@ -111,6 +113,7 @@ module.exports = class PlayerState
     if @capsule.isFalling()
       @capsule.applyInput input
       @capsule.drop()
+      @game.playerDidDropCapsule @
       if @capsule.isLanded()
         # If the capsule can't fit in the grid, it's over.
         if @capsule.isOutOfBounds()
@@ -121,15 +124,17 @@ module.exports = class PlayerState
         else if @ticks isnt @capsule.landedTick
           @capsule.writeToGrid()
           console.log "Wrote capsule to grid"
+          @tickRate = @fallingTickRate if @fallingTickRate?
           if markResult = @grid.markLines()
             console.log 'Marked %d lines', markResult
-            @game.playerDidMarkLines @ if markResult > 1
+            @game.playerDidMarkLines @, markResult
     # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
       console.log "Cleared %d cells, %d viruses", cellsCleared, virusesCleared
+      @game.playerDidClearMarked @, cellsCleared, virusesCleared
       @virusesLeft -= virusesCleared
       if @virusesLeft is 0
         @isGameOver = true
@@ -137,11 +142,12 @@ module.exports = class PlayerState
         @game.playerDidEndGame @
     # Drop any loose, falling cells
     else if dropResult = @grid.dropFalling()
-      console.log "Dropped %d cells", dropResult
+      console.log "Dropped %d pills", dropResult
+      @game.playerDidDropCapsule @, dropResult
     # Mark any falling cells that have landed
     else if markResult = @grid.markLines()
       console.log 'Marked %d lines', markResult
-      @game.playerDidMarkLines @ if markResult > 1
+      @game.playerDidMarkLines @, markResult
     # Generate a new capsule
     else
       @capsule.generate()
@@ -150,7 +156,7 @@ module.exports = class PlayerState
       # Speed up
       if 0 is @capsuleCount % @speedUpRate and @speedCount < maxSpeedCount
         @speedCount += 1
-        @tickRate = speedIndexToRate (@baseSpeed + @speedCount)
         console.log "Speed up: %d frames per tick", @tickRate
         @game.playerDidSpeedUp @
+      @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true

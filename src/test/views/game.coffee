@@ -63,12 +63,6 @@ module.exports = class Game
       @lastTick = now
     @unpause() unless Timer.isRepeating @clockType
     return
-  playerDidEndGame: (player) ->
-    return
-  playerDidMarkLines: (player) ->
-    return
-  playerDidSpeedUp: (player) ->
-    return
   handleEvent: (event) =>
     if eventHandlerKey = @events[event.type]
       isEventHandled = @[eventHandlerKey]?(event) ? false
@@ -81,4 +75,18 @@ module.exports = class Game
   handleKeyDown: (event) ->
     # TODO
   handleKeyUp: (event) ->
+    # TODO
+  playerDidMoveCapsule: (player) ->
+    # TODO
+  playerDidRotateCapsule: (player) ->
+    # TODO
+  playerDidDropCapsule: (player) ->
+    # TODO
+  playerDidSpeedUp: (player) ->
+    # TODO
+  playerDidMarkLines: (player, numLines) ->
+    # TODO
+  playerDidClearMarked: (player, numCells, numViruses) ->
+    # TODO
+  playerDidEndGame: (player) ->
     # TODO
