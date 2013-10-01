@@ -26,10 +26,9 @@ module.exports = class Player
     delete @state
     return
   tick: ->
-    unless PlayerInput.isNone @input
-      # TODO Rate-limit holding movement input down
-      @state.applyInput @input
-      @input = PlayerInput.clear @input, PlayerInput.PRESS_ACTIONS
+    # TODO Rate-limit holding movement input down
+    @state.applyInput @input
+    @input = PlayerInput.clear @input, PlayerInput.PRESS_ACTIONS
     @state.tick()
     @view?.update()
     return

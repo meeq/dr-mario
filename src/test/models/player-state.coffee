@@ -17,7 +17,7 @@ defaultCapsuleSize = 2
 defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultSpeedUpRate = 10
-defaultFallingTickRate = 14
+defaultFallingTickRate = 13
 defaultLevelVirusMultiplier = 4
 
 speedToBaseIndex = (speed) ->
@@ -155,7 +155,7 @@ module.exports = class PlayerState
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true
   applyInput: (input) ->
-    return if PlayerInput.isNone input
+    return if not @capsule.isFalling()
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
       @capsule.move Direction.LEFT
     if PlayerInput.get input, PlayerInput.MOVE_RIGHT
