@@ -15,7 +15,8 @@ maxNumColors = 7
 maxSpeedCount = 49
 defaultCapsuleSize = 2
 defaultLineLength = 4
-defaultMaxYCeiling = 3
+defaultMinYCeiling = 3
+defaultMaxYCeiling = 9
 defaultSpeedUpRate = 10
 defaultFallingTickRate = 13
 defaultLevelVirusMultiplier = 4
@@ -60,6 +61,7 @@ module.exports = class PlayerState
     # Tweaks
     @lineLength = options.lineLength ? defaultLineLength
     @capsuleSize = options.capsuleSize ? defaultCapsuleSize
+    @minYCeiling = options.minYCeiling ? defaultMinYCeiling
     @maxYCeiling = options.maxYCeiling ? defaultMaxYCeiling
     @fallingTickRate = options.fallingTickRate ? defaultFallingTickRate
     @speedUpRate = options.speedUpRate ? defaultSpeedUpRate
@@ -77,8 +79,7 @@ module.exports = class PlayerState
     @grid = new Matrix @
     @capsule = new Capsule @
     # Create an index of available cells for viruses
-    yCeiling = @height - @level
-    yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
+    yCeiling = clamp @height - @level, @minYCeiling, @maxYCeiling
     topLeftOpenIndex = (yCeiling * @width)
     bottomRightOpenIndex = @width + ((@height - 1) * @width)
     openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
