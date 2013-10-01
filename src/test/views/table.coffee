@@ -6,17 +6,17 @@ getCellClassName = (cell) ->
     className = 'empty'
   else
     className = Cell.getColorName cell
-    if Cell.isVirus cell
+    if Cell.isMarked cell
+      className += ' marked'
+    else if Cell.isVirus cell
       className += ' virus'
     else
       className += ' pill'
-    if Cell.isMarked cell
-      className += ' marked'
-    switch Cell.getDirection cell
-      when Direction.UP    then className += ' up'
-      when Direction.DOWN  then className += ' down'
-      when Direction.LEFT  then className += ' left'
-      when Direction.RIGHT then className += ' right'
+      switch Cell.getDirection cell
+        when Direction.UP    then className += ' up'
+        when Direction.DOWN  then className += ' down'
+        when Direction.LEFT  then className += ' left'
+        when Direction.RIGHT then className += ' right'
   className
 
 module.exports = class TableView

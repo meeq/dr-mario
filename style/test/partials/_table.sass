@@ -65,6 +65,12 @@
             $image_url: "test/virus-#{$color}-1.png"
             background-image: inline-image($image_url)
 
+      &.marked
+        @each $color in $pill-colors
+          &.#{$color}
+            $image_url: "test/pill-#{$color}-clear.png"
+            background-image: inline-image($image_url)
+
     &.tock td.virus
       @each $color in $pill-colors
         &.#{$color}
