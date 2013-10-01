@@ -2,6 +2,7 @@ Cell = require './cell'
 Direction = require './direction'
 Matrix = require './matrix'
 Capsule = require './capsule'
+PlayerInput = require './player-input'
 
 # TODO Refactor this into defaults
 defaultWidth = 10
@@ -16,7 +17,7 @@ defaultCapsuleSize = 2
 defaultLineLength = 4
 defaultMaxYCeiling = 3
 defaultSpeedUpRate = 10
-defaultFallingTickRate = 15
+defaultFallingTickRate = 14
 defaultLevelVirusMultiplier = 4
 
 speedToBaseIndex = (speed) ->
@@ -67,14 +68,14 @@ module.exports = class PlayerState
     # Setup grid
     @reset options.level ? defaultLevel
   reset: (level) ->
+    @isGameOver = false
+    @level = level ? @level ? defaultLevel
     @speedCount = 0
     @capsuleCount = 0
+    @tickCount = 0
     @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
-    @ticks = 0
-    @level = level ? @level ? defaultLevel
     @grid = new Matrix @
     @capsule = new Capsule @
-    @isGameOver = false
     # Create an index of available cells for viruses
     yCeiling = @height - @level
     yCeiling = @maxYCeiling if yCeiling < @maxYCeiling
@@ -106,12 +107,11 @@ module.exports = class PlayerState
       else
         @virusesLeft += 1
     return
-  tick: (input) ->
-    @ticks += 1
-    return false if @isGameOver or @ticks % @tickRate
+  tick: ->
+    @tickCount += 1
+    return false if @isGameOver or @tickCount % @tickRate
     # Drop falling capsule
     if @capsule.isFalling()
-      @capsule.applyInput input
       @capsule.drop()
       @game.playerDidDropCapsule @
       if @capsule.isLanded()
@@ -120,7 +120,7 @@ module.exports = class PlayerState
           @isGameOver = true
           @game.playerDidEndGame @, false
         # Allow the capsule to "slide" for a tick
-        else if @ticks isnt @capsule.landedTick
+        else if @tickCount isnt @capsule.landedTick
           @capsule.writeToGrid()
           # Switch to "falling speed"
           @tickRate = @fallingTickRate if @fallingTickRate?
@@ -154,3 +154,22 @@ module.exports = class PlayerState
       # Switch back to "player speed"
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true
+  applyInput: (input) ->
+    return if PlayerInput.isNone input
+    if PlayerInput.get input, PlayerInput.MOVE_LEFT
+      @capsule.move Direction.LEFT
+    if PlayerInput.get input, PlayerInput.MOVE_RIGHT
+      @capsule.move Direction.RIGHT
+    if PlayerInput.get input, PlayerInput.FLIP_LEFT
+      @capsule.rotate Direction.LEFT
+    if PlayerInput.get input, PlayerInput.FLIP_RIGHT
+      @capsule.rotate Direction.RIGHT
+    if PlayerInput.get input, PlayerInput.FAST_DROP
+      @tickRate = 0
+    else if @tickRate is 0
+      @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
+    if PlayerInput.get input, PlayerInput.INSTANT_DROP
+      @capsule.drop() while not @capsule.isLanded()
+    if PlayerInput.get input, PlayerInput.SWAP_HOLD
+      @capsule.swapHold()
+    return

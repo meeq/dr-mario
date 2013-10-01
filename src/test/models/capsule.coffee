@@ -1,7 +1,6 @@
 Cell = require './cell'
 Direction = require './direction'
 Matrix = require './matrix'
-PlayerInput = require './player-input'
 
 module.exports = class Capsule
   constructor: (@player) ->
@@ -42,26 +41,9 @@ module.exports = class Capsule
     if not @isLanded()
       @y += 1
       if @isLanded()
-        @landedTick = @player.ticks
+        @landedTick = @player.tickCount
       else
         delete @landedTick
-    return
-  applyInput: (input) ->
-    return if @fallingBuffer.isClear() or PlayerInput.isNone input
-    if PlayerInput.get input, PlayerInput.MOVE_LEFT
-      @move Direction.LEFT
-    if PlayerInput.get input, PlayerInput.MOVE_RIGHT
-      @move Direction.RIGHT
-    if PlayerInput.get input, PlayerInput.FLIP_LEFT
-      @rotate Direction.LEFT
-    if PlayerInput.get input, PlayerInput.FLIP_RIGHT
-      @rotate Direction.RIGHT
-    if PlayerInput.get input, PlayerInput.FAST_DROP
-      @drop()
-    if PlayerInput.get input, PlayerInput.INSTANT_DROP
-      @drop() while not @isLanded()
-    if PlayerInput.get input, PlayerInput.SWAP_HOLD
-      @swapHold()
     return
   move: (direction) ->
     switch direction
