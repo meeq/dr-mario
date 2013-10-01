@@ -36,7 +36,7 @@ module.exports = class Capsule
     else
       @checkCollision @x, @y + 1
   isOutOfBounds: ->
-    @y <= (-@size + 1)
+    @y <= @startY
   drop: ->
     if not @isLanded()
       @y += 1

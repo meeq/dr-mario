@@ -19,6 +19,9 @@ getCellClassName = (cell) ->
         when Direction.RIGHT then className += ' right'
   className
 
+tickClassName = 'game-state tick'
+tockClassName = 'game-state tock'
+
 module.exports = class TableView
   lastTick: null
   tickRate: 250
@@ -26,31 +29,15 @@ module.exports = class TableView
     @lastTick = Date.now()
     return
   render: ->
-    @el = document.createElement 'div'
-    @el.className = 'game-state table'
-    # Render borders behind table
-    borderEl = document.createElement 'div'
-    borderEl.className = 'border'
-    @el.appendChild borderEl
-    @tableEl = document.createElement 'table'
+    @el = document.createElement 'table'
+    @el.className = tickClassName
     @cellEls = []
-    # Render the drop zone
-    thead = document.createElement 'thead'
-    for y in [-@state.capsuleSize...0]
-      tr = document.createElement 'tr'
-      for x in [0...@state.width]
-        tr.appendChild @renderCell x, y
-      thead.appendChild tr
-    @tableEl.appendChild thead
     # Render playable grid
-    tbody = document.createElement 'tbody'
     for y in [0...@state.height]
       tr = document.createElement 'tr'
       for x in [0...@state.width]
         tr.appendChild @renderCell x, y
-      tbody.appendChild tr
-    @tableEl.appendChild tbody
-    @el.appendChild @tableEl
+      @el.appendChild tr
     @update()
     @el
   renderCell: (x, y) ->
@@ -62,18 +49,18 @@ module.exports = class TableView
     cellEl
   destroy: ->
     @el?.parentNode?.removeChild @el
-    delete @el
     delete @cellEls
+    delete @el
     return
   update: ->
     now = Date.now()
     # Update animations
     if @lastTick + @tickRate < now
       @lastTick = now
-      if @tableEl.className isnt 'tick'
-        @tableEl.className = 'tick'
+      if @el.className isnt tickClassName
+        @el.className = tickClassName
       else
-        @tableEl.className = 'tock'
+        @el.className = tockClassName
     # Update cell states
     for td in @cellEls
       x = td.dataset.x | 0
