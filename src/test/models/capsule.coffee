@@ -8,7 +8,7 @@ module.exports = class Capsule
     {@grid, @game} = @player
     @width = @height = @size = @player.capsuleSize
     @x = @startX = Math.round (@player.width / 2) - (@size / 2)
-    @y = @startY = -@size
+    @y = @startY = -@size + 1
     @fallingBuffer = new Matrix @
     @rotateBuffer = new Matrix @
     @nextBuffer = new Matrix @
@@ -37,7 +37,7 @@ module.exports = class Capsule
     else
       @checkCollision @x, @y + 1
   isOutOfBounds: ->
-    @y < (-@size + 1)
+    @y <= (-@size + 1)
   drop: ->
     if not @isLanded()
       @y += 1
@@ -64,7 +64,6 @@ module.exports = class Capsule
       @swapHold()
     return
   move: (direction) ->
-    return if @y is @startY
     switch direction
       when Direction.LEFT
         newX = @x - 1
