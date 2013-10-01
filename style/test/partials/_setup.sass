@@ -1,8 +1,8 @@
 #setup
 
-  $small-font-size: 12px
-  $medium-font-size: 14px
-  $large-font-size: 16px
+  $small-font-size: 9px
+  $medium-font-size: 10px
+  $large-font-size: 12px
 
   $base-margin: 10px
   $border-width: 16px
@@ -104,7 +104,7 @@
     &::after
       content: attr(value)
       color: #FFFFFF
-      font-size: $medium-font-size
+      font-size: $small-font-size
       position: absolute
       right: -45px
       top: -14px
@@ -122,6 +122,7 @@
     width: $speed-width
     height: $speed-height
     padding-top: $speed-checked-height
+    margin-bottom: $speed-checked-height
 
     &::before
       content: attr(value)
@@ -150,10 +151,11 @@
       display: block
       position: relative
       width: 100px
-      height: 24px
+      line-height: 20px
       margin-left: 150px
       margin-bottom: 5px
       color: #FFFFFF
+      font-size: $small-font-size
       background-color: transparent
       border: 2px solid #0D5FDA
 
@@ -169,7 +171,7 @@
       &::before
         content: attr(name)
         color: #FFFFFF
-        font-size: $small-font-size
+        font-size: $medium-font-size
         position: absolute
         top: 0
         left: -150px
