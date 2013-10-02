@@ -21,6 +21,13 @@ files = [
   'virus-clear'
 ]
 
+loops = [
+  'menu'
+  'setup'
+  'chill'
+  'fever'
+]
+
 module.exports = class Sound
   soundsDir: '/static/sounds/test/'
   soundsExt: '.mp3'
@@ -32,14 +39,14 @@ module.exports = class Sound
     @loopSource = null
     @loadBuffer file, @bufferDidLoad for file in files
     return
-  play: (file, isLoop) ->
+  play: (file) ->
     return unless @buffers[file]?
     source = @audioCtx.createBufferSource()
     source.buffer = @buffers[file]
     source.connect @audioCtx.destination
     source.start ?= source.noteOn
     source.stop ?= source.noteOff
-    if isLoop
+    if file in loops
       @stopLoop()
       @loopSource = source
       source.loop = true
