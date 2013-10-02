@@ -114,7 +114,6 @@ module.exports = class PlayerState
     # Drop falling capsule
     if @capsule.isFalling()
       @capsule.drop()
-      @game.playerDidDropCapsule @
       if @capsule.isLanded()
         # If the capsule can't fit in the grid, it's over.
         if @capsule.isOutOfBounds()
@@ -123,6 +122,7 @@ module.exports = class PlayerState
         # Allow the capsule to "slide" for a tick
         else if @tickCount isnt @capsule.landedTick
           @capsule.writeToGrid()
+          @game.playerDidDropCapsule @
           # Switch to "falling speed"
           @tickRate = @fallingTickRate if @fallingTickRate?
           if markResult = @grid.markLines()

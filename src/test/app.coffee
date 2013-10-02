@@ -1,9 +1,11 @@
 Setup = require './views/setup'
 Game = require './views/game'
+Sound = require './views/sound'
 
 module.exports = class TestApp
   wrapper: document.getElementById 'wrap'
   start: ->
+    @sound = new Sound
     @showSetup()
     return
   cleanup: ->

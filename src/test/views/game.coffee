@@ -12,6 +12,7 @@ module.exports = class Game
   clockType: Timer.REQUEST_FRAME
   clockRef: null
   constructor: ({@app, players}) ->
+    @sound = @app.sound
     # Create players from options
     @players = []
     for playerName, options of players
@@ -81,28 +82,39 @@ module.exports = class Game
     # TODO
   playerDidMoveCapsule: (player) ->
     console.log "Moved capsule"
-    # TODO
+    @sound.play 'move'
+    return
   playerDidRotateCapsule: (player) ->
     console.log "Rotated capsule"
-    # TODO
+    @sound.play 'flip'
+    return
   playerDidDropCapsule: (player, numDropped) ->
     if numDropped?
       console.log "Dropped %d capsules", numDropped
     else
-      console.log "Dropped capsule"
-    # TODO
+      console.log "Capsule landed"
+    @sound.play 'drop'
+    return
   playerDidSpeedUp: (player) ->
     console.log "Speed up: %d frames per tick", player.tickRate
-    # TODO
+    @sound.play 'speed-up'
+    return
   playerDidMarkLines: (player, numLines) ->
     console.log 'Marked %d lines', numLines
-    # TODO
+    return
   playerDidClearMarked: (player, numCells, numViruses) ->
     console.log "Cleared %d cells, %d viruses", numCells, numViruses
-    # TODO
+    if numViruses
+      @sound.play 'virus-clear'
+    else
+      @sound.play 'pill-clear'
+    return
   playerDidEndGame: (player, isVictory) ->
+    @sound.stopLoop()
     if isVictory
       console.log 'You win!'
+      @sound.play 'victory'
     else
       console.log 'Game over!'
-    # TODO
+      @sound.play 'game-over'
+    return
