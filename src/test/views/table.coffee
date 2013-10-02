@@ -12,11 +12,11 @@ getCellClassName = (cell) ->
       className += ' virus'
     else
       className += ' pill'
-      switch Cell.getDirection cell
-        when Direction.UP    then className += ' up'
-        when Direction.DOWN  then className += ' down'
-        when Direction.LEFT  then className += ' left'
-        when Direction.RIGHT then className += ' right'
+      direction = Cell.getDirection cell
+      if      direction is Direction.UP    then className += ' up'
+      else if direction is Direction.DOWN  then className += ' down'
+      else if direction is Direction.LEFT  then className += ' left'
+      else if direction is Direction.RIGHT then className += ' right'
   className
 
 tickClassName = 'game-state tick'
