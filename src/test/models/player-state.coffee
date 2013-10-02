@@ -111,22 +111,23 @@ module.exports = class PlayerState
   tick: ->
     @tickCount += 1
     return false if @isGameOver or @tickCount % @tickRate
-    # Drop falling capsule
+    # Handle falling capsule
     if @capsule.isFalling()
+      # If the capsule can't fit in the grid, it's over.
+      if @capsule.isOutOfBounds()
+        @isGameOver = true
+        @game.playerDidEndGame @, false
+        return true
       @capsule.drop()
-      if @capsule.isLanded()
-        # If the capsule can't fit in the grid, it's over.
-        if @capsule.isOutOfBounds()
-          @isGameOver = true
-          @game.playerDidEndGame @, false
-        # Allow the capsule to "slide" for a tick
-        else if @tickCount isnt @capsule.landedTick
-          @capsule.writeToGrid()
-          @game.playerDidDropCapsule @
-          # Switch to "falling speed"
-          @tickRate = @fallingTickRate if @fallingTickRate?
-          if markResult = @grid.markLines()
-            @game.playerDidMarkLines @, markResult
+      # Allow the capsule to "slide" for a tick
+      isPlaced = @tickCount isnt @capsule.landedTick or @tickRate is 0
+      if @capsule.isLanded() and isPlaced
+        @capsule.writeToGrid()
+        @game.playerDidDropCapsule @
+        # Switch to "falling speed"
+        @tickRate = @fallingTickRate if @fallingTickRate?
+        if markResult = @grid.markLines()
+          @game.playerDidMarkLines @, markResult
     # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
@@ -171,6 +172,7 @@ module.exports = class PlayerState
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     if PlayerInput.get input, PlayerInput.INSTANT_DROP
       @capsule.drop() while not @capsule.isLanded()
+      @tickRate = 0
     if PlayerInput.get input, PlayerInput.SWAP_HOLD
       @capsule.swapHold()
     return

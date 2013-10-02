@@ -44,7 +44,6 @@ module.exports = class TableView
     cellEl = document.createElement 'td'
     cellEl.dataset.x = x
     cellEl.dataset.y = y
-    cellEl.title = "#{x}, #{y}"
     @cellEls?.push cellEl
     cellEl
   destroy: ->
@@ -65,9 +64,9 @@ module.exports = class TableView
     for td in @cellEls
       x = td.dataset.x | 0
       y = td.dataset.y | 0
-      cell = @state.grid?.get x, y
+      cell = @state.capsule?.get x, y
       if Cell.isEmpty cell
-        cell = @state.capsule?.get x, y
+        cell = @state.grid?.get x, y
       className = getCellClassName cell
       if td.className isnt className
         td.className = className
