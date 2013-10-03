@@ -31,7 +31,7 @@ module.exports = class Setup
     for formEl in @el.querySelectorAll @formSelector
       formEl.addEventListener 'submit', @formSubmitted
     for radioEl in @el.querySelectorAll @soundSelector
-      radioEl.addEventListener 'click', @soundChanged
+      radioEl.addEventListener 'change', @soundChanged
     for radioEl in @el.querySelectorAll @musicSelector
       radioEl.addEventListener 'change', @musicChanged
     for rangeEl in @el.querySelectorAll @levelSelector
@@ -46,7 +46,7 @@ module.exports = class Setup
     for formEl in @el.querySelectorAll @formSelector
       formEl.removeEventListener 'submit', @formSubmitted
     for radioEl in @el.querySelectorAll @soundSelector
-      radioEl.removeEventListener 'click', @soundChanged
+      radioEl.removeEventListener 'change', @soundChanged
     for radioEl in @el.querySelectorAll @musicSelector
       radioEl.removeEventListener 'change', @musicChanged
     for rangeEl in @el.querySelectorAll @levelSelector
