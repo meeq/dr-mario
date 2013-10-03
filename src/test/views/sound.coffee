@@ -69,12 +69,17 @@ module.exports = class Sound
     @unloadedBuffers += 1
     request = new XMLHttpRequest
     decodeResponse = =>
-      @audioCtx.decodeAudioData request.response, (buffer) =>
+      onSuccess = (buffer) =>
         @buffers[file] = buffer
         @unloadedBuffers -= 1
         @loadedBuffers += 1
         callback?(file)
         return
+      onFailure = =>
+        @unloadedBuffers -= 1
+        callback?(file)
+        return
+      @audioCtx.decodeAudioData request.response, onSuccess, onFailure
       return
     url = @soundsDir + file + @soundsExt
     # Set up and send the request
