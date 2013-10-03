@@ -2,12 +2,21 @@
   <div class="global">
     <form name="global">
       <h2>Sound Effects</h2>
-      <input type="radio" name="sound" value="on" />
-      <input type="radio" name="sound" value="off" checked />
+      <% for option in @soundOptions: %>
+      <input type="radio"
+             name="sound"
+             value="<%= option %>"
+             <%= 'checked' if option is 'off' %>
+             />
+      <% end %>
       <h2>Music Type</h2>
-      <input type="radio" name="music" value="fever" />
-      <input type="radio" name="music" value="chill" />
-      <input type="radio" name="music" value="quiet" checked />
+      <% for option in @musicOptions: %>
+      <input type="radio"
+             name="music"
+             value="<%= option %>"
+             <%= 'checked' if option is @music %>
+             />
+      <% end %>
     </form>
   </div>
   <ul class="players">

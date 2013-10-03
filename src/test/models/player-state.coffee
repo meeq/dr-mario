@@ -123,7 +123,7 @@ module.exports = class PlayerState
       isPlaced = @tickCount isnt @capsule.landedTick or @tickRate is 0
       if @capsule.isLanded() and isPlaced
         @capsule.writeToGrid()
-        @game.playerDidDropCapsule @
+        @game.playerDidWriteCellsToGrid @, @capsule.size
         # Switch to "falling speed"
         @tickRate = @fallingTickRate if @fallingTickRate?
         if markResult = @grid.markLines()
@@ -140,7 +140,7 @@ module.exports = class PlayerState
         @game.playerDidEndGame @, true
     # Drop any loose, falling cells
     else if dropResult = @grid.dropFalling()
-      @game.playerDidDropCapsule @, dropResult
+      @game.playerDidWriteCellsToGrid @, dropResult
     # Mark any falling cells that have landed
     else if markResult = @grid.markLines()
       @game.playerDidMarkLines @, markResult

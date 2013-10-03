@@ -11,8 +11,9 @@ module.exports = class Game
   tickEpsilon: 5 # Max ticks per loop
   clockType: Timer.REQUEST_FRAME
   clockRef: null
-  constructor: ({@app, players}) ->
+  constructor: ({@app, @music, players}) ->
     @sound = @app.sound
+    @sound.play @music unless @music is 'quiet'
     # Create players from options
     @players = []
     for playerName, options of players
@@ -78,32 +79,25 @@ module.exports = class Game
   handleKeyUp: (event) ->
     # TODO
   playerDidSpawnCapsule: (player) ->
-    console.log "Spawned new capsule"
-    # TODO
+    return
   playerDidMoveCapsule: (player) ->
-    console.log "Moved capsule"
     @sound.play 'move'
     return
   playerDidRotateCapsule: (player) ->
-    console.log "Rotated capsule"
     @sound.play 'flip'
     return
-  playerDidDropCapsule: (player, numDropped) ->
-    if numDropped?
-      console.log "Dropped %d capsules", numDropped
-    else
-      console.log "Capsule landed"
+  playerDidWriteCellsToGrid: (player, numCells) ->
     @sound.play 'drop'
     return
   playerDidSpeedUp: (player) ->
-    console.log "Speed up: %d frames per tick", player.tickRate
     @sound.play 'speed-up'
     return
   playerDidMarkLines: (player, numLines) ->
-    console.log 'Marked %d lines', numLines
+    if numLines > 1
+      console.log 'Marked %d lines', numLines
+      # TODO Multi-player attack buffer
     return
   playerDidClearMarked: (player, numCells, numViruses) ->
-    console.log "Cleared %d cells, %d viruses", numCells, numViruses
     if numViruses
       @sound.play 'virus-clear'
     else
@@ -113,8 +107,10 @@ module.exports = class Game
     @sound.stopLoop()
     if isVictory
       console.log 'You win!'
+      # TODO Show Next / Setup buttons
       @sound.play 'victory'
     else
       console.log 'Game over!'
+      # TODO Show Retry / Setup buttons
       @sound.play 'game-over'
     return

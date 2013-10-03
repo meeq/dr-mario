@@ -67,14 +67,12 @@ module.exports = class Sound
   loadBuffer: (file, callback) ->
     @buffers[file] = null
     @unloadedBuffers += 1
-    console.log 'Loading sound file %s', file
     request = new XMLHttpRequest
     decodeResponse = =>
       @audioCtx.decodeAudioData request.response, (buffer) =>
         @buffers[file] = buffer
         @unloadedBuffers -= 1
         @loadedBuffers += 1
-        console.log 'Decoded sound buffer %s', file
         callback?(file)
         return
       return

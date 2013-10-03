@@ -6,6 +6,8 @@ defaults = require '../defaults'
 module.exports = class Setup
   template: require '../templates/setup'
   eventCharacter: eventCharacter
+  soundOptions: ['on', 'off']
+  musicOptions: ['fever', 'chill', 'quiet']
   speedOptions: ['lo', 'med', 'hi']
   formSelector: 'form'
   soundSelector: '[name=sound]'
@@ -15,7 +17,7 @@ module.exports = class Setup
   controlSelector: '.controls button'
   constructor: ({@app, numPlayers}) ->
     @sound = @app.sound
-    @music = 'fever'
+    @music = 'quiet'
     @players = {}
     for i in [1..numPlayers]
       playerName = 'P'+i
@@ -37,8 +39,7 @@ module.exports = class Setup
     for radioEl in @el.querySelectorAll @speedSelector
       radioEl.addEventListener 'change', @speedChanged
     for buttonEl in @el.querySelectorAll @controlSelector
-      # TODO Listen for and handle button clicks
-      buttonEl.addEventListener
+      buttonEl.addEventListener 'click', @bindControl
     @el
   destroy: ->
     # Unregister event handlers
@@ -53,8 +54,7 @@ module.exports = class Setup
     for radioEl in @el.querySelectorAll @speedSelector
       radioEl.removeEventListener 'change', @speedChanged
     for buttonEl in @el.querySelectorAll @controlSelector
-      # TODO Remove button click listener
-      buttonEl.removeEventListener
+      buttonEl.removeEventListener 'click', @bindControl
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el
@@ -88,6 +88,10 @@ module.exports = class Setup
       player = @players[radioEl.form.name]
       player.speed = radioEl.value
       @sound.play 'move'
+    return
+  bindControl: (event) =>
+    buttonEl = event.target
+    # TODO
     return
   formSubmitted: (event) =>
     formEl = event.target
