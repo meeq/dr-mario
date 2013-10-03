@@ -15,14 +15,18 @@
   $level-thumb-height: $level-height * 2
 
   $level-color-stops: ()
-  @each $color in white, transparent
+  @each $color in black, white
     $level-color-stops: append($level-color-stops, $color 4px, comma)
-  @each $stop in 36px, 78px, 120px
+  @each $color in white, transparent
+    $level-color-stops: append($level-color-stops, $color 8px, comma)
+  @each $stop in 42px, 78px, 114px
     @each $color in transparent, white
       $level-color-stops: append($level-color-stops, $color $stop, comma)
     @each $color in white, transparent
       $level-color-stops: append($level-color-stops, $color $stop + 2px, comma)
   @each $color in transparent, white
+    $level-color-stops: append($level-color-stops, $color 150px, comma)
+  @each $color in white, black
     $level-color-stops: append($level-color-stops, $color 154px, comma)
   $level-webkit-gradient: join((left), $level-color-stops, comma)
   $level-css3-gradient: join((90deg), $level-color-stops, comma)
