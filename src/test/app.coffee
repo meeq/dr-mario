@@ -6,6 +6,7 @@ module.exports = class TestApp
   wrapper: document.getElementById 'wrap'
   start: ->
     @sound = new Sound
+    @sound.loadAll()
     @showSetup()
     return
   cleanup: ->

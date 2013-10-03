@@ -32,15 +32,15 @@ module.exports = class Sound
   soundsDir: '/static/sounds/test/'
   soundsExt: '.mp3'
   constructor: ->
-    @audioCtx = new AudioContext()
+    @isEnabled = false
+    @audioCtx = new AudioContext
     @buffers = {}
     @unloadedBuffers = 0
     @loadedBuffers = 0
     @loopSource = null
-    @loadBuffer file, @bufferDidLoad for file in files
     return
   play: (file) ->
-    return unless @buffers[file]?
+    return unless @isEnabled and @buffers[file]?
     source = @audioCtx.createBufferSource()
     source.buffer = @buffers[file]
     source.connect @audioCtx.destination
@@ -57,18 +57,25 @@ module.exports = class Sound
       @loopSource.stop 0
       @loopSource = null
     return
+  loadAll: (callback) ->
+    if callback?
+      bufferDidLoad = =>
+        callback() if 0 is @unloadedBuffers
+    for file in files
+      @loadBuffer file, bufferDidLoad
+    return
   loadBuffer: (file, callback) ->
     @buffers[file] = null
     @unloadedBuffers += 1
     console.log 'Loading sound file %s', file
-    request = new XMLHttpRequest()
+    request = new XMLHttpRequest
     decodeResponse = =>
       @audioCtx.decodeAudioData request.response, (buffer) =>
         @buffers[file] = buffer
         @unloadedBuffers -= 1
         @loadedBuffers += 1
         console.log 'Decoded sound buffer %s', file
-        callback file
+        callback?(file)
         return
       return
     url = @soundsDir + file + @soundsExt
@@ -77,7 +84,4 @@ module.exports = class Sound
     request.responseType = 'arraybuffer'
     request.addEventListener 'load', decodeResponse, false
     request.send()
-    return
-  bufferDidLoad: (file) =>
-    console.log 'All buffers loaded' if 0 is @unloadedBuffers
     return

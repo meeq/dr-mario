@@ -1,10 +1,13 @@
 <div class="center">
   <div class="global">
     <form name="global">
-      <h2>Music</h2>
-      <input type="radio" name="music" value="fever" checked />
+      <h2>Sound Effects</h2>
+      <input type="radio" name="sound" value="on" />
+      <input type="radio" name="sound" value="off" checked />
+      <h2>Music Type</h2>
+      <input type="radio" name="music" value="fever" />
       <input type="radio" name="music" value="chill" />
-      <input type="radio" name="music" value="quiet" />
+      <input type="radio" name="music" value="quiet" checked />
     </form>
   </div>
   <ul class="players">

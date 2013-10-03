@@ -1,6 +1,6 @@
 #setup
 
-  $small-font-size: 9px
+  $small-font-size: 8px
   $medium-font-size: 10px
   $large-font-size: 12px
 
@@ -55,9 +55,6 @@
       color: transparent
       image: inline-image("test/setup-border.png") $border-image-width stretch
 
-  .global
-    display: none // TODO
-
   form
     margin-top: -5px // WTF: I have no idea why this doesn't line up
     padding: $base-margin
@@ -68,12 +65,13 @@
     font-size: $large-font-size
     text-align: left
 
-  input[name=level]
+  input[type=range]
     +appearance('none')
     position: relative
     width: $level-width
     height: 0px
     margin: $base-margin 0
+    margin-left: -30px
     background-color: transparent
     border-top: 2px solid #FFFFFF
     border-bottom: 2px solid #B90D7D
@@ -82,6 +80,7 @@
       +appearance('none')
       width: $level-thumb-width
       height: $level-thumb-height
+      border: 0 solid transparent
       background:
         color: transparent
         image: inline-image('test/setup-level-slider.png')
@@ -104,7 +103,7 @@
     &::after
       content: attr(value)
       color: #FFFFFF
-      font-size: $small-font-size
+      font-size: $medium-font-size
       position: absolute
       right: -45px
       top: -14px
@@ -113,7 +112,7 @@
       text-align: center
       border: 2px solid #8AD800
 
-  input[name=speed], input[name=music]
+  input[type=radio]
     +appearance('none')
     border: 0px none transparent
     background-color: transparent
@@ -144,15 +143,15 @@
 
   .controls
     margin: 0 auto
-    width: 250px
+    width: 220px
 
     button
       +appearance('none')
       display: block
       position: relative
-      width: 100px
+      width: 80px
       line-height: 20px
-      margin-left: 150px
+      margin-left: 140px
       margin-bottom: 5px
       color: #FFFFFF
       font-size: $small-font-size
@@ -174,7 +173,7 @@
         font-size: $medium-font-size
         position: absolute
         top: 0
-        left: -150px
+        left: -140px
         width: 150px
         line-height: 24px
         text-align: left
@@ -189,3 +188,5 @@
     border: 0 none transparent
     &:active
       color: #FFFFFF
+    &:disabled
+      background-color: #B7197C
