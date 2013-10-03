@@ -3,19 +3,23 @@
     <form name="global">
       <h2>Sound Effects</h2>
       <% for option in @soundOptions: %>
-      <input type="radio"
-             name="sound"
-             value="<%= option %>"
-             <%= 'checked' if option is 'off' %>
-             />
+        <input type="radio"
+               name="sound"
+               id="sound-<%= option %>"
+               value="<%= option %>"
+               <%= 'checked' if option is 'off' %>
+               />
+        <label for="sound-<%= option %>"></label>
       <% end %>
       <h2>Music Type</h2>
       <% for option in @musicOptions: %>
-      <input type="radio"
-             name="music"
-             value="<%= option %>"
-             <%= 'checked' if option is @music %>
-             />
+        <input type="radio"
+               name="music"
+               id="music-<%= option %>"
+               value="<%= option %>"
+               <%= 'checked' if option is @music %>
+               />
+        <label for="music-<%= option %>"></label>
       <% end %>
     </form>
   </div>
@@ -31,12 +35,14 @@
                  value="<%= player.level %>"
                  />
           <h2>Speed</h2>
-          <% for speed in @speedOptions: %>
+          <% for option in @speedOptions: %>
             <input type="radio"
                    name="speed"
-                   value="<%= speed %>"
-                   <%= 'checked' if speed is player.speed %>
+                   id="speed-<%= option %>"
+                   value="<%= option %>"
+                   <%= 'checked' if option is player.speed %>
                    />
+            <label for="speed-<%= option %>"></label>
           <% end %>
           <h2>Controls</h2>
           <div class="controls">
