@@ -88,6 +88,17 @@
         repeat: no-repeat
         position: top center
 
+    &::-moz-range-thumb
+      width: $level-thumb-width
+      height: $level-thumb-height
+      border: 0 solid transparent
+      background:
+        color: transparent
+        image: inline-image('test/setup-level-slider.png')
+        size: $level-thumb-image-size $level-thumb-image-size
+        repeat: no-repeat
+        position: top center
+
     &::before
       content: ''
       position: absolute
@@ -98,6 +109,13 @@
       background:
         color: transparent
         image: -webkit-linear-gradient($level-webkit-gradient...)
+        image: linear-gradient($level-css3-gradient...)
+
+    &::-moz-range-track
+      height: $level-height
+      border: 0 solid transparent
+      background:
+        color: transparent
         image: linear-gradient($level-css3-gradient...)
 
     &::after
