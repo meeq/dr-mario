@@ -8,7 +8,8 @@ module.exports = class Player
   constructor: (options) ->
     {@controls} = options
     @state = new PlayerState options
-    @input = @holdInput = PlayerInput.NONE
+    @startMoveTick = @lastMoveTick = null
+    @input = @holdInput = @moveInput = PlayerInput.NONE
     return
   render: ->
     @el = document.createElement 'li'
@@ -26,9 +27,25 @@ module.exports = class Player
     delete @state
     return
   tick: ->
-    # TODO Rate-limit holding movement input down
+    # Rate-limit holding move down
+    if PlayerInput.isNone @moveInput
+      @startMoveTick = @lastMoveTick = null
+    else
+      currentTick = @state.tickCount
+      if currentTick > @startMoveTick + 4
+        if currentTick > @lastMoveTick + 1
+          @input = PlayerInput.set @input, @moveInput
+    # Apply the input
     @state.applyInput @input
+    # Clean up single button press actions
     @input = PlayerInput.clear @input, PlayerInput.PRESS_ACTIONS
+    # Clean up movement actions
+    moveInput = @input & PlayerInput.MOVE_ACTIONS
+    unless PlayerInput.isNone moveInput
+      @startMoveTick ?= @lastMoveTick = @state.tickCount
+      @moveInput = moveInput
+      @input = PlayerInput.clear @input, PlayerInput.MOVE_ACTIONS
+    # Process the tick
     @state.tick()
     @view?.update()
     return
@@ -46,5 +63,6 @@ module.exports = class Player
     if action = @actionFromEvent event
       @input = PlayerInput.clear @input, action
       @holdInput = PlayerInput.clear @holdInput, action
+      @moveInput = PlayerInput.clear @moveInput, action
       true
     else false
