@@ -33,14 +33,14 @@ module.exports = class Sound
   soundsExt: '.mp3'
   constructor: ->
     @isEnabled = false
-    @audioCtx = new AudioContext
+    @audioCtx = new AudioContext if AudioContext?
     @buffers = {}
     @unloadedBuffers = 0
     @loadedBuffers = 0
     @loopSource = null
     return
   play: (file) ->
-    return unless @isEnabled and @buffers[file]?
+    return unless @audioCtx? and @isEnabled and @buffers[file]?
     source = @audioCtx.createBufferSource()
     source.buffer = @buffers[file]
     source.connect @audioCtx.destination

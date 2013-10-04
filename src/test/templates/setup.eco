@@ -1,4 +1,5 @@
 <div class="center">
+  <% if @sound?: %>
   <div class="global">
     <form name="global">
       <h2>Sound Effects</h2>
@@ -23,6 +24,7 @@
       <% end %>
     </form>
   </div>
+  <% end %>
   <ul class="players">
     <% for playerName, player of @players: %>
       <li class="player">

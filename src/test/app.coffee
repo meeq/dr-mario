@@ -6,7 +6,10 @@ module.exports = class TestApp
   wrapper: document.getElementById 'wrap'
   start: ->
     @sound = new Sound
-    @sound.loadAll()
+    if @sound.audioCtx?
+      @sound.loadAll()
+    else
+      delete @sound
     @showSetup()
     return
   cleanup: ->

@@ -63,15 +63,15 @@ module.exports = class Setup
     if (radioEl = event.target).checked
       switch radioEl.value
         when 'off'
-          @sound.isEnabled = false
+          @sound?.isEnabled = false
         when 'on'
-          @sound.isEnabled = true
-          @sound.play 'move'
+          @sound?.isEnabled = true
+          @sound?.play 'move'
     return
   musicChanged: (event) =>
     if (radioEl = event.target).checked
       @music = radioEl.value
-      @sound.play 'move'
+      @sound?.play 'move'
     return
   levelChanged: (event) =>
     rangeEl = event.target
@@ -80,14 +80,14 @@ module.exports = class Setup
     # Update the player options
     player = @players[rangeEl.form.name]
     player.level = rangeEl.value | 0
-    @sound.play 'move'
+    @sound?.play 'move'
     return
   speedChanged: (event) =>
     if (radioEl = event.target).checked
       # Update the player options
       player = @players[radioEl.form.name]
       player.speed = radioEl.value
-      @sound.play 'move'
+      @sound?.play 'move'
     return
   bindControl: (event) =>
     buttonEl = event.target

@@ -13,7 +13,7 @@ module.exports = class Game
   clockRef: null
   constructor: ({@app, @music, players}) ->
     @sound = @app.sound
-    @sound.play @music unless @music is 'quiet'
+    @sound?.play @music unless @music is 'quiet'
     # Create players from options
     @players = []
     for playerName, options of players
@@ -81,16 +81,16 @@ module.exports = class Game
   playerDidSpawnCapsule: (player) ->
     return
   playerDidMoveCapsule: (player) ->
-    @sound.play 'move'
+    @sound?.play 'move'
     return
   playerDidRotateCapsule: (player) ->
-    @sound.play 'flip'
+    @sound?.play 'flip'
     return
   playerDidWriteCellsToGrid: (player, numCells) ->
-    @sound.play 'drop'
+    @sound?.play 'drop'
     return
   playerDidSpeedUp: (player) ->
-    @sound.play 'speed-up'
+    @sound?.play 'speed-up'
     return
   playerDidMarkLines: (player, numLines) ->
     if numLines > 1
@@ -99,18 +99,18 @@ module.exports = class Game
     return
   playerDidClearMarked: (player, numCells, numViruses) ->
     if numViruses
-      @sound.play 'virus-clear'
+      @sound?.play 'virus-clear'
     else
-      @sound.play 'pill-clear'
+      @sound?.play 'pill-clear'
     return
   playerDidEndGame: (player, isVictory) ->
-    @sound.stopLoop()
+    @sound?.stopLoop()
     if isVictory
       console.log 'You win!'
       # TODO Show Next / Setup buttons
-      @sound.play 'victory'
+      @sound?.play 'victory'
     else
       console.log 'Game over!'
       # TODO Show Retry / Setup buttons
-      @sound.play 'game-over'
+      @sound?.play 'game-over'
     return
