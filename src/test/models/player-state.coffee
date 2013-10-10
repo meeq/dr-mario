@@ -18,7 +18,7 @@ defaultLineLength = 4
 defaultMinYCeiling = 3
 defaultMaxYCeiling = 9
 defaultSpeedUpRate = 10
-defaultFallingTickRate = 13
+defaultFallingTickRate = 12
 defaultLevelVirusMultiplier = 4
 
 speedToBaseIndex = (speed) ->

@@ -45,7 +45,7 @@ module.exports = class Game
     return
   unpause: ->
     @paused = false
-    @lastTick = Date.now() unless @lastTick?
+    @lastTick = Timer.now() unless @lastTick?
     @clockRef = Timer.start @clockType, @loop, @tickRate
     return
   pause: ->
@@ -56,18 +56,26 @@ module.exports = class Game
     return
   loop: =>
     return if @paused
-    now = Date.now()
+    # Figure out how many ticks have happened since the last loop
+    now = Timer.now()
     deltaTicks = (now - @lastTick) / @tickRate | 0
     if deltaTicks and deltaTicks <= @tickEpsilon
+      # Update the player states
       for tick in [0...deltaTicks]
         for player in @players
           player.tick()
+      # Only update the UI once
+      for player in @players
+        player.update()
       @lastTick = now
+    # Schedule the next loop
     @unpause() unless Timer.isRepeating @clockType
     return
   handleEvent: (event) =>
     if eventHandlerKey = @events[event.type]
+      # Check if the game handles the key
       isEventHandled = @[eventHandlerKey]?(event) ? false
+      # Check if any of the players have the key bound
       for player in @players when not isEventHandled
         isEventHandled = player[eventHandlerKey]?(event) ? false
       if isEventHandled and not event.metaKey # Preserve browser hotkeys

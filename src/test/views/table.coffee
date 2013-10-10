@@ -1,5 +1,6 @@
 Cell = require '../models/cell'
 Direction = require '../models/direction'
+Timer = require '../models/timer'
 
 getCellClassName = (cell) ->
   if Cell.isEmpty cell
@@ -26,7 +27,7 @@ module.exports = class TableView
   lastTick: null
   tickRate: 250
   constructor: (@state) ->
-    @lastTick = Date.now()
+    @lastTick = Timer.now()
     return
   render: ->
     @el = document.createElement 'table'
@@ -52,7 +53,7 @@ module.exports = class TableView
     delete @el
     return
   update: ->
-    now = Date.now()
+    now = Timer.now()
     # Update animations
     if @lastTick + @tickRate < now
       @lastTick = now

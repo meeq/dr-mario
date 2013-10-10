@@ -17,6 +17,9 @@ module.exports = class Player
     @view = new TableView @state
     @el.appendChild @view.render()
     @el
+  update: ->
+    @view?.update()
+    return
   destroy: ->
     # Clean up child view
     @view?.destroy()
@@ -47,7 +50,6 @@ module.exports = class Player
       @input = PlayerInput.clear @input, PlayerInput.MOVE_ACTIONS
     # Process the tick
     @state.tick()
-    @view?.update()
     return
   actionFromEvent: (event) ->
     control = key for key, val of @controls when val is event.which

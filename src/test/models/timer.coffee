@@ -14,6 +14,19 @@ cancelAnimationFrame =
   window.msCancelAnimationFrame     ?
   null
 
+if performance?
+  hiResNow =
+    performance.now ?
+    performance.mozNow ?
+    performance.msNow ?
+    performance.oNow ?
+    performance.webkitNow
+
+if hiResNow?
+  exports.now = hiResNow.bind performance
+else
+  exports.now = Date.now ? -> new Date().getTime()
+
 exports.TIMEOUT       = TIMEOUT       = 0
 exports.INTERVAL      = INTERVAL      = 1
 exports.REQUEST_FRAME = REQUEST_FRAME = 2
