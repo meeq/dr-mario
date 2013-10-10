@@ -10,7 +10,7 @@ files = [
   'match-over'
   'menu'
   'move'
-  'multi-clear'
+  'color-clear'
   'pause'
   'pill-clear'
   'setup'
