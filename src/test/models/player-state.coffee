@@ -155,7 +155,7 @@ module.exports = class PlayerState
         # Switch to "falling speed"
         @tickRate = @fallingTickRate if @fallingTickRate?
         if linesMarked = @grid.markLines()
-          @recomputeMarkedViruses linesMarked
+          @recomputeVirusesLeft linesMarked
     # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
@@ -168,7 +168,7 @@ module.exports = class PlayerState
       @game.playerDidWriteCellsToGrid @, cellsDropped
     # Mark any falling cells that have landed
     else if linesMarked = @grid.markLines()
-      @recomputeMarkedViruses linesMarked
+      @recomputeVirusesLeft linesMarked
     # Generate a new capsule
     else
       @capsule.generate()
@@ -181,7 +181,7 @@ module.exports = class PlayerState
       # Switch back to "player speed"
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true
-  recomputeMarkedViruses: (linesMarked) ->
+  recomputeVirusesLeft: (linesMarked) ->
     virusesMarked = 0
     didClearColor = false
     for colorIndex in [1..@numColors]
