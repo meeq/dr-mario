@@ -40,11 +40,13 @@ module.exports = class Matrix
     result
   mark: (x, y) ->
     @set x, y, (Cell.setMark @get x, y)
-  checkLineDirections: (originX, originY, markDirections = Direction.NONE) ->
+  checkLineDirections: (originX, originY) ->
+    @markLineDirections originX, originY, Direction.NONE
+  markLineDirections: (originX, originY, markDirections) ->
     cell = @get originX, originY
     cellColor = Cell.getColor cell
     if not cellColor or (@isFalling originX, originY) or Cell.isMarked cell
-      return false
+      return Direction.NONE
     (@mark originX, originY) if markDirections
     # Horizontal Left
     testX = originX - 1
@@ -142,7 +144,7 @@ module.exports = class Matrix
     for x in [0...@width]
       for y in [0...@height]
         if (lines = @checkLineDirections x, y)
-          @checkLineDirections x, y, lines
+          @markLineDirections x, y, lines
           totalMarked += Direction.numLines lines
     totalMarked
   reshape: (x, y) ->
