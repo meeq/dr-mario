@@ -12,6 +12,7 @@ module.exports = class Game
   clockType: Timer.REQUEST_FRAME
   clockRef: null
   constructor: ({@app, @music, players}) ->
+    # Cue the music!
     @sound = @app.sound
     @sound?.play @music unless @music is 'quiet'
     # Create players from options
@@ -26,6 +27,7 @@ module.exports = class Game
   render: ->
     @el = document.createElement 'ul'
     @el.id = 'game'
+    # Render player containers
     for player in @players
       @el.appendChild player.render()
     @el
@@ -45,7 +47,7 @@ module.exports = class Game
     return
   unpause: ->
     @paused = false
-    @lastTick = Timer.now() unless @lastTick?
+    @lastTick ?= Timer.now()
     @clockRef = Timer.start @clockType, @loop, @tickRate
     return
   pause: ->
@@ -87,7 +89,7 @@ module.exports = class Game
   handleKeyUp: (event) ->
     # TODO
   playerDidSpawnCapsule: (player) ->
-    return
+    # TODO
   playerDidMoveCapsule: (player) ->
     @sound?.play 'move'
     return
@@ -100,17 +102,19 @@ module.exports = class Game
   playerDidSpeedUp: (player) ->
     @sound?.play 'speed-up'
     return
-  playerDidMarkLines: (player, numLines) ->
-    if numLines > 1
-      console.log 'Marked %d lines', numLines
-      # TODO Multi-player attack buffer
-    return
-  playerDidClearMarked: (player, numCells, numViruses) ->
-    if numViruses
+  playerDidMarkLines: (player, numLines, numViruses, didClearColor) ->
+    if didClearColor
+      @sound?.play 'color-clear'
+    else if numViruses
       @sound?.play 'virus-clear'
     else
       @sound?.play 'pill-clear'
+    if numLines > 1 and @players.length > 1
+      console.log 'Marked %d lines; attacking!', numLines
+      # TODO Multi-player attack buffer
     return
+  playerDidClearMarked: (player, numCells, numViruses) ->
+    # TODO
   playerDidEndGame: (player, isVictory) ->
     @sound?.stopLoop()
     if isVictory

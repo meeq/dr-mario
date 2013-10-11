@@ -34,7 +34,12 @@ module.exports = class Matrix
         for y in [@height - 1..0]
           return false if not Cell.isEmpty @get x, y
       true
-  mark: (x, y) -> @set x, y, (Cell.setMark @get x, y)
+  count: (cellMask) ->
+    result = 0
+    result += 1 for cell in @cells when cellMask is (cell & cellMask)
+    result
+  mark: (x, y) ->
+    @set x, y, (Cell.setMark @get x, y)
   checkLineDirections: (originX, originY, markDirections = Direction.NONE) ->
     cell = @get originX, originY
     cellColor = Cell.getColor cell

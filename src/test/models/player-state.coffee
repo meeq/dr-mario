@@ -85,6 +85,7 @@ module.exports = class PlayerState
     openCellIndexes = [topLeftOpenIndex...bottomRightOpenIndex]
     # Randomly generate viruses on grid
     @virusesLeft = 0
+    @virusesLeftByColor = [0]
     levelViruses = (@levelVirusMultiplier * @level) + @levelVirusMultiplier
     while @virusesLeft < levelViruses and openCellIndexes.length
       # Get a random cell and remove it from the available cell list
@@ -98,7 +99,8 @@ module.exports = class PlayerState
       lineDirection = Direction.CROSS
       attemptsLeft = @numColors * 2
       while lineDirection and attemptsLeft
-        randomVirus = Cell.setVirus Cell.randomColor @numColors
+        randomColor = Cell.randomColor @numColors
+        randomVirus = Cell.setVirus randomColor
         @grid.set x, y, randomVirus
         lineDirection = @grid.checkLineDirections x, y
         attemptsLeft -= 1
@@ -107,12 +109,22 @@ module.exports = class PlayerState
         @grid.clear x, y
       else
         @virusesLeft += 1
+        if @virusesLeftByColor[randomColor]?
+          @virusesLeftByColor[randomColor] += 1
+        else
+          @virusesLeftByColor[randomColor] = 1
     return
   tick: ->
     @tickCount += 1
-    return false if @isGameOver or @tickCount % @tickRate
+    # Skip the tick if the game is over
+    if @isGameOver or @tickCount % @tickRate
+      return false
+    # End the game if there are no objectives left
+    else if 0 is @virusesLeft
+      @isGameOver = true
+      @game.playerDidEndGame @, true
     # Handle falling capsule
-    if @capsule.isFalling()
+    else if @capsule.isFalling()
       # If the capsule can't fit in the grid, it's over.
       if @capsule.isOutOfBounds()
         @isGameOver = true
@@ -126,24 +138,20 @@ module.exports = class PlayerState
         @game.playerDidWriteCellsToGrid @, @capsule.size
         # Switch to "falling speed"
         @tickRate = @fallingTickRate if @fallingTickRate?
-        if markResult = @grid.markLines()
-          @game.playerDidMarkLines @, markResult
+        if linesMarked = @grid.markLines()
+          @recomputeMarkedViruses linesMarked
     # Clear marked cells
     else if clearResult = @grid.clearMarked()
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
       @game.playerDidClearMarked @, cellsCleared, virusesCleared
-      # Check if the game is over because we are out of viruses.
-      if 0 is @virusesLeft -= virusesCleared
-        @isGameOver = true
-        @game.playerDidEndGame @, true
     # Drop any loose, falling cells
-    else if dropResult = @grid.dropFalling()
-      @game.playerDidWriteCellsToGrid @, dropResult
+    else if cellsDropped = @grid.dropFalling()
+      @game.playerDidWriteCellsToGrid @, cellsDropped
     # Mark any falling cells that have landed
-    else if markResult = @grid.markLines()
-      @game.playerDidMarkLines @, markResult
+    else if linesMarked = @grid.markLines()
+      @recomputeMarkedViruses linesMarked
     # Generate a new capsule
     else
       @capsule.generate()
@@ -156,6 +164,18 @@ module.exports = class PlayerState
       # Switch back to "player speed"
       @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
     return true
+  recomputeMarkedViruses: (linesMarked) ->
+    virusesMarked = 0
+    didClearColor = false
+    for colorIndex in [1..@numColors]
+      cellMask = Cell.setVirus Cell.setMark colorIndex
+      if colorMarkVirusResult = @grid.count cellMask
+        virusesMarked += colorMarkVirusResult
+        if 0 is @virusesLeftByColor[colorIndex] -= 1
+          didClearColor = true
+    @virusesLeft -= virusesMarked if virusesMarked
+    @game.playerDidMarkLines @, linesMarked, virusesMarked, didClearColor
+    return
   applyInput: (input) ->
     return if not @capsule.isFalling()
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
