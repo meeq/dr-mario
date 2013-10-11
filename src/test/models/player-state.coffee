@@ -40,6 +40,21 @@ speedIndexToTickRate = (index) ->
   else if index <= 69 then 2
   else                     1
 
+minCombo = 1
+maxCombo = 6
+scoreMultiplier = 100
+calculateScore = (speed, numViruses) ->
+  speedMultiplier = 0
+  switch speed
+    when 'lo'  then speedMultiplier = 1
+    when 'med' then speedMultiplier = 2
+    when 'hi'  then speedMultiplier = 3
+  numCombos = clamp numViruses, minCombo, maxCombo
+  score = 0
+  for comboIndex in [minCombo..numCombos]
+    score += scoreMultiplier * (Math.pow speedMultiplier, comboIndex)
+  score
+
 randomInRange = (start, end) ->
   start + (Math.random() * (end - start)) | 0
 
@@ -72,6 +87,7 @@ module.exports = class PlayerState
   reset: (level) ->
     @isGameOver = false
     @level = level ? @level ? defaultLevel
+    @score = 0
     @speedCount = 0
     @capsuleCount = 0
     @tickCount = 0
@@ -145,6 +161,7 @@ module.exports = class PlayerState
       # Unpack the 32-bit result into 2 16-bit integers
       virusesCleared = clearResult >>> 16
       cellsCleared = clearResult & 0xFFFF
+      @score += calculateScore @speed, virusesCleared if virusesCleared
       @game.playerDidClearMarked @, cellsCleared, virusesCleared
     # Drop any loose, falling cells
     else if cellsDropped = @grid.dropFalling()
