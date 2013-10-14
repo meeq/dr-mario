@@ -4,11 +4,13 @@
 defaults = require '../defaults'
 
 module.exports = class Setup
+  # Template helpers
   template: require '../templates/setup'
   eventCharacter: eventCharacter
   soundOptions: ['on', 'off']
   musicOptions: ['fever', 'chill', 'quiet']
   speedOptions: ['lo', 'med', 'hi']
+  # Child element selectors
   formSelector: 'form'
   soundSelector: '[name=sound]'
   musicSelector: '[name=music]'

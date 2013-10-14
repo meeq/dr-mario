@@ -14,16 +14,16 @@ module.exports = class Player
   render: ->
     @el = document.createElement 'li'
     @el.className = 'player'
-    @view = new TableView @state
-    @el.appendChild @view.render()
+    @tableView = new TableView @state
+    @el.appendChild @tableView.render()
     @el
   update: ->
-    @view?.update()
+    @tableView?.update()
     return
   destroy: ->
     # Clean up child view
-    @view?.destroy()
-    delete @view
+    @tableView?.destroy()
+    delete @tableView
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el
