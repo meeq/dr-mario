@@ -185,9 +185,9 @@ module.exports = class PlayerState
     virusesMarked = 0
     didClearColor = false
     for colorIndex in [1..@numColors]
-      cellMask = Cell.setVirus Cell.setMark colorIndex
-      if colorMarkVirusResult = @grid.count cellMask
-        virusesMarked += colorMarkVirusResult
+      markedColoredVirus = Cell.setVirus Cell.setMark colorIndex
+      if numMarkedColoredViruses = @grid.count markedColoredVirus
+        virusesMarked += numMarkedColoredViruses
         if 0 is @virusesLeftByColor[colorIndex] -= 1
           didClearColor = true
     @virusesLeft -= virusesMarked if virusesMarked

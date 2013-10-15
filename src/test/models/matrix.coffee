@@ -34,9 +34,9 @@ module.exports = class Matrix
         for y in [@height - 1..0]
           return false if not Cell.isEmpty @get x, y
       true
-  count: (cellMask) ->
+  count: (sampleCell) ->
     result = 0
-    result += 1 for cell in @cells when cellMask is (cell & cellMask)
+    result += 1 for cell in @cells when cell is sampleCell
     result
   mark: (x, y) ->
     @set x, y, (Cell.setMark @get x, y)
