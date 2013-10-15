@@ -93,7 +93,31 @@ module.exports = class Setup
     return
   bindControl: (event) =>
     buttonEl = event.target
-    # TODO
+    buttonEl.className = 'bind'
+    buttonEl.innerText = 'bind'
+    if @bindButtonEl?
+      @unbindControl @bindButtonEl
+    else
+      window.addEventListener 'keydown', @handleKeyBind, false
+    @bindButtonEl = buttonEl
+    return
+  unbindControl: (buttonEl) ->
+    buttonEl.className = ''
+    player = @players[buttonEl.form.name]
+    controlName = buttonEl.name
+    keyCode = player.controls[controlName]
+    buttonEl.innerText = eventCharacter keyCode
+    return
+  handleKeyBind: (event) =>
+    return unless (buttonEl = @bindButtonEl)?
+    keyCode = event.which
+    unless 'esc' is eventCharacter keyCode
+      player = @players[buttonEl.form.name]
+      controlName = buttonEl.name
+      player.controls[controlName] = keyCode
+    window.removeEventListener 'keydown', @handleKeyBind, false
+    @unbindControl buttonEl
+    delete @bindButtonEl
     return
   formSubmitted: (event) =>
     formEl = event.target
