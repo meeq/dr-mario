@@ -51,6 +51,7 @@
     vertical-align: middle
 
   .global, .player
+    display: inline-block
     font-size: 0
     margin: $base-margin 25px
     border:
@@ -58,6 +59,10 @@
       style: solid
       color: transparent
       image: inline-image("test/setup-border.png") $border-image-width stretch
+
+  .global, .player:only-child
+    width: 80%
+    max-width: 600px
 
   form
     margin-top: -5px // WTF: I have no idea why this doesn't line up
