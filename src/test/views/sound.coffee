@@ -21,12 +21,11 @@ files = [
   'virus-clear'
 ]
 
-loops = [
-  'menu'
-  'setup'
-  'chill'
-  'fever'
-]
+musicLoopOffsets =
+  'menu': 0
+  'setup': 0
+  'fever': 3.189
+  'chill': 7.421
 
 module.exports = class Sound
   soundsDir: '/static/sounds/test/'
@@ -46,10 +45,11 @@ module.exports = class Sound
     source.connect @audioCtx.destination
     source.start ?= source.noteOn
     source.stop ?= source.noteOff
-    if file in loops
+    if musicLoopOffsets[file]?
       @stopLoop()
       @loopSource = source
       source.loop = true
+      source.loopStart = musicLoopOffsets[file]
     source.start 0
     return
   stopLoop: ->
