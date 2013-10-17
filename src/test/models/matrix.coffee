@@ -14,9 +14,14 @@ module.exports = class Matrix
       @cells.length = numCells
     return
   get: (x, y) ->
+    x = x | 0
+    y = y | 0
     return if x < 0 or x >= @width or y < 0 or y >= @height
     @cells[x + (y * @width)] | 0
   set: (x, y, value) ->
+    x = x | 0
+    y = y | 0
+    value = value | 0
     return if x < 0 or x >= @width or y < 0 or y >= @height
     @cells[x + (y * @width)] = value | 0
   clear: (x, y) ->
@@ -41,8 +46,12 @@ module.exports = class Matrix
   mark: (x, y) ->
     @set x, y, (Cell.setMark @get x, y)
   checkLineDirections: (originX, originY) ->
+    originX = originX | 0
+    originY = originY | 0
     @markLineDirections originX, originY, Direction.NONE
   markLineDirections: (originX, originY, markDirections) ->
+    originX = originX | 0
+    originY = originY | 0
     cell = @get originX, originY
     cellColor = Cell.getColor cell
     if not cellColor or (@isFalling originX, originY) or Cell.isMarked cell
@@ -92,6 +101,8 @@ module.exports = class Matrix
     else if isVerticalLine then Direction.VERT
     else Direction.NONE
   isFalling: (originX, originY, checkDirection = true) ->
+    originX = originX | 0
+    originY = originY | 0
     cell = @get originX, originY
     if (originY >= @height - 1) or (Cell.isEmpty cell) or (Cell.isVirus cell)
       false
@@ -113,6 +124,8 @@ module.exports = class Matrix
     else
       false
   drop: (x, y) ->
+    x = x | 0
+    y = y | 0
     cell = @get x, y
     @clear x, y
     @set x, y + 1, cell
@@ -148,6 +161,8 @@ module.exports = class Matrix
           totalMarked += Direction.numLines lines
     totalMarked
   reshape: (x, y) ->
+    x = x | 0
+    y = y | 0
     cell = @get x, y
     newDirection = directions = Cell.getDirection cell
     for i in [0...Direction.numDirections directions]

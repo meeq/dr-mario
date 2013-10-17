@@ -22,6 +22,8 @@ module.exports = class Capsule
     @random @nextBuffer
     return
   get: (x, y) ->
+    x = x | 0
+    y = y | 0
     isInX = x >= @x and x < (@x + @size)
     isInY = y >= @y and y < (@y + @size)
     if isInX and isInY
@@ -75,6 +77,8 @@ module.exports = class Capsule
     @fallingBuffer.clear()
     return
   blit: (source, dest, destOffsetX = 0, destOffsetY = 0) ->
+    destOffsetX = destOffsetX | 0
+    destOffsetY = destOffsetY | 0
     # Copy the non-empty cells of source to dest
     for x in [0...@size]
       for y in [0...@size]
@@ -133,6 +137,8 @@ module.exports = class Capsule
     @blit @rotateBuffer, buffer
     return
   checkCollision: (originX = @x, originY = @y) ->
+    originX = originX | 0
+    originY = originY | 0
     for x in [0...@size]
       for y in [0...@size]
         capsuleCell = @fallingBuffer.get x, y

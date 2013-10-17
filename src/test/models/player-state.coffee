@@ -3,11 +3,12 @@ Direction = require './direction'
 Matrix = require './matrix'
 Capsule = require './capsule'
 PlayerInput = require './player-input'
+Speed = require './speed'
 
 # TODO Refactor this into defaults
 defaultWidth = 10
 defaultHeight = 16
-defaultSpeed = 'med'
+defaultSpeed = Speed.MED
 defaultLevel = 10
 defaultNumColors = 3
 minNumColors = 1
@@ -21,52 +22,34 @@ defaultSpeedUpRate = 10
 defaultFallingTickRate = 12
 defaultLevelVirusMultiplier = 4
 
-speedToBaseIndex = (speed) ->
-  switch speed
-    when 'lo'  then 15
-    when 'med' then 25
-    when 'hi'  then 31
-
-speedIndexToTickRate = (index) ->
-  if      index <= 25 then (35 - index) * 2 - 1
-  else if index <= 34 then 44 - index
-  else if index <= 36 then 9
-  else if index <= 38 then 8
-  else if index <= 40 then 7
-  else if index <= 42 then 6
-  else if index <= 54 then 5
-  else if index <= 59 then 4
-  else if index <= 64 then 3
-  else if index <= 69 then 2
-  else                     1
-
 minCombo = 1
 maxCombo = 6
 scoreMultiplier = 100
 calculateScore = (speed, numViruses) ->
-  speedMultiplier = 0
-  switch speed
-    when 'lo'  then speedMultiplier = 1
-    when 'med' then speedMultiplier = 2
-    when 'hi'  then speedMultiplier = 3
+  numViruses = numViruses | 0
+  baseCombo = Speed.baseScoreCombo speed
   numCombos = clamp numViruses, minCombo, maxCombo
   score = 0
   for comboIndex in [minCombo..numCombos]
-    score += scoreMultiplier * (Math.pow speedMultiplier, comboIndex)
-  score
+    score += (scoreMultiplier * (Math.pow baseCombo, comboIndex)) | 0
+  score | 0
 
 randomInRange = (start, end) ->
-  start + (Math.random() * (end - start)) | 0
+  start = start | 0
+  end = end | 0
+  (start + (Math.random() * (end - start))) | 0
 
 clamp = (val, min, max) ->
-  (Math.min (Math.max val, min), max)
+  val = val | 0
+  min = min | 0
+  max = max | 0
+  (Math.min (Math.max val, min), max) | 0
 
 module.exports = class PlayerState
   constructor: (options = {}) ->
     @game = options.game
     # Timing
-    @speed = options.speed ? defaultSpeed
-    @baseSpeed = speedToBaseIndex @speed
+    @speed = (Speed.fromOption options.speed) ? defaultSpeed
     # Dimensions
     @width = options.width ? defaultWidth
     @height = options.height ? defaultHeight
@@ -91,7 +74,7 @@ module.exports = class PlayerState
     @speedCount = 0
     @capsuleCount = 0
     @tickCount = 0
-    @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
+    @tickRate = Speed.calculateTickRate @speed, @speedCount
     @grid = new Matrix @
     @capsule = new Capsule @
     # Create an index of available cells for viruses
@@ -179,9 +162,10 @@ module.exports = class PlayerState
         @speedCount += 1
         @game.playerDidSpeedUp @
       # Switch back to "player speed"
-      @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
+      @tickRate = Speed.calculateTickRate @speed, @speedCount
     return true
   recomputeVirusesLeft: (linesMarked) ->
+    linesMarked = linesMarked | 0
     virusesMarked = 0
     didClearColor = false
     for colorIndex in [1..@numColors]
@@ -206,7 +190,7 @@ module.exports = class PlayerState
     if PlayerInput.get input, PlayerInput.FAST_DROP
       @tickRate = 0
     else if @tickRate is 0
-      @tickRate = speedIndexToTickRate (@baseSpeed + @speedCount)
+      @tickRate = Speed.calculateTickRate @speed, @speedCount
     if PlayerInput.get input, PlayerInput.INSTANT_DROP
       @capsule.drop() while not @capsule.isLanded()
       @tickRate = 0

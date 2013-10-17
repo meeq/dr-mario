@@ -1,38 +1,44 @@
-exports.NONE  = NONE  = 0
+exports.NONE  = NONE  = 0 | 0
 # Simple directions
-exports.UP    = UP    = 1
-exports.DOWN  = DOWN  = 2
-exports.LEFT  = LEFT  = 3
-exports.RIGHT = RIGHT = 4
+exports.UP    = UP    = 1 | 0
+exports.DOWN  = DOWN  = 2 | 0
+exports.LEFT  = LEFT  = 3 | 0
+exports.RIGHT = RIGHT = 4 | 0
 # Complex directions
-exports.HORIZ = HORIZ = 5
-exports.VERT  = VERT  = 6
-exports.CROSS = CROSS = 7
+exports.HORIZ = HORIZ = 5 | 0
+exports.VERT  = VERT  = 6 | 0
+exports.CROSS = CROSS = 7 | 0
 
 exports.isX = (direction) ->
+  direction = direction | 0
   switch direction
     when LEFT, RIGHT, HORIZ, CROSS then true
     else false
 
 exports.isY = (direction) ->
+  direction = direction | 0
   switch direction
     when UP, DOWN, VERT, CROSS then true
     else false
 
 exports.numLines = (direction) ->
+  direction = direction | 0
   switch direction
-    when HORIZ, VERT then 1
-    when CROSS then 2
-    else 0
+    when HORIZ, VERT then 1 | 0
+    when CROSS then 2 | 0
+    else 0 | 0
 
 exports.numDirections = (direction) ->
+  direction = direction | 0
   switch direction
-    when UP, DOWN, LEFT, RIGHT then 1
-    when HORIZ, VERT then 2
-    when CROSS then 4
-    else 0
+    when UP, DOWN, LEFT, RIGHT then 1 | 0
+    when HORIZ, VERT then 2 | 0
+    when CROSS then 4 | 0
+    else 0 | 0
 
 exports.directionAt = (direction, num) ->
+  direction = direction | 0
+  num = num | 0
   switch direction
     when UP, DOWN, LEFT, RIGHT
       if num is 0 then direction
@@ -57,6 +63,7 @@ exports.directionAt = (direction, num) ->
     else NONE
 
 exports.reverse = reverse = (direction) ->
+  direction = direction | 0
   switch direction
     when LEFT   then RIGHT
     when RIGHT  then LEFT
@@ -67,6 +74,7 @@ exports.reverse = reverse = (direction) ->
     else direction
 
 exports.rotateLeft = rotateLeft = (direction) ->
+  direction = direction | 0
   switch direction
     when LEFT   then DOWN
     when RIGHT  then UP
@@ -75,6 +83,7 @@ exports.rotateLeft = rotateLeft = (direction) ->
     else reverse direction
 
 exports.rotateRight = rotateRight = (direction) ->
+  direction = direction | 0
   switch direction
     when LEFT   then UP
     when RIGHT  then DOWN
@@ -83,6 +92,8 @@ exports.rotateRight = rotateRight = (direction) ->
     else reverse direction
 
 exports.rotate = (direction, rotateDirection) ->
+  direction = direction | 0
+  rotateDirection = rotateDirection | 0
   switch rotateDirection
     when LEFT   then rotateLeft direction
     when RIGHT  then rotateRight direction
@@ -91,6 +102,8 @@ exports.rotate = (direction, rotateDirection) ->
     else direction
 
 exports.unset = (directions, direction) ->
+  directions = directions | 0
+  direction = direction | 0
   if directions is direction then NONE
   else
     switch directions
@@ -113,6 +126,9 @@ exports.unset = (directions, direction) ->
         directions
 
 exports.coordinates = (x, y, direction) ->
+  x = x | 0
+  y = y | 0
+  direction = direction | 0
   switch direction
     when LEFT   then x -= 1
     when RIGHT  then x += 1

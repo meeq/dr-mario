@@ -1,6 +1,7 @@
 # Core libs
 {eventCharacter} = require 'core/events'
 # App data
+Speed = require '../models/speed'
 defaults = require '../defaults'
 
 module.exports = class Setup
@@ -9,7 +10,7 @@ module.exports = class Setup
   eventCharacter: eventCharacter
   soundOptions: ['on', 'off']
   musicOptions: ['fever', 'chill', 'quiet']
-  speedOptions: ['lo', 'med', 'hi']
+  speedOptions: Speed.options
   # Child element selectors
   formSelector: 'form'
   soundSelector: '[name=sound]'
