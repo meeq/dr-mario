@@ -46,13 +46,13 @@ module.exports = class Capsule
         @landedTick = @player.tickCount
       else
         delete @landedTick
+    else
+      @landedTick ?= @player.tickCount
     return
   move: (direction) ->
     switch direction
-      when Direction.LEFT
-        newX = @x - 1
-      when Direction.RIGHT
-        newX = @x + 1
+      when Direction.LEFT  then newX = (@x - 1) | 0
+      when Direction.RIGHT then newX = (@x + 1) | 0
     if newX? and not @checkCollision newX, @y
       @x = newX
       @game.playerDidMoveCapsule @player
@@ -87,27 +87,30 @@ module.exports = class Capsule
           destY = destOffsetY + y
           dest.set destX, destY, cell
           # Correct for top-of-grid cut-off
-          if y isnt 0 and destY is 0 and Direction.UP is Cell.getDirection cell
-            dest.reshape destX, destY
+          if y isnt 0 and destY is 0
+            if Direction.UP is Cell.getDirection cell
+              dest.reshape destX, destY
     return
   random: (buffer = @nextBuffer) ->
+    dim = (@size - 1) | 0
     numColors = @player.numColors
     for x in [0...@size]
       for y in [0...@size]
         # Clear everything except the bottom row
-        if y < @size - 1
+        if y < dim
           buffer.clear x, y
         else
-          # Randomly colored cells across the whole row facing each other.
+          cell = Cell.randomColor numColors
+          # Face the outside pills inward
           switch x
-            when 0          then direction = Direction.RIGHT
-            when @size - 1  then direction = Direction.LEFT
-            else                 direction = Direction.HORIZ
-          cell = Cell.setDirection (Cell.randomColor numColors), direction
+            when 0   then direction = Direction.RIGHT
+            when dim then direction = Direction.LEFT
+            else          direction = Direction.HORIZ
+          cell = Cell.setDirection cell, direction
           buffer.set x, y, cell
     return
   flip: (buffer, direction) ->
-    dim = @size - 1
+    dim = (@size - 1) | 0
     # Rotate the cells and their positions into a scratch buffer
     for x in [0..dim]
       for y in [0..dim]
@@ -143,8 +146,8 @@ module.exports = class Capsule
       for y in [0...@size]
         capsuleCell = @fallingBuffer.get x, y
         continue if Cell.isEmpty capsuleCell
-        gridX = originX + x
-        gridY = originY + y
+        gridX = (originX + x) | 0
+        gridY = (originY + y) | 0
         # Treat grid boundaries (except top) as collisions
         return true if gridX < 0 or gridX >= @grid.width
         return true if gridY >= @grid.height
