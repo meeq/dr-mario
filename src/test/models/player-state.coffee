@@ -19,7 +19,7 @@ defaultLineLength = 4
 defaultMinYCeiling = 3
 defaultMaxYCeiling = 9
 defaultSpeedUpRate = 10
-defaultFallingTickRate = 12
+defaultFallingTickRate = 8
 defaultLevelVirusMultiplier = 4
 
 minCombo = 1
