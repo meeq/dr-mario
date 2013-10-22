@@ -1,3 +1,6 @@
+# Core libs
+{eventCharacter} = require 'core/events'
+# App libs
 Timer = require '../models/timer'
 Player = require './player'
 
@@ -51,6 +54,7 @@ module.exports = class Game
     @clockRef = Timer.start @clockType, @loop, @tickRate
     return
   pause: ->
+    @sound?.play 'pause'
     @paused = true
     @lastTick = null
     Timer.stop @clockType, @clockRef if @clockRef?
@@ -85,9 +89,16 @@ module.exports = class Game
         return false
     return
   handleKeyDown: (event) ->
-    # TODO
+    switch (eventCharacter event)
+      when 'p'
+        return true
+    false
   handleKeyUp: (event) ->
-    # TODO
+    switch (eventCharacter event)
+      when 'p'
+        if @paused then @unpause() else @pause()
+        return true
+    false
   playerDidSpawnCapsule: (player) ->
     # TODO
   playerDidMoveCapsule: (player) ->
