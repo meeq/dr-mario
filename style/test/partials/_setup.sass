@@ -6,6 +6,7 @@
 
   $base-margin: 10px
   $border-width: 16px
+  $border-image-src: inline-image("test/setup-border.png")
   $border-image-width: strip-units($border-width)
 
   $level-width: 158px
@@ -58,7 +59,7 @@
       width: $border-width
       style: solid
       color: transparent
-      image: inline-image("test/setup-border.png") $border-image-width stretch
+    +border-image($border-image-src $border-image-width stretch)
 
   .global, .player:only-child
     width: 80%
