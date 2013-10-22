@@ -178,7 +178,7 @@ module.exports = class PlayerState
     @game.playerDidMarkLines @, linesMarked, virusesMarked, didClearColor
     return
   applyInput: (input) ->
-    return if not @capsule.isFalling()
+    return if not @capsule.isFalling() or @capsule.isOutOfBounds()
     if PlayerInput.get input, PlayerInput.MOVE_LEFT
       @capsule.move Direction.LEFT
     if PlayerInput.get input, PlayerInput.MOVE_RIGHT
