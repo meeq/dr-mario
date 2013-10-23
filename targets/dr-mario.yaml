@@ -4,5 +4,7 @@ wrapper:
   template: 'test/templates/layout'
 requirejs:
   app: 'test/app'
+  paths: ['core', 'test']
+  shim: []
 style:
   'screen, projection': 'test/screen'
