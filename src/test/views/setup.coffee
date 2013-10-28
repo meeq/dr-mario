@@ -12,12 +12,13 @@ module.exports = class Setup
   musicOptions: ['fever', 'chill', 'quiet']
   speedOptions: Speed.options
   # Child element selectors
-  formSelector: 'form'
-  soundSelector: '[name=sound]'
-  musicSelector: '[name=music]'
-  levelSelector: '[name=level]'
-  speedSelector: '[name=speed]'
-  controlSelector: '.controls button'
+  events:
+    'submit form': 'formSubmitted'
+    'change [name=sound]': 'soundChanged'
+    'change [name=music]': 'musicChanged'
+    'change [name=level]': 'levelChanged'
+    'change [name=speed]': 'speedChanged'
+    'click .controls button': 'bindControl'
   constructor: ({@app, numPlayers}) ->
     @sound = @app.sound
     @music = 'quiet'
@@ -30,37 +31,30 @@ module.exports = class Setup
     @el = document.createElement 'div'
     @el.id = 'setup'
     @el.innerHTML = @template @
-    # Capture form submission events
-    for formEl in @el.querySelectorAll @formSelector
-      formEl.addEventListener 'submit', @formSubmitted
-    for radioEl in @el.querySelectorAll @soundSelector
-      radioEl.addEventListener 'change', @soundChanged
-    for radioEl in @el.querySelectorAll @musicSelector
-      radioEl.addEventListener 'change', @musicChanged
-    for rangeEl in @el.querySelectorAll @levelSelector
-      rangeEl.addEventListener 'change', @levelChanged
-    for radioEl in @el.querySelectorAll @speedSelector
-      radioEl.addEventListener 'change', @speedChanged
-    for buttonEl in @el.querySelectorAll @controlSelector
-      buttonEl.addEventListener 'click', @bindControl
+    # Register form event handlers
+    for eventStr, callbackName of @events
+      eventSplit = eventStr.indexOf ' '
+      eventType = eventStr[0...eventSplit]
+      eventSelector = eventStr[eventSplit+1..]
+      for eventEl in @el.querySelectorAll eventSelector
+        eventEl.addEventListener eventType, @[callbackName]
     @el
   destroy: ->
-    # Unregister event handlers
-    for formEl in @el.querySelectorAll @formSelector
-      formEl.removeEventListener 'submit', @formSubmitted
-    for radioEl in @el.querySelectorAll @soundSelector
-      radioEl.removeEventListener 'change', @soundChanged
-    for radioEl in @el.querySelectorAll @musicSelector
-      radioEl.removeEventListener 'change', @musicChanged
-    for rangeEl in @el.querySelectorAll @levelSelector
-      rangeEl.removeEventListener 'change', @levelChanged
-    for radioEl in @el.querySelectorAll @speedSelector
-      radioEl.removeEventListener 'change', @speedChanged
-    for buttonEl in @el.querySelectorAll @controlSelector
-      buttonEl.removeEventListener 'click', @bindControl
+    # Unregister form event handlers
+    for eventStr, callbackName of @events
+      eventSplit = eventStr.indexOf ' '
+      eventType = eventStr[0..eventSplit]
+      eventSelector = eventStr[eventSplit+1..]
+      for eventEl in @el.querySelectorAll eventSelector
+        eventEl.removeEventListener eventType, @[callbackName]
+    # Cancel binding-in-progress
+    if @bindButtonEl?
+      @unbindControl @bindButtonEl
+      delete @bindButtonEl
     # Clean up the DOM
-    @el?.parentNode?.removeChild @el
-    delete @el
+    if @el?
+      @el.parentNode?.removeChild @el
+      delete @el
     return
   soundChanged: (event) =>
     if (radioEl = event.target).checked
@@ -111,7 +105,7 @@ module.exports = class Setup
     return
   handleKeyBind: (event) =>
     return unless (buttonEl = @bindButtonEl)?
-    keyCode = event.which
+    keyCode = event.keyCode ? event.which
     unless 'esc' is eventCharacter keyCode
       player = @players[buttonEl.form.name]
       controlName = buttonEl.name
