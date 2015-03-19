@@ -5,8 +5,13 @@
 @import "compass/css3/box-sizing"
 @import "compass/css3/user-interface"
 
+// Directories
+@function app-url($rest)
+  @return "dr-puzzle/#{$rest}"
+
 // Font
-@include font-face("8bit", inline-font-files("PressStart.ttf", truetype))
+$base-font-url: app-url("PressStart.ttf")
+@include font-face("8bit", inline-font-files($base-font-url, truetype))
 $base-font-family: "8bit", sans-serif
 
 // Base styles
