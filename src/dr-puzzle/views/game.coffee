@@ -60,6 +60,14 @@ module.exports = class Game
     Timer.stop @clockType, @clockRef if @clockRef?
     @clockRef = null
     return
+  reset: ->
+    @sound?.stopLast()
+    @pause()
+    for player in @players
+      player.reset()
+    @unpause()
+    @sound?.play @music unless @music is 'quiet'
+    return
   loop: =>
     return if @paused
     # Figure out how many ticks have happened since the last loop
@@ -90,13 +98,16 @@ module.exports = class Game
     return
   handleKeyDown: (event) ->
     switch (eventCharacter event)
-      when 'p'
+      when 'p', 'r'
         return true
     false
   handleKeyUp: (event) ->
     switch (eventCharacter event)
       when 'p'
         if @paused then @unpause() else @pause()
+        return true
+      when 'r'
+        @reset()
         return true
     false
   playerDidSpawnCapsule: (player) ->

@@ -5,11 +5,17 @@ PlayerState = require '../models/player-state'
 TableView = require './table'
 
 module.exports = class Player
-  constructor: (options) ->
-    {@controls} = options
-    @state = new PlayerState options
+  constructor: (@options) ->
+    {@controls} = @options
+    @reset()
+    return
+  reset: ->
+    @state = new PlayerState @options
     @startMoveTick = @lastMoveTick = null
     @input = @holdInput = @moveInput = PlayerInput.NONE
+    if @tableView?
+      @tableView.state = @state
+      @update()
     return
   render: ->
     @el = document.createElement 'li'

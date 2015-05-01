@@ -36,6 +36,7 @@ module.exports = class Sound
     @buffers = {}
     @unloadedBuffers = 0
     @loadedBuffers = 0
+    @lastSource = null
     @loopSource = null
     return
   play: (file) ->
@@ -51,6 +52,12 @@ module.exports = class Sound
       source.loop = true
       source.loopStart = musicLoopOffsets[file]
     source.start 0
+    @lastSource = source
+    return
+  stopLast: ->
+    if @lastSource?
+      @lastSource.stop 0
+      @lastSource = null
     return
   stopLoop: ->
     if @loopSource?
