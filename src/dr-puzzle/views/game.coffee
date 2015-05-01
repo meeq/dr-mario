@@ -35,6 +35,9 @@ module.exports = class Game
       @el.appendChild player.render()
     @el
   destroy: ->
+    # Stop sound
+    @sound?.stopLast()
+    @sound?.stopLoop()
     # Stop timer
     @pause()
     # Clean up players
@@ -98,7 +101,7 @@ module.exports = class Game
     return
   handleKeyDown: (event) ->
     switch (eventCharacter event)
-      when 'p', 'r'
+      when 'p', 'r', 'q'
         return true
     false
   handleKeyUp: (event) ->
@@ -108,6 +111,9 @@ module.exports = class Game
         return true
       when 'r'
         @reset()
+        return true
+      when 'q'
+        @app.showSetup()
         return true
     false
   playerDidSpawnCapsule: (player) ->
