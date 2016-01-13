@@ -1,6 +1,4 @@
-# Core libs
-{eventCharacter} = require 'core/events'
-# App data
+{eventCharacter} = require '../events'
 Speed = require '../models/speed'
 defaults = require '../defaults'
 

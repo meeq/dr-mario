@@ -1,5 +1,4 @@
-# Core libs
-{stringKeyCode} = require 'core/events'
+{stringKeyCode} = require './events'
 
 module.exports = (playerName) ->
   level: 10

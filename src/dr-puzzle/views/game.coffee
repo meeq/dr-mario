@@ -1,6 +1,4 @@
-# Core libs
-{eventCharacter} = require 'core/events'
-# App libs
+{eventCharacter} = require '../events'
 Timer = require '../models/timer'
 Player = require './player'
 
