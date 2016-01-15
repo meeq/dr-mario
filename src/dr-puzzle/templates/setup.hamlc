@@ -1,0 +1,28 @@
+.center
+  - if @sound
+    .global
+      %form{name: 'global'}
+        %h2 Sound Effects
+        - for option in @soundOptions
+          %input{type: 'radio', name: 'sound', id: 'sound-#{option}', value: option}
+          %label{for: 'sound-#{option}'}
+        %h2 Music Type
+        - for option in @musicOptions
+          %input{type: 'radio', name: 'music', id: 'music-#{option}', value: option}
+          %label{for: 'music-#{option}'}
+  %ul.players
+    - for playerName, player of @players
+      %li.player
+        %form{name: playerName}
+          %h2 Level
+          %input{type: 'range', name: 'level', min: '0', max: '20', value: '10'}
+          %h2 Speed
+          - for option in @speedOptions
+            %input{type: 'radio', name: 'speed', id: 'speed-#{option}', value: option}
+            %label{for: 'speed-#{option}'}
+          %h2 Controls
+          .controls
+            - for controlName, keyCode of player.controls
+              %button{type: 'button', name: controlName}
+                = @eventCharacter keyCode
+          %button{type: 'submit'} Ready?

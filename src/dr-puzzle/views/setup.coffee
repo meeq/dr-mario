@@ -29,6 +29,14 @@ module.exports = class Setup
     @el = document.createElement 'div'
     @el.id = 'setup'
     @el.innerHTML = @template @
+    # Setup initial form state
+    soundValue = if @sound?.isEnabled then 'on' else 'off'
+    (@el.querySelector "[id=sound-#{soundValue}]").checked = true
+    (@el.querySelector "[id=music-#{@music}]").checked = true
+    for playerName, player of @players
+      playerEl = @el.querySelector "[name=#{playerName}]"
+      (playerEl.querySelector "[name=level]").value = player.level
+      (playerEl.querySelector "[id=speed-#{player.speed}]").checked = true
     # Register form event handlers
     for eventStr, callbackName of @events
       eventSplit = eventStr.indexOf ' '

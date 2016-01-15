@@ -7,17 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" type="text/css" media="screen, projection" href="/static/stylesheets/dr-puzzle/screen.css">
+    <link rel="stylesheet" type="text/css" media="screen, projection" href="./stylesheets/dr-puzzle/screen.css">
   </head>
   <body ontouchstart="">
     <div id="wrap"></div>
-    <script type="text/javascript" src="/static/apps/dr-puzzle.js"></script>
-    <script type="text/javascript" charset="utf-8">
-      require(["dr-puzzle/app"], function(App) {
-        var app = new App;
-        if ('undefined' !== typeof this) this.app = app;
-        app.start();
-      });
-    </script>
+    <script type="text/javascript" src="./dr-puzzle.js" charset="utf-8"></script>
   </body>
 </html>

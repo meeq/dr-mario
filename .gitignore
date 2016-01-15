@@ -1,9 +1,5 @@
 .DS_Store
 .sass-cache/
 node_modules/
-Gemfile.lock
-static/apps/
-static/stylesheets/*
-static/javascripts/*
-!static/stylesheets/vendor/
-!static/javascripts/vendor/
+static/**/*.js
+static/**/*.css
