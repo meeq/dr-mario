@@ -6,7 +6,7 @@
 
   $base-margin: 10px
   $border-width: 16px
-  $border-image-src: inline-image(app-url('setup-border.png'))
+  $border-image-src: image-url('setup-border.png')
   $border-image-width: strip-units($border-width)
 
   $level-width: 158px
@@ -44,7 +44,7 @@
     left: 0
     width: 100%
     height: 100%
-    background-image: inline-image(app-url('bg-setup.png'))
+    background-image: image-url('bg-setup.png')
 
   .center
     display: table-cell
@@ -94,7 +94,7 @@
       border: 0 solid transparent
       background:
         color: transparent
-        image: inline-image(app-url('setup-level-slider.png'))
+        image: image-url('setup-level-slider.png')
         size: $level-thumb-image-size $level-thumb-image-size
         repeat: no-repeat
         position: top center
@@ -105,7 +105,7 @@
       border: 0 solid transparent
       background:
         color: transparent
-        image: inline-image(app-url('setup-level-slider.png'))
+        image: image-url('setup-level-slider.png')
         size: $level-thumb-image-size $level-thumb-image-size
         repeat: no-repeat
         position: top center
@@ -166,7 +166,7 @@
     &:checked
       background:
         color: transparent
-        image: inline-image(app-url('setup-speed-checked.png'))
+        image: image-url('setup-speed-checked.png')
         size: $speed-checked-width $speed-checked-height
         repeat: no-repeat
         position: top center

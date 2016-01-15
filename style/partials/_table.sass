@@ -7,7 +7,7 @@ table.game-state
     width: 16px
     style: solid
     color: transparent
-  +border-image(inline-image(app-url('bottle.png')) 16 stretch)
+  +border-image(image-url('bottle.png') 16 stretch)
 
   &::before
     content: ''
@@ -18,7 +18,7 @@ table.game-state
     width: 96px
     height: 80px
     background:
-      image: inline-image(app-url('bottle-top.png'))
+      image: image-url('bottle-top.png')
       position: center center
       repeat: no-repeat
 
@@ -38,27 +38,27 @@ table.game-state
     &.marked
       @each $color in $pill-colors
         &.#{$color}
-          $image_url: app-url('pill-#{$color}-clear.png')
-          background-image: inline-image($image_url)
+          $image: 'pill-#{$color}-clear.png'
+          background-image: image-url($image)
 
     &.pill
       @each $color in $pill-colors
         &.#{$color}
-          $image_url: app-url('pill-#{$color}-round.png')
-          background-image: inline-image($image_url)
+          $image: 'pill-#{$color}-round.png'
+          background-image: image-url($image)
           @each $direction in $pill-directions
             &.#{$direction}
-              $image_url: app-url('pill-#{$color}-#{$direction}.png')
-              background-image: inline-image($image_url)
+              $image: 'pill-#{$color}-#{$direction}.png'
+              background-image: image-url($image)
 
     &.virus
       @each $color in $pill-colors
         &.#{$color}
-          $image_url: app-url('virus-#{$color}-1.png')
-          background-image: inline-image($image_url)
+          $image: 'virus-#{$color}-1.png'
+          background-image: image-url($image)
 
   &.tock td.virus
     @each $color in $pill-colors
       &.#{$color}
-        $image_url: app-url('virus-#{$color}-2.png')
-        background-image: inline-image($image_url)
+        $image: 'virus-#{$color}-2.png'
+        background-image: image-url($image)

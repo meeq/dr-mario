@@ -7,11 +7,13 @@
 
 // Directories
 @function app-url($rest)
-  @return "dr-puzzle/#{$rest}"
+  @return url("../#{$rest}")
+
+@function image-url($rest)
+  @return url("../images/#{$rest}")
 
 // Font
-$base-font-url: app-url("PressStart.ttf")
-@include font-face("8bit", inline-font-files($base-font-url, truetype))
+@include font-face("8bit", url("../fonts/PressStart.ttf"))
 $base-font-family: "8bit", sans-serif
 
 // Base styles

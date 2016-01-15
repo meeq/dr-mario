@@ -28,7 +28,7 @@ musicLoopOffsets =
   'chill': 7.421
 
 module.exports = class Sound
-  soundsDir: '/static/sounds/dr-puzzle/'
+  soundsDir: './sounds/'
   soundsExt: '.mp3'
   constructor: ->
     @isEnabled = false

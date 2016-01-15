@@ -2,8 +2,12 @@ Setup = require './views/setup'
 Game = require './views/game'
 Sound = require './views/sound'
 
-module.exports = class TestApp
-  wrapper: document.getElementById 'wrap'
+module.exports = class DrPuzzleApp
+  wrapper: (document.getElementById 'wrap') ? do ->
+    div = document.createElement "div"
+    div.setAttribute 'id', 'wrap'
+    document.body.appendChild div
+    div
   start: ->
     @sound = new Sound
     if @sound.audioCtx?
