@@ -71,34 +71,25 @@ eventCharacter = (arg) ->
   else
     keyCode = arg
   code = if keyCode then keyCode else which
-  # Return keypress events as-is...
+  # Key-press tells us which character was input
+  # Key-down/up tells us which key was pressed
   if type is 'keypress'
-    String.fromCharCode code
-  # ...Non-keypress events should interpret special keys...
+    if code is KEY_CODES_TO_SPECIAL_KEYS_MAP['enter']
+      '\n'
+    else if code < KEY_CODES_TO_SPECIAL_KEYS_MAP['space']
+      ''
+    else
+      String.fromCharCode code
+  # Non-keypress events should interpret special keys
   else if KEY_CODES_TO_SPECIAL_KEYS_MAP[code]?
     KEY_CODES_TO_SPECIAL_KEYS_MAP[code]
   else if KEY_CODES_TO_SPECIAL_CHARS_MAP[code]?
     KEY_CODES_TO_SPECIAL_CHARS_MAP[code]
-  # ...Non-special keys should be mapped to lower-case for consistency.
+  # Non-special keys should be mapped to lower-case for consistency
   else
     (String.fromCharCode code).toLowerCase()
-
-eventModifiers = (event) ->
-  modifiers = []
-  modifiers.push 'shift' if event.shiftKey
-  modifiers.push 'alt' if event.altKey
-  modifiers.push 'ctrl' if event.ctrlKey
-  modifiers.push 'meta' if event.metaKey
-  modifiers
-
-isArrowKey = (event) ->
-  switch (eventCharacter event)
-    when 'left', 'right', 'up', 'down' then true
-    else false
 
 module.exports =
   stringKeyCode: stringKeyCode
   characterKeyCode: characterKeyCode
   eventCharacter: eventCharacter
-  eventModifiers: eventModifiers
-  isArrowKey: isArrowKey

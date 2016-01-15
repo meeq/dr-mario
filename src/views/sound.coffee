@@ -6,17 +6,6 @@ musicLoopOffsets =
   'fever': 3.189
   'chill': 7.421
 
-base64ToByteArray = (base64) ->
-  dataUriSeparatorIndex = base64.indexOf ','
-  if dataUriSeparatorIndex > -1
-    base64 = base64[dataUriSeparatorIndex + 1..]
-  data = atob base64
-  size = data.length
-  result = new Uint8Array size
-  for i in [0...size]
-    result[i] = data.charCodeAt i
-  result
-
 module.exports = class Sound
   constructor: ->
     @isEnabled = false
@@ -57,8 +46,7 @@ module.exports = class Sound
       bufferDidLoad = =>
         callback() if 0 is @unloadedBuffers
     require.ensure [], =>
-      for file, dataUri of require '../sounds'
-        data = base64ToByteArray dataUri
+      for file, data of require '../sounds'
         @decodeAudioData file, data, bufferDidLoad
     , "sounds"
     return
