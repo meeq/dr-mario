@@ -1,5 +1,7 @@
+var path = require('path');
+
 module.exports = {
-    context: __dirname + "/src/dr-puzzle",
+    context: __dirname + "/src",
     entry: "./main",
     output: {
         path: __dirname + '/static',
@@ -8,11 +10,17 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.coffee$/, loader: "coffee-loader" },
-            { test: /\.hamlc$/, loader: "hamlc-loader" }
+            { test: /\.coffee$/, loader: "coffee" },
+            { test: /\.hamlc$/, loader: "hamlc" },
+            { test: /\.sass$/, loaders: ["style", "css", "sass"] }
         ]
     },
     resolve: {
-        extensions: [".js", ".coffee", ".hamlc"]
+        root: path.resolve("./src"),
+        extensions: ["", ".js", ".coffee", ".hamlc", ".sass"]
+    },
+    sassLoader: {
+        indentedSyntax: true,
+        includePaths: [path.resolve("./node_modules/compass-mixins/lib")]
     }
 };
