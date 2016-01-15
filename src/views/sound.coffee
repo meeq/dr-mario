@@ -1,35 +1,23 @@
 AudioContext = window.AudioContext ? window.webkitAudioContext
 
-files = [
-  'chill'
-  'defeat'
-  'drop'
-  'fever'
-  'flip'
-  'game-over'
-  'match-over'
-  'menu'
-  'move'
-  'color-clear'
-  'pause'
-  'pill-clear'
-  'setup'
-  'speed-up'
-  'taunt1'
-  'taunt2'
-  'victory'
-  'virus-clear'
-]
-
 musicLoopOffsets =
   'menu': 0
   'setup': 0
   'fever': 3.189
   'chill': 7.421
 
+base64ToByteArray = (base64) ->
+  dataUriSeparatorIndex = base64.indexOf ','
+  if dataUriSeparatorIndex > -1
+    base64 = base64[dataUriSeparatorIndex + 1..]
+  data = atob base64
+  size = data.length
+  result = new Uint8Array size
+  for i in [0...size]
+    result[i] = data.charCodeAt i
+  result
+
 module.exports = class Sound
-  soundsDir: './sounds/'
-  soundsExt: '.mp3'
   constructor: ->
     @isEnabled = false
     @audioCtx = new AudioContext if AudioContext?
@@ -68,30 +56,24 @@ module.exports = class Sound
     if callback?
       bufferDidLoad = =>
         callback() if 0 is @unloadedBuffers
-    for file in files
-      @loadBuffer file, bufferDidLoad
+    require.ensure [], =>
+      for file, dataUri of require '../sounds'
+        data = base64ToByteArray dataUri
+        @decodeAudioData file, data, bufferDidLoad
+    , "sounds"
     return
-  loadBuffer: (file, callback) ->
+  decodeAudioData: (file, data, callback) ->
     @buffers[file] = null
     @unloadedBuffers += 1
-    request = new XMLHttpRequest
-    decodeResponse = =>
-      onSuccess = (buffer) =>
-        @buffers[file] = buffer
-        @unloadedBuffers -= 1
-        @loadedBuffers += 1
-        callback?(file)
-        return
-      onFailure = =>
-        @unloadedBuffers -= 1
-        callback?(file)
-        return
-      @audioCtx.decodeAudioData request.response, onSuccess, onFailure
+    onSuccess = (buffer) =>
+      @buffers[file] = buffer
+      @unloadedBuffers -= 1
+      @loadedBuffers += 1
+      callback?(file)
       return
-    url = @soundsDir + file + @soundsExt
-    # Set up and send the request
-    request.open 'GET', url, true
-    request.responseType = 'arraybuffer'
-    request.addEventListener 'load', decodeResponse, false
-    request.send()
+    onFailure = =>
+      @unloadedBuffers -= 1
+      callback?(file)
+      return
+    @audioCtx.decodeAudioData data.buffer, onSuccess, onFailure
     return
