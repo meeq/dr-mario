@@ -2,11 +2,12 @@
 PlayerInput = require '../models/player-input'
 
 buttonActions =
-  'quit': PlayerInput.NONE
+  'back': PlayerInput.NONE
   'pause': PlayerInput.NONE
   'retry': PlayerInput.NONE
   'move-left': PlayerInput.MOVE_LEFT
   'move-right': PlayerInput.MOVE_RIGHT
+  'fast-drop': PlayerInput.FAST_DROP
   'flip-left': PlayerInput.FLIP_LEFT
   'flip-right': PlayerInput.FLIP_RIGHT
 
@@ -15,10 +16,12 @@ module.exports = class PlayerTouchControls
     return
   render: ->
     @el = document.createElement 'div'
-    @el.className = 'player-touch-controls'
+    @el.id = 'player-touch-controls'
+    # Create button elements
     for name, action of buttonActions
       buttonEl = document.createElement 'button'
       buttonEl.name = name
+      buttonEl.innerText = name.replace '-', ' '
       @el.appendChild buttonEl
     # Register touch event listeners
     @el.addEventListener 'touchstart', @handleTouchStart
@@ -33,9 +36,10 @@ module.exports = class PlayerTouchControls
     delete @el
     return
   handleTouchStart: (event) =>
+    event.preventDefault()
     return unless name = event.target.name
     switch name
-      when 'quit'
+      when 'back'
         @app.showSetup()
       when 'pause'
         @game.togglePaused()

@@ -1,0 +1,55 @@
+#player-touch-controls
+
+  position: absolute
+  top: 0
+  left: 0
+  bottom: 0
+  right: 0
+
+  button
+    position: absolute
+    display: block
+    width: 64px
+    height: 60px
+    background-color: #E99D00
+    border: 2px solid black
+    text-align: center
+
+    &:active
+      color: white
+
+  [name=back], [name=pause], [name=retry]
+    top: 0
+    width: 80px
+    height: 40px
+
+  [name=back]
+    left: 0
+
+  [name=pause]
+    left: 50%
+    margin-left: -40px
+
+  [name=retry]
+    right: 0
+
+  [name=move-left]
+    bottom: 0
+    left: 0
+
+  [name=move-right]
+    bottom: 0
+    left: 64px
+
+  [name=fast-drop]
+    bottom: 0
+    left: 50%
+    margin-left: -32px
+
+  [name=flip-left]
+    bottom: 0
+    right: 64px
+
+  [name=flip-right]
+    bottom: 0
+    right: 0
