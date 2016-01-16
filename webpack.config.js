@@ -8,7 +8,8 @@ var buildDir = path.resolve(__dirname, 'build');
 var compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
 
 var htmlPlugin = new HtmlWebpackPlugin({
-    title: 'Dr. Puzzle'
+    template: path.resolve(srcDir, 'templates/index.html'),
+    inject: true
 });
 
 module.exports = {

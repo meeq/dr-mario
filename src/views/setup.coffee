@@ -14,11 +14,12 @@ module.exports = class Setup
     'submit form': 'formSubmitted'
     'change [name=sound]': 'soundChanged'
     'change [name=music]': 'musicChanged'
+    'input [name=level]': 'levelChanged'
     'change [name=level]': 'levelChanged'
     'change [name=speed]': 'speedChanged'
     'click .controls button': 'bindControl'
   constructor: ({@app, numPlayers}) ->
-    @sound = @app.sound
+    {@isTouchDevice, @sound} = @app
     @music = 'quiet'
     @players = {}
     for i in [1..numPlayers]
@@ -78,12 +79,14 @@ module.exports = class Setup
     return
   levelChanged: (event) =>
     rangeEl = event.target
+    rangeVal = rangeEl.value | 0
     # Set the attribute so that the pseduo-element content changes
-    rangeEl.setAttribute 'value', rangeEl.value
+    rangeEl.setAttribute 'value', rangeVal
     # Update the player options
     player = @players[rangeEl.form.name]
-    player.level = rangeEl.value | 0
-    @sound?.play 'move'
+    if player.level isnt rangeVal
+      player.level = rangeVal
+      @sound?.play 'move'
     return
   speedChanged: (event) =>
     if (radioEl = event.target).checked

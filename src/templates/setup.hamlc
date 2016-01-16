@@ -20,9 +20,10 @@
           - for option in @speedOptions
             %input{type: 'radio', name: 'speed', id: 'speed-#{option}', value: option}
             %label{for: 'speed-#{option}'}
-          %h2 Controls
-          .controls
-            - for controlName, keyCode of player.controls
-              %button{type: 'button', name: controlName}
-                = @eventCharacter keyCode
+          - unless @isTouchDevice
+            %h2 Controls
+            .controls
+              - for controlName, keyCode of player.controls
+                %button{type: 'button', name: controlName}
+                  = @eventCharacter keyCode
           %button{type: 'submit'} Ready?

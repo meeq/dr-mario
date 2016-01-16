@@ -29,7 +29,6 @@
     $level-color-stops: append($level-color-stops, $color 150px, comma)
   @each $color in white, black
     $level-color-stops: append($level-color-stops, $color 154px, comma)
-  $level-webkit-gradient: join((left), $level-color-stops, comma)
   $level-css3-gradient: join((90deg), $level-color-stops, comma)
 
   $speed-width: 72px
@@ -62,7 +61,7 @@
     +border-image($border-image-src $border-image-width stretch)
 
   .global, .player:only-child
-    width: 80%
+    width: 85%
     max-width: 600px
 
   form
@@ -119,15 +118,14 @@
       height: $level-height
       background:
         color: transparent
-        image: -webkit-linear-gradient($level-webkit-gradient...)
-        image: linear-gradient($level-css3-gradient...)
+        image: linear-gradient($level-css3-gradient)
 
     &::-moz-range-track
       height: $level-height
       border: 0 solid transparent
       background:
         color: transparent
-        image: linear-gradient($level-css3-gradient...)
+        image: linear-gradient($level-css3-gradient)
 
     &::after
       content: attr(value)
@@ -210,8 +208,10 @@
         text-align: left
 
   button[type=submit]
+    display: block
     +appearance('none')
     outline: none
+    margin: 0 auto
     margin-top: 15px
     font-size: $large-font-size
     padding: 4px
