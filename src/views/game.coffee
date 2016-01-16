@@ -19,6 +19,7 @@ module.exports = class Game
     # Create players from options
     @players = []
     for playerName, options of players
+      options.app = @app
       options.game = @
       @players.push new Player options
     # Register event handlers
@@ -60,6 +61,9 @@ module.exports = class Game
     @lastTick = null
     Timer.stop @clockType, @clockRef if @clockRef?
     @clockRef = null
+    return
+  togglePaused: ->
+    if @paused then @unpause() else @pause()
     return
   reset: ->
     @sound?.stopLast()
@@ -105,7 +109,7 @@ module.exports = class Game
   handleKeyUp: (event) ->
     switch (eventCharacter event)
       when 'p'
-        if @paused then @unpause() else @pause()
+        @togglePaused()
         return true
       when 'r'
         @reset()

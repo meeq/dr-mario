@@ -26,7 +26,7 @@ tockClassName = 'game-state tock'
 module.exports = class TableView
   lastTick: null
   tickRate: 250
-  constructor: (@state) ->
+  constructor: ({@state}) ->
     @lastTick = Timer.now()
     return
   render: ->

@@ -3,10 +3,12 @@ PlayerInput = require '../models/player-input'
 PlayerState = require '../models/player-state'
 # App views
 TableView = require './table'
+PlayerTouchControls = require './player-touch-controls'
 
 module.exports = class Player
   constructor: (@options) ->
-    {@controls} = @options
+    {@app, @game, @controls} = @options
+    {@isTouchDevice} = @app
     @reset()
     return
   reset: ->
@@ -20,14 +22,20 @@ module.exports = class Player
   render: ->
     @el = document.createElement 'li'
     @el.className = 'player'
-    @tableView = new TableView @state
+    options = {@app, @game, @state, player: @}
+    if @isTouchDevice
+      @touchControls = new PlayerTouchControls options
+      @el.appendChild @touchControls.render()
+    @tableView = new TableView options
     @el.appendChild @tableView.render()
     @el
   update: ->
     @tableView?.update()
     return
   destroy: ->
-    # Clean up child view
+    # Clean up child views
+    @touchControls?.destroy()
+    delete @touchControls
     @tableView?.destroy()
     delete @tableView
     # Clean up the DOM
@@ -60,17 +68,23 @@ module.exports = class Player
   actionFromEvent: (event) ->
     control = key for key, val of @controls when val is event.which
     PlayerInput.actionFromString control if control?
-  handleKeyDown: (event) ->
-    if action = @actionFromEvent event
+  beginAction: (action) ->
+    unless PlayerInput.isNone action
       unless PlayerInput.get @holdInput, action
         @input = PlayerInput.set @input, action
         @holdInput = PlayerInput.set @holdInput, action
       true
-    else false
-  handleKeyUp: (event) ->
-    if action = @actionFromEvent event
+    else
+      false
+  endAction: (action) ->
+    unless PlayerInput.isNone action
       @input = PlayerInput.clear @input, action
       @holdInput = PlayerInput.clear @holdInput, action
       @moveInput = PlayerInput.clear @moveInput, action
       true
-    else false
+    else
+      false
+  handleKeyDown: (event) ->
+    @beginAction @actionFromEvent event
+  handleKeyUp: (event) ->
+    @endAction @actionFromEvent event
