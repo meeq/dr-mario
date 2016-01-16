@@ -2,6 +2,7 @@ var path = require('path');
 
 var webpack = require("webpack");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var srcDir = path.resolve(__dirname, 'src');
 var buildDir = path.resolve(__dirname, 'build');
@@ -11,6 +12,9 @@ var htmlPlugin = new HtmlWebpackPlugin({
     template: path.resolve(srcDir, 'templates/index.html'),
     inject: true
 });
+
+var styleLoader = ExtractTextPlugin.extract('style', 'css!sass');
+var stylePlugin = new ExtractTextPlugin('style.css');
 
 module.exports = {
     context: srcDir,
@@ -26,8 +30,9 @@ module.exports = {
         loaders: [
             { test: /\.coffee$/, loader: "coffee" },
             { test: /\.hamlc$/, loader: "hamlc" },
-            { test: /\.sass$/, loaders: ["style", "css", "sass"] },
-            { test: /\.(png|ttf|mp3)$/, loader: "url" }
+            { test: /\.sass$/, loader: styleLoader },
+            { test: /\.(png|ttf)$/, loader: "url" },
+            { test: /\.mp3$/, loader: "file?name=sounds/[name].[ext]" }
         ]
     },
     resolve: {
@@ -39,6 +44,7 @@ module.exports = {
         includePaths: [compassLibDir]
     },
     plugins: [
-        htmlPlugin
+        htmlPlugin,
+        stylePlugin
     ]
 };

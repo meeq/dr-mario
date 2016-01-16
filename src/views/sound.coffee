@@ -45,10 +45,8 @@ module.exports = class Sound
     if callback?
       bufferDidLoad = =>
         callback() if 0 is @unloadedBuffers
-    require.ensure [], =>
-      for file, data of require '../sounds'
-        @decodeAudioData file, data, bufferDidLoad
-    , "sounds"
+    for file, data of require '../sounds'
+      @decodeAudioData file, data, bufferDidLoad
     return
   decodeAudioData: (file, data, callback) ->
     @buffers[file] = null
