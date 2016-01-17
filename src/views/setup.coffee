@@ -27,6 +27,10 @@ module.exports = class Setup
       @players[playerName] = defaults playerName
     return
   render: ->
+    # Setup the sound
+    @sound?.stopLoop()
+    @sound?.play 'setup' if @sound?.isEnabled
+    # Create the view
     @el = document.createElement 'div'
     @el.id = 'setup'
     @el.innerHTML = @template @

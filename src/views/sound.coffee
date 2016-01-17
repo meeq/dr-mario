@@ -28,8 +28,9 @@ module.exports = class Sound
       @loopSource = source
       source.loop = true
       source.loopStart = musicLoopOffsets[file]
+    else
+      @lastSource = source
     source.start 0
-    @lastSource = source
     return
   stopLast: ->
     if @lastSource?
