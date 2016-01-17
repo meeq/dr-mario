@@ -16,6 +16,7 @@
     "dev": "webpack-dev-server"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^0.1.6",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.10.0",
     "compass-mixins": "^0.12.7",

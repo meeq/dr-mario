@@ -89,7 +89,8 @@ eventCharacter = (arg) ->
   else
     (String.fromCharCode code).toLowerCase()
 
-module.exports =
-  stringKeyCode: stringKeyCode
-  characterKeyCode: characterKeyCode
-  eventCharacter: eventCharacter
+module.exports = {
+  stringKeyCode
+  characterKeyCode
+  eventCharacter
+}

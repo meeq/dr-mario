@@ -2,7 +2,7 @@
   - if @sound
     .global
       %form{name: 'global'}
-        %h2 Sound Effects
+        %h2 Sounds
         - for option in @soundOptions
           %input{type: 'radio', name: 'sound', id: 'sound-#{option}', value: option}
           %label{for: 'sound-#{option}'}

@@ -1,12 +1,15 @@
 var path = require('path');
 
 var webpack = require("webpack");
+var CleanPlugin = require('clean-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var srcDir = path.resolve(__dirname, 'src');
 var buildDir = path.resolve(__dirname, 'build');
 var compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
+
+var cleanPlugin = new CleanPlugin([buildDir]);
 
 var htmlPlugin = new HtmlWebpackPlugin({
     template: path.resolve(srcDir, 'templates/index.html'),
@@ -47,6 +50,7 @@ module.exports = {
         includePaths: [compassLibDir]
     },
     plugins: [
+        cleanPlugin,
         htmlPlugin,
         stylePlugin
     ]
