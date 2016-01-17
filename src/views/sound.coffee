@@ -41,25 +41,26 @@ module.exports = class Sound
       @loopSource.stop 0
       @loopSource = null
     return
-  loadAll: (callback) ->
-    if callback?
-      bufferDidLoad = =>
-        callback() if 0 is @unloadedBuffers
-    for file, data of require '../sounds'
-      @decodeAudioData file, data, bufferDidLoad
+  loadAll: (done) ->
+    if done? then bufferDidLoad = =>
+      done() if 0 is @unloadedBuffers
+    (require '../sounds').loadAll (sounds) =>
+      for file, data of sounds
+        @decodeAudioData file, data, bufferDidLoad
+      return
     return
-  decodeAudioData: (file, data, callback) ->
+  decodeAudioData: (file, data, done) ->
     @buffers[file] = null
     @unloadedBuffers += 1
     onSuccess = (buffer) =>
       @buffers[file] = buffer
       @unloadedBuffers -= 1
       @loadedBuffers += 1
-      callback?(file)
+      done?(file)
       return
     onFailure = =>
       @unloadedBuffers -= 1
-      callback?(file)
+      done?(file)
       return
-    @audioCtx.decodeAudioData data.buffer, onSuccess, onFailure
+    @audioCtx.decodeAudioData data, onSuccess, onFailure
     return

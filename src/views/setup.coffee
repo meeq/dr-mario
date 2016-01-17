@@ -68,9 +68,11 @@ module.exports = class Setup
       switch radioEl.value
         when 'off'
           @sound?.isEnabled = false
+          @sound.stopLoop()
         when 'on'
           @sound?.isEnabled = true
           @sound?.play 'move'
+          @sound?.play 'setup'
     return
   musicChanged: (event) =>
     if (radioEl = event.target).checked

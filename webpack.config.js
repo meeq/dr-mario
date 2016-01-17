@@ -16,6 +16,8 @@ var htmlPlugin = new HtmlWebpackPlugin({
 var styleLoader = ExtractTextPlugin.extract('style', 'css!sass');
 var stylePlugin = new ExtractTextPlugin('style.css');
 
+var soundLoader = "url?limit=10000&name=sounds/[name].[ext]";
+
 module.exports = {
     context: srcDir,
     entry: {
@@ -31,8 +33,9 @@ module.exports = {
             { test: /\.coffee$/, loader: "coffee" },
             { test: /\.hamlc$/, loader: "hamlc" },
             { test: /\.sass$/, loader: styleLoader },
-            { test: /\.(png|ttf)$/, loader: "url" },
-            { test: /\.mp3$/, loader: "file?name=sounds/[name].[ext]" }
+            { test: /\.png$/, loader: "url" },
+            { test: /\.ttf$/, loader: "url" },
+            { test: /\.mp3$/, loader: soundLoader }
         ]
     },
     resolve: {
