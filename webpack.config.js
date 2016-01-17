@@ -12,6 +12,9 @@ var compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
 var cleanPlugin = new CleanPlugin([buildDir]);
 
 var htmlPlugin = new HtmlWebpackPlugin({
+    title: 'Dr. Mario',
+    favicon: 'images/favicon.ico',
+    viewport: 'width=device-width, initial-scale=1.0, user-scalable=no',
     template: path.resolve(srcDir, 'templates/index.html'),
     inject: true
 });
@@ -19,12 +22,12 @@ var htmlPlugin = new HtmlWebpackPlugin({
 var styleLoader = ExtractTextPlugin.extract('style', 'css!sass');
 var stylePlugin = new ExtractTextPlugin('style.css');
 
-var soundLoader = "url?limit=10000&name=sounds/[name].[ext]";
+var soundLoader = "url?limit=10240&name=sounds/[name].[ext]";
 
 module.exports = {
     context: srcDir,
     entry: {
-        app: "./main"
+        main: "./main"
     },
     output: {
         path: buildDir,
@@ -50,7 +53,7 @@ module.exports = {
         includePaths: [compassLibDir]
     },
     plugins: [
-        cleanPlugin,
+        // cleanPlugin,
         htmlPlugin,
         stylePlugin
     ]

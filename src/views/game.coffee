@@ -39,16 +39,16 @@ module.exports = class Game
     # Stop sound
     @sound?.stopLast()
     @sound?.stopLoop()
+    # Unregister event handlers
+    for eventType, handler of @events
+      window.removeEventListener eventType, @handleEvent, false
+    # Clean up view
+    @el?.parentNode?.removeChild @el
+    delete @el
     # Clean up players
     for player in @players
       player.destroy()
     delete @players
-    # Clean up view
-    @el?.parentNode?.removeChild @el
-    delete @el
-    # Unregister event handlers
-    for eventType, handler of @events
-      window.removeEventListener eventType, @handleEvent, false
     return
   unpause: ->
     @paused = false

@@ -2,7 +2,7 @@ Setup = require './views/setup'
 Game = require './views/game'
 Sound = require './views/sound'
 
-module.exports = class DrPuzzleApp
+module.exports = class App
   isTouchDevice: do ->
     {userAgent} = navigator
     (/(iPod|iPhone|iPad)/.test userAgent) and
