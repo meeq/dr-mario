@@ -51,6 +51,8 @@ module.exports = class Setup
         eventEl.addEventListener eventType, @[callbackName]
     @el
   destroy: ->
+    # Stop the music
+    @sound?.stopLoop()
     # Unregister form event handlers
     for eventStr, callbackName of @events
       eventSplit = eventStr.indexOf ' '
