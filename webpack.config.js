@@ -7,16 +7,22 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var srcDir = path.resolve(__dirname, 'src');
 var buildDir = path.resolve(__dirname, 'build');
+var imagesDir = path.resolve(__dirname, 'images');
 var compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
 
 var cleanPlugin = new CleanPlugin([buildDir]);
 
 var htmlPlugin = new HtmlWebpackPlugin({
     title: 'Dr. Mario',
-    favicon: 'images/favicon.ico',
+    favicon: path.join(imagesDir, 'favicon.ico'),
     viewport: 'width=device-width, initial-scale=1.0, user-scalable=no',
-    template: path.resolve(srcDir, 'templates/index.html'),
-    inject: true
+    template: path.join(srcDir, "templates/index.hamlc"),
+    inject: true,
+    minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        useShortDoctype: true
+    }
 });
 
 var styleLoader = ExtractTextPlugin.extract('style', 'css!sass');
