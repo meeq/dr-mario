@@ -25,10 +25,18 @@ var htmlPlugin = new HtmlWebpackPlugin({
     }
 });
 
-var styleLoader = ExtractTextPlugin.extract('style', 'css!sass');
-var stylePlugin = new ExtractTextPlugin('style.css');
+var styleLoader = [
+  { loader: "style-loader" },
+  { loader: "css-loader" },
+  { loader: "sass-loader",
+    options: {
+      indentedSyntax: true,
+      includePaths: [compassLibDir]
+    }
+  }
+];
 
-var soundLoader = "url?limit=10240&name=sounds/[name].[ext]";
+var soundLoader = "url-loader?limit=10240&name=sounds/[name].[ext]";
 
 module.exports = {
     context: srcDir,
@@ -41,26 +49,20 @@ module.exports = {
         chunkFilename: "[name].js"
     },
     module: {
-        loaders: [
-            { test: /\.coffee$/, loader: "coffee" },
-            { test: /\.hamlc$/, loader: "hamlc" },
-            { test: /\.sass$/, loader: styleLoader },
-            { test: /\.png$/, loader: "url" },
-            { test: /\.ttf$/, loader: "url" },
-            { test: /\.mp3$/, loader: soundLoader }
+        rules: [
+            { test: /\.coffee$/, use: "coffee-loader" },
+            { test: /\.hamlc$/, use: "hamlc-loader" },
+            { test: /\.sass$/, use: styleLoader },
+            { test: /\.png$/, use: "url-loader" },
+            { test: /\.ttf$/, use: "url-loader" },
+            { test: /\.mp3$/, use: soundLoader }
         ]
     },
     resolve: {
-        root: srcDir,
-        extensions: ["", ".js", ".coffee", ".hamlc", ".sass"]
-    },
-    sassLoader: {
-        indentedSyntax: true,
-        includePaths: [compassLibDir]
+        extensions: [".js", ".coffee", ".hamlc", ".sass"]
     },
     plugins: [
         // cleanPlugin,
-        htmlPlugin,
-        stylePlugin
+        htmlPlugin
     ]
 };

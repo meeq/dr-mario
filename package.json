@@ -9,28 +9,28 @@
     "email": "me@christopherbonhage.com"
   },
   "engine": {
-    "node": ">= 0.12.2"
+    "node": ">= 7"
   },
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server"
   },
   "devDependencies": {
-    "clean-webpack-plugin": "^0.1.6",
-    "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.10.0",
-    "compass-mixins": "^0.12.7",
-    "css-loader": "^0.23.1",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.8.5",
+    "clean-webpack-plugin": "^0.1.16",
+    "coffee-loader": "^0.7.3",
+    "coffee-script": "^1.12.4",
+    "compass-mixins": "^0.12.10",
+    "css-loader": "^0.27.3",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.10.1",
     "haml-coffee": "^1.14.1",
     "hamlc-loader": "^0.0.11",
-    "html-webpack-plugin": "^2.6.5",
-    "node-sass": "^3.4.2",
-    "sass-loader": "^3.1.2",
-    "style-loader": "^0.13.0",
-    "url-loader": "^0.5.7",
-    "webpack": "^1.12.11",
-    "webpack-dev-server": "^1.14.1"
+    "html-webpack-plugin": "^2.28.0",
+    "node-sass": "^4.5.0",
+    "sass-loader": "^6.0.3",
+    "style-loader": "^0.14.1",
+    "url-loader": "^0.5.8",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.2"
   }
 }
