@@ -103,7 +103,7 @@ module.exports = class Game
     return
   handleKeyDown: (event) ->
     switch (eventCharacter event)
-      when 'p', 'r', 'q'
+      when 'p', 'r', 'q', 'esc'
         return true
     false
   handleKeyUp: (event) ->
@@ -114,7 +114,7 @@ module.exports = class Game
       when 'r'
         @reset()
         return true
-      when 'q'
+      when 'q', 'esc'
         @app.showSetup()
         return true
     false
