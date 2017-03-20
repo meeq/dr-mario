@@ -95,8 +95,9 @@ module.exports = class Game
       # Check if the game handles the key
       isEventHandled = @[eventHandlerKey]?(event) ? false
       # Check if any of the players have the key bound
-      for player in @players when not isEventHandled
-        isEventHandled = player[eventHandlerKey]?(event) ? false
+      if not @paused
+        for player in @players when not isEventHandled
+          isEventHandled = player[eventHandlerKey]?(event) ? false
       if isEventHandled and not event.metaKey # Preserve browser hotkeys
         event.preventDefault()
         return false
