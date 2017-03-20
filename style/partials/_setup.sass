@@ -57,6 +57,10 @@
     border-width: $border-width
     +border-image($border-image-src $border-image-width stretch)
 
+    .google-chrome &, .mozilla-firefox &
+      border-color: transparent
+      border-style: solid
+
   .global, .player:only-child
     width: 85%
     max-width: 600px

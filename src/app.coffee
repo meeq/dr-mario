@@ -3,14 +3,9 @@ Game = require './views/game'
 Sound = require './views/sound'
 
 module.exports = class App
-  isTouchDevice: do ->
-    {userAgent} = navigator
-    (/(iPod|iPhone|iPad)/.test userAgent) and
-    (/AppleWebKit/.test userAgent)
   baseEl: document.body
   start: ->
-    if @isTouchDevice
-      @disableBodyScrolling()
+    @detectBrowser()
     @sound = new Sound
     if @sound.audioCtx?
       @sound.loadAll()
@@ -39,6 +34,28 @@ module.exports = class App
     @game = new Game options
     @baseEl.appendChild @game.render()
     @game.unpause()
+    return
+  detectBrowser: ->
+    {userAgent, vendor} = navigator
+    isMozillaFirefox =
+      (/firefox/i.test userAgent)
+    isGoogleChrome =
+      (/Chrome/.test userAgent) and
+      (/Google Inc/.test vendor)
+    isAppleMobileDevice =
+      (/AppleWebKit/.test userAgent) and
+      (/(iPod|iPhone|iPad)/.test userAgent)
+    isAndroidMobileDevice =
+      (/android/i.test userAgent)
+    @isTouchDevice =
+      isAppleMobileDevice or
+      isAndroidMobileDevice
+    if @isTouchDevice
+      @disableBodyScrolling()
+    if isMozillaFirefox
+      @baseEl.className = "mozilla-firefox"
+    else if isGoogleChrome
+      @baseEl.className = "google-chrome"
     return
   disableBodyScrolling: ->
     document.addEventListener 'touchmove', (event) ->

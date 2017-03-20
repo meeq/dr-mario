@@ -6,6 +6,10 @@ table.game-state
   border-width: 16px
   +border-image(image-url('bottle.png') 16 stretch)
 
+  .google-chrome &, .mozilla-firefox &
+    border-color: transparent
+    border-style: solid
+
   &::before
     content: ''
     position: absolute
