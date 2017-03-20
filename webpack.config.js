@@ -3,6 +3,7 @@ const path = require("path");
 const webpack = require("webpack");
 const CleanPlugin = require("clean-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
+const OfflinePlugin = require("offline-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const srcDir = path.resolve(__dirname, 'src');
@@ -11,6 +12,8 @@ const imagesDir = path.resolve(__dirname, 'images');
 const compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
 
 var cleanPlugin = new CleanPlugin([buildDir]);
+
+var offlinePlugin = new OfflinePlugin();
 
 var htmlPlugin = new HtmlPlugin({
     title: 'Dr. Mario',
@@ -71,6 +74,7 @@ module.exports = {
     plugins: [
         cleanPlugin,
         stylePlugin,
-        htmlPlugin
+        htmlPlugin,
+        offlinePlugin
     ]
 };
