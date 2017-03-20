@@ -23,7 +23,7 @@ getCellClassName = (cell) ->
 tickClassName = 'game-state tick'
 tockClassName = 'game-state tock'
 
-module.exports = class TableView
+module.exports = class PlayerTableView
   lastTick: null
   tickRate: 250
   constructor: ({@state}) ->

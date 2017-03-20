@@ -11,7 +11,7 @@ buttonActions =
   'flip-left': PlayerInput.FLIP_LEFT
   'flip-right': PlayerInput.FLIP_RIGHT
 
-module.exports = class PlayerTouchControls
+module.exports = class PlayerTouchControlsView
   constructor: ({@app, @game, @player}) ->
     return
   render: ->
