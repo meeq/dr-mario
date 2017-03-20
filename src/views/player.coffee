@@ -2,6 +2,7 @@
 PlayerInput = require '../models/player-input'
 PlayerState = require '../models/player-state'
 # App views
+PlayerScoreboardView = require './player-scoreboard'
 PlayerTableView = require './player-table'
 PlayerTouchControlsView = require './player-touch-controls'
 
@@ -15,6 +16,7 @@ module.exports = class Player
     @state = new PlayerState @options
     @startMoveTick = @lastMoveTick = null
     @input = @holdInput = @moveInput = PlayerInput.NONE
+    @scoreboardView.state = @state if @scoreboardView?
     @tableView.state = @state if @tableView?
     @update()
     return
@@ -25,16 +27,21 @@ module.exports = class Player
     if @isTouchDevice
       @touchView = new PlayerTouchControlsView options
       @el.appendChild @touchView.render()
+    @scoreboardView = new PlayerScoreboardView options
+    @el.appendChild @scoreboardView.render()
     @tableView = new PlayerTableView options
     @el.appendChild @tableView.render()
     @el
   update: ->
+    @scoreboardView?.update()
     @tableView?.update()
     return
   destroy: ->
     # Clean up child views
     @touchView?.destroy()
     delete @touchView
+    @scoreboardView?.destroy()
+    delete @scoreboardView
     @tableView?.destroy()
     delete @tableView
     # Clean up the DOM
