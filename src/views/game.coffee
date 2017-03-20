@@ -34,11 +34,11 @@ module.exports = class Game
       @el.appendChild player.render()
     @el
   destroy: ->
-    # Stop timer
-    @pause()
     # Stop sound
     @sound?.stopLast()
     @sound?.stopLoop()
+    # Stop timer
+    @pause()
     # Unregister event handlers
     for eventType, handler of @events
       window.removeEventListener eventType, @handleEvent, false
