@@ -1,18 +1,18 @@
-var path = require('path');
+const path = require("path");
 
-var webpack = require("webpack");
-var CleanPlugin = require('clean-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require("webpack");
+const CleanPlugin = require("clean-webpack-plugin");
+const HtmlPlugin = require("html-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var srcDir = path.resolve(__dirname, 'src');
-var buildDir = path.resolve(__dirname, 'build');
-var imagesDir = path.resolve(__dirname, 'images');
-var compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
+const srcDir = path.resolve(__dirname, 'src');
+const buildDir = path.resolve(__dirname, 'build');
+const imagesDir = path.resolve(__dirname, 'images');
+const compassLibDir = path.resolve(__dirname, 'node_modules/compass-mixins/lib');
 
 var cleanPlugin = new CleanPlugin([buildDir]);
 
-var htmlPlugin = new HtmlWebpackPlugin({
+var htmlPlugin = new HtmlPlugin({
     title: 'Dr. Mario',
     favicon: path.join(imagesDir, 'favicon.ico'),
     viewport: 'width=device-width, initial-scale=1.0, user-scalable=no',
@@ -25,16 +25,23 @@ var htmlPlugin = new HtmlWebpackPlugin({
     }
 });
 
-var styleLoader = [
-  { loader: "style-loader" },
-  { loader: "css-loader" },
-  { loader: "sass-loader",
-    options: {
-      indentedSyntax: true,
-      includePaths: [compassLibDir]
+var stylePlugin = new ExtractTextPlugin({
+  filename: "[name].[contenthash].css",
+  disable: process.env.NODE_ENV === "development"
+});
+
+var styleLoader = stylePlugin.extract({
+  use: [
+    { loader: "css-loader" },
+    { loader: "sass-loader",
+      options: {
+        indentedSyntax: true,
+        includePaths: [compassLibDir]
+      }
     }
-  }
-];
+  ],
+  fallback: "style-loader"
+});
 
 var soundLoader = "url-loader?limit=10240&name=sounds/[name].[ext]";
 
@@ -45,8 +52,8 @@ module.exports = {
     },
     output: {
         path: buildDir,
-        filename: "[name].js",
-        chunkFilename: "[name].js"
+        filename: "[name].[hash].js",
+        chunkFilename: "[name].[hash].js"
     },
     module: {
         rules: [
@@ -62,7 +69,8 @@ module.exports = {
         extensions: [".js", ".coffee", ".hamlc", ".sass"]
     },
     plugins: [
-        // cleanPlugin,
+        cleanPlugin,
+        stylePlugin,
         htmlPlugin
     ]
 };
