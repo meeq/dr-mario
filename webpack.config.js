@@ -72,9 +72,9 @@ module.exports = {
         extensions: [".js", ".coffee", ".hamlc", ".sass"]
     },
     plugins: [
-        cleanPlugin,
+        // cleanPlugin,
         stylePlugin,
         htmlPlugin,
-        offlinePlugin
+        // offlinePlugin
     ]
 };
