@@ -75,6 +75,6 @@ module.exports = {
         // cleanPlugin,
         stylePlugin,
         htmlPlugin,
-        // offlinePlugin
+        offlinePlugin
     ]
 };
