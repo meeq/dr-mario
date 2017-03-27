@@ -22,9 +22,6 @@ module.exports = class Game
       options.app = @app
       options.game = @
       @players.push new Player options
-    # Register event handlers
-    for eventType, handler of @events
-      window.addEventListener eventType, @handleEvent, false
     return
   render: ->
     @el = document.createElement 'ul'
@@ -32,6 +29,10 @@ module.exports = class Game
     # Render player containers
     for player in @players
       @el.appendChild player.render()
+    # Register event handlers
+    for eventType, handler of @events
+      window.addEventListener eventType, @handleEvent, false
+    document.addEventListener 'visibilitychange', @handleVisibilityChange
     @el
   destroy: ->
     # Stop sound
@@ -39,9 +40,6 @@ module.exports = class Game
     @sound?.stopLoop()
     # Stop timer
     @pause()
-    # Unregister event handlers
-    for eventType, handler of @events
-      window.removeEventListener eventType, @handleEvent, false
     # Clean up view
     @el?.parentNode?.removeChild @el
     delete @el
@@ -49,6 +47,10 @@ module.exports = class Game
     for player in @players
       player.destroy()
     delete @players
+    # Unregister event handlers
+    for eventType, handler of @events
+      window.removeEventListener eventType, @handleEvent, false
+    document.removeEventListener 'visibilitychange', @handleVisibilityChange
     return
   unpause: ->
     @paused = false
@@ -89,6 +91,13 @@ module.exports = class Game
       @lastTick = now
     # Schedule the next loop
     @unpause() unless Timer.isRepeating @clockType
+    return
+  handleVisibilityChange: (event) =>
+    if document.hidden
+      @pause() unless @paused
+      @sound?.stopLoop()
+    else
+      @sound?.play @music unless @music is 'quiet'
     return
   handleEvent: (event) =>
     if eventHandlerKey = @events[event.type]

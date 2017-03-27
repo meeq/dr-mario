@@ -34,6 +34,7 @@ module.exports = class Setup
     @el = document.createElement 'div'
     @el.id = 'setup'
     @el.innerHTML = @template @
+    @registerEventHandlers()
     # Setup initial form state
     soundValue = if @sound?.isEnabled then 'on' else 'off'
     (@el.querySelector "[id=sound-#{soundValue}]").checked = true
@@ -42,6 +43,22 @@ module.exports = class Setup
       playerEl = @el.querySelector "[name=#{playerName}]"
       (playerEl.querySelector "[name=level]").value = player.level
       (playerEl.querySelector "[id=speed-#{player.speed}]").checked = true
+    @el
+  destroy: ->
+    # Stop the music
+    @sound?.stopLoop()
+    # Tear down elements and events
+    if @el?
+      @unregisterEventHandlers()
+      # Cancel binding-in-progress
+      if @bindButtonEl?
+        @unbindControl @bindButtonEl
+        delete @bindButtonEl
+      # Clean up the DOM
+      @el.parentNode?.removeChild @el
+      delete @el
+    return
+  registerEventHandlers: ->
     # Register form event handlers
     for eventStr, callbackName of @events
       eventSplit = eventStr.indexOf ' '
@@ -49,10 +66,9 @@ module.exports = class Setup
       eventSelector = eventStr[eventSplit+1..]
       for eventEl in @el.querySelectorAll eventSelector
         eventEl.addEventListener eventType, @[callbackName]
-    @el
-  destroy: ->
-    # Stop the music
-    @sound?.stopLoop()
+    document.addEventListener 'visibilitychange', @handleVisibilityChange
+    return
+  unregisterEventHandlers: ->
     # Unregister form event handlers
     for eventStr, callbackName of @events
       eventSplit = eventStr.indexOf ' '
@@ -60,14 +76,13 @@ module.exports = class Setup
       eventSelector = eventStr[eventSplit+1..]
       for eventEl in @el.querySelectorAll eventSelector
         eventEl.removeEventListener eventType, @[callbackName]
-    # Cancel binding-in-progress
-    if @bindButtonEl?
-      @unbindControl @bindButtonEl
-      delete @bindButtonEl
-    # Clean up the DOM
-    if @el?
-      @el.parentNode?.removeChild @el
-      delete @el
+    document.removeEventListener 'visibilitychange', @handleVisibilityChange
+    return
+  handleVisibilityChange: (event) =>
+    if document.hidden
+      @sound?.stopLoop()
+    else
+      @sound?.play 'setup' if @sound?.isEnabled
     return
   soundChanged: (event) =>
     if (radioEl = event.target).checked
