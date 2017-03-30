@@ -1,14 +1,16 @@
-$pill-colors: "blue", "red", "yellow"
-$pill-directions: "left", "down", "right", "up"
-
 .player-matrix
-  display: table
-  border-collapse: separate
-  border-spacing: 0
+  $pill-size: 14px
+  $pill-colors: "blue", "red", "yellow"
+  $pill-directions: "left", "down", "right", "up"
+
+  &
+    display: table
+    border-collapse: separate
+    border-spacing: 0
 
   td
-    width: 14px
-    height: 14px
+    width: $pill-size
+    height: $pill-size
     border: 1px solid transparent
     background:
       color: #000000

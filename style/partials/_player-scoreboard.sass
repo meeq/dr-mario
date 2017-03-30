@@ -1,17 +1,21 @@
 .player-scoreboard
-
-  position: absolute
-  left: 50%
-  margin-left: 100
-  margin-top: 150
-  width: 110px
-
-  background-color: #D6D6FF
-  background-clip: padding-box
-  +border-image-compat('clipboard-border.png', 16)
-
   $clipboard-top-width: 52px
   $clipboard-top-height: 26px
+
+  &
+    position: absolute
+    left: 50%
+    margin-left: 100
+    margin-top: 150
+    width: 110px
+
+    color: black
+    font-size: $large-font-size
+    padding: 7px 0 2px 0
+
+    background-clip: padding-box
+    background-color: #D6D6FF
+    +border-image-compat('clipboard-border.png', 16)
 
   &::before
     content: ''
@@ -25,10 +29,6 @@
       image: image-url('clipboard-top.png')
       position: center center
       repeat: no-repeat
-
-  color: black
-  font-size: $large-font-size
-  padding: 7px 0 2px 0
 
   dt
     text-align: left
