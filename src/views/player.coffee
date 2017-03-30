@@ -5,6 +5,7 @@ PlayerState = require '../models/player-state'
 PlayerScoreboardView = require './player-scoreboard'
 PlayerStateView = require './player-state'
 PlayerTouchControlsView = require './player-touch-controls'
+PlayerUpNextView = require './player-up-next'
 
 module.exports = class Player
   constructor: (@options) ->
@@ -28,6 +29,7 @@ module.exports = class Player
     if @isTouchDevice
       @subviews.push @touchView = new PlayerTouchControlsView options
     @subviews.push @scoreboardView = new PlayerScoreboardView options
+    @subviews.push @upNextView = new PlayerUpNextView options
     @subviews.push @stateView = new PlayerStateView options
     for view in @subviews
       @el.appendChild view.render()
@@ -42,6 +44,7 @@ module.exports = class Player
       view.destroy()
     delete @touchView
     delete @scoreboardView
+    delete @upNextView
     delete @stateView
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
