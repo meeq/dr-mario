@@ -3,12 +3,8 @@ table.game-state
   position: relative
   border-collapse: separate
   border-spacing: 0
-  border-width: 16px
-  +border-image(image-url('bottle.png') 16 stretch)
 
-  .google-chrome &, .mozilla-firefox &
-    border-color: transparent
-    border-style: solid
+  +border-image-compat('bottle-border.png', 16)
 
   &::before
     content: ''
@@ -22,6 +18,9 @@ table.game-state
       image: image-url('bottle-top.png')
       position: center center
       repeat: no-repeat
+
+    .mozilla-firefox &
+      margin-top: 16px
 
   $pill-colors: "blue", "red", "yellow"
   $pill-directions: "left", "down", "right", "up"

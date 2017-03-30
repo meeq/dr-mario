@@ -1,0 +1,7 @@
+@mixin border-image-compat($image, $size)
+  border-width: $size
+  +border-image(image-url($image) strip-units($size) stretch)
+
+  .google-chrome &, .mozilla-firefox &
+    border-color: transparent
+    border-style: solid

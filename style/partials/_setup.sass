@@ -1,14 +1,5 @@
 #setup
 
-  $small-font-size: 8px
-  $medium-font-size: 10px
-  $large-font-size: 12px
-
-  $base-margin: 10px
-  $border-width: 16px
-  $border-image-src: image-url('setup-border.png')
-  $border-image-width: strip-units($border-width)
-
   $level-width: 158px
   $level-height: 16px
   $level-thumb-image-size: 7px
@@ -54,19 +45,14 @@
     display: inline-block
     font-size: 0
     margin: $base-margin 25px
-    border-width: $border-width
-    +border-image($border-image-src $border-image-width stretch)
-
-    .google-chrome &, .mozilla-firefox &
-      border-color: transparent
-      border-style: solid
+    +border-image-compat('setup-border.png', 16px)
 
   .global, .player:only-child
     width: 85%
     max-width: 600px
 
   form
-    margin-top: -5px // WTF: I have no idea why this doesn't line up
+    margin-top: -5px // WTF: I have no idea why this does not line up
     padding: $base-margin
     background-color: #000000
 
