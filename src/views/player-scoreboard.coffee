@@ -7,6 +7,7 @@ module.exports = class PlayerScoreboardView
   render: ->
     @el = document.createElement 'dl'
     @el.className = 'player-scoreboard'
+    # Create the data descriptor fields
     for field in @fields
       keyElem = document.createElement 'dt'
       keyElem.innerText = field
@@ -14,6 +15,9 @@ module.exports = class PlayerScoreboardView
       valueElem = document.createElement 'dd'
       @el.appendChild valueElem
       @[field + 'Elem'] = valueElem
+    # Populate the fields that will not change
+    @levelElem.innerText = "#{@state.level}"
+    @speedElem.innerText = Speed.options[@state.speed]
     @el
   destroy: ->
     for field in @fields
@@ -25,6 +29,4 @@ module.exports = class PlayerScoreboardView
   update: ->
     @scoreElem.innerText = "#{@state.score}"
     @virusElem.innerText = "#{@state.virusesLeft}"
-    @levelElem.innerText = "#{@state.level}"
-    @speedElem.innerText = Speed.options[@state.speed]
     return
