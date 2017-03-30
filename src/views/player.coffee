@@ -3,7 +3,7 @@ PlayerInput = require '../models/player-input'
 PlayerState = require '../models/player-state'
 # App views
 PlayerScoreboardView = require './player-scoreboard'
-PlayerTableView = require './player-table'
+PlayerStateView = require './player-state'
 PlayerTouchControlsView = require './player-touch-controls'
 
 module.exports = class Player
@@ -16,34 +16,33 @@ module.exports = class Player
     @state = new PlayerState @options
     @startMoveTick = @lastMoveTick = null
     @input = @holdInput = @moveInput = PlayerInput.NONE
-    @scoreboardView.state = @state if @scoreboardView?
-    @tableView.state = @state if @tableView?
+    if @subviews? then for view in @subviews
+      view.state = @state
     @update()
     return
   render: ->
     @el = document.createElement 'li'
     @el.className = 'player'
+    @subviews = []
     options = {@app, @game, @state, player: @}
     if @isTouchDevice
-      @touchView = new PlayerTouchControlsView options
-      @el.appendChild @touchView.render()
-    @scoreboardView = new PlayerScoreboardView options
-    @el.appendChild @scoreboardView.render()
-    @tableView = new PlayerTableView options
-    @el.appendChild @tableView.render()
+      @subviews.push @touchView = new PlayerTouchControlsView options
+    @subviews.push @scoreboardView = new PlayerScoreboardView options
+    @subviews.push @stateView = new PlayerStateView options
+    for view in @subviews
+      @el.appendChild view.render()
     @el
   update: ->
-    @scoreboardView?.update()
-    @tableView?.update()
+    if @subviews? then for view in @subviews
+      view.update()
     return
   destroy: ->
     # Clean up child views
-    @touchView?.destroy()
+    if @subviews? then for view in @subviews
+      view.destroy()
     delete @touchView
-    @scoreboardView?.destroy()
     delete @scoreboardView
-    @tableView?.destroy()
-    delete @tableView
+    delete @stateView
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el

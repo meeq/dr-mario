@@ -10,21 +10,21 @@
   background-clip: padding-box
   +border-image-compat('clipboard-border.png', 16)
 
+  $clipboard-top-width: 52px
+  $clipboard-top-height: 26px
+
   &::before
     content: ''
     position: absolute
-    top: -26px
+    top: -($clipboard-top-height)
     left: 50%
-    margin-left: -26px
-    width: 52px
-    height: 26px
+    margin-left: -($clipboard-top-width / 2)
+    width: $clipboard-top-width
+    height: $clipboard-top-height
     background:
       image: image-url('clipboard-top.png')
       position: center center
       repeat: no-repeat
-
-    .mozilla-firefox &
-      margin-top: 0px
 
   color: black
   font-size: $large-font-size

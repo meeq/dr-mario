@@ -1,29 +1,10 @@
-table.game-state
-  margin: 64px auto 0 auto
-  position: relative
+$pill-colors: "blue", "red", "yellow"
+$pill-directions: "left", "down", "right", "up"
+
+.player-matrix
+  display: table
   border-collapse: separate
   border-spacing: 0
-
-  +border-image-compat('bottle-border.png', 16)
-
-  &::before
-    content: ''
-    position: absolute
-    top: -80px
-    left: 50%
-    margin-left: -48px
-    width: 96px
-    height: 80px
-    background:
-      image: image-url('bottle-top.png')
-      position: center center
-      repeat: no-repeat
-
-    .mozilla-firefox &
-      margin-top: 16px
-
-  $pill-colors: "blue", "red", "yellow"
-  $pill-directions: "left", "down", "right", "up"
 
   td
     width: 14px
@@ -57,8 +38,8 @@ table.game-state
           $image: 'virus-#{$color}-1.png'
           background-image: image-url($image)
 
-  &.tock td.virus
-    @each $color in $pill-colors
-      &.#{$color}
-        $image: 'virus-#{$color}-2.png'
-        background-image: image-url($image)
+      .tock &
+        @each $color in $pill-colors
+          &.#{$color}
+            $image: 'virus-#{$color}-2.png'
+            background-image: image-url($image)

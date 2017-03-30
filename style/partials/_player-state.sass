@@ -1,0 +1,22 @@
+figure.player-state
+  display: table
+  margin: 64px auto 0 auto
+  position: relative
+
+  +border-image-compat('bottle-border.png', 16)
+
+  &::before
+    content: ''
+    position: absolute
+    top: -80px
+    left: 50%
+    margin-left: -48px
+    width: 96px
+    height: 80px
+    background:
+      image: image-url('bottle-top.png')
+      position: center center
+      repeat: no-repeat
+
+    .mozilla-firefox &
+      margin-top: 16px
