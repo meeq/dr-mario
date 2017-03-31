@@ -27,12 +27,16 @@ module.exports = class Player
     @subviews = []
     options = {@app, @game, @state, player: @}
     if @isTouchDevice
-      @subviews.push @touchView = new PlayerTouchControlsView options
+      @touchView = new PlayerTouchControlsView options
+      @el.appendChild @touchView.render()
     @subviews.push @scoreboardView = new PlayerScoreboardView options
     @subviews.push @upNextView = new PlayerUpNextView options
     @subviews.push @stateView = new PlayerStateView options
+    divEl = document.createElement 'div'
+    divEl.className = 'player-wrapper'
     for view in @subviews
-      @el.appendChild view.render()
+      divEl.appendChild view.render()
+    @el.appendChild divEl
     @el
   update: ->
     if @subviews? then for view in @subviews
@@ -40,9 +44,10 @@ module.exports = class Player
     return
   destroy: ->
     # Clean up child views
+    @touchView?.destroy()
+    delete @touchView
     if @subviews? then for view in @subviews
       view.destroy()
-    delete @touchView
     delete @scoreboardView
     delete @upNextView
     delete @stateView
