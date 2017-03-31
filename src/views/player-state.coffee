@@ -1,3 +1,6 @@
+setter = (klass, prop, set) ->
+  Object.defineProperty klass.prototype, prop, {set, configurable: true}
+
 Timer = require '../models/timer'
 PlayerMatrixView = require './player-matrix'
 
@@ -5,6 +8,10 @@ tickClassName = 'player-state tick'
 tockClassName = 'player-state tock'
 
 module.exports = class PlayerStateView
+  setter @, 'state', (state) ->
+    @_state = state
+    @matrixView?.state = state
+    return
   lastTick: null
   tickRate: 250
   constructor: ({@state}) ->
@@ -13,7 +20,7 @@ module.exports = class PlayerStateView
   render: ->
     @el = document.createElement 'figure'
     @el.className = tickClassName
-    @matrixView = new PlayerMatrixView {@state}
+    @matrixView = new PlayerMatrixView state: @_state
     @el.appendChild @matrixView.render()
     @update()
     @el

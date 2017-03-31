@@ -7,6 +7,7 @@ module.exports = class PlayerUpNextView
   setter @, 'state', (state) ->
     {capsule} = state
     {@nextBuffer} = capsule
+    @matrixView?.buffer = @nextBuffer
     return
   constructor: (options) ->
     @state = options.state
