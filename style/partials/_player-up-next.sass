@@ -1,12 +1,10 @@
 .player-up-next
 
-  height: 110px
-  width: 110px
-
-  background-clip: padding-box
-  background-color: black
-  +border-image-compat('up-next-border.png', 16)
+  &
+    background-clip: padding-box
+    background-color: black
+    +border-image-compat('up-next-border.png', 16)
 
   .player-matrix
     margin: 0 auto
-    padding-bottom: 14px
+    padding-bottom: $pill-size

@@ -1,22 +1,21 @@
 figure.player-state
 
-  &
-    display: table
+  $bottle-top-width: 96px
+  $bottle-top-height: 80px
 
+  &
     +border-image-compat('bottle-border.png', 16)
 
   &::before
     content: ''
     position: absolute
-    top: -80px
+    top: -($bottle-top-height)
+    height: $bottle-top-height
     left: 50%
-    margin-left: -48px
-    width: 96px
-    height: 80px
+    width: $bottle-top-width
+    margin-left: -($bottle-top-width / 2)
+
     background:
       image: image-url('bottle-top.png')
       position: center center
       repeat: no-repeat
-
-    .mozilla-firefox &
-      margin-top: 16px
