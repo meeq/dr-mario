@@ -24,16 +24,17 @@ module.exports = class Player
   render: ->
     @el = document.createElement 'li'
     @el.className = 'player'
-    @subviews = []
     options = {@app, @game, @state, player: @}
     if @isTouchDevice
       @touchView = new PlayerTouchControlsView options
       @el.appendChild @touchView.render()
-    @subviews.push @scoreboardView = new PlayerScoreboardView options
-    @subviews.push @upNextView = new PlayerUpNextView options
-    @subviews.push @stateView = new PlayerStateView options
     divEl = document.createElement 'div'
-    divEl.className = 'player-wrapper'
+    divEl.className = 'player-container'
+    @subviews = [
+      (@scoreboardView = new PlayerScoreboardView options)
+      (@upNextView = new PlayerUpNextView options)
+      (@stateView = new PlayerStateView options)
+    ]
     for view in @subviews
       divEl.appendChild view.render()
     @el.appendChild divEl
@@ -51,10 +52,10 @@ module.exports = class Player
     delete @scoreboardView
     delete @upNextView
     delete @stateView
+    delete @subviews
     # Clean up the DOM
     @el?.parentNode?.removeChild @el
     delete @el
-    delete @state
     return
   tick: ->
     # Rate-limit holding move down
