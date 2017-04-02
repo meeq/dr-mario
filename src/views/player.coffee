@@ -7,7 +7,7 @@ PlayerStateView = require './player-state'
 PlayerTouchControlsView = require './player-touch-controls'
 PlayerUpNextView = require './player-up-next'
 
-module.exports = class Player
+module.exports = class PlayerView
   constructor: (@options) ->
     {@app, @game, @controls} = @options
     {@isTouchDevice} = @app
@@ -80,8 +80,13 @@ module.exports = class Player
     @state.tick()
     return
   actionFromEvent: (event) ->
-    control = key for key, val of @controls when val is event.which
-    PlayerInput.actionFromString control if control?
+    eventControl = null
+    for controlName, controlInfo of @controls
+      if controlInfo.type is 'keyCode'
+        if controlInfo.keyCode is event.which
+          eventControl = controlName
+          break
+    PlayerInput.actionFromString eventControl if eventControl?
   beginAction: (action) ->
     unless PlayerInput.isNone action
       unless PlayerInput.get @holdInput, action
@@ -102,3 +107,16 @@ module.exports = class Player
     @beginAction @actionFromEvent event
   handleKeyUp: (event) ->
     @endAction @actionFromEvent event
+  handleGamepad: ->
+    return unless @app.isGamepadSupported
+    allGamepads = navigator.getGamepads()
+    for controlName, controlInfo of @controls
+      if controlInfo.type is 'gamepadButton'
+        controlAction = PlayerInput.actionFromString controlName
+        gamepad = allGamepads[controlInfo.gamepadIndex]
+        button = gamepad.buttons[controlInfo.buttonIndex]
+        if button.pressed or button.value > 0
+          @beginAction controlAction
+        else
+          @endAction controlAction
+    return

@@ -1,8 +1,11 @@
 {eventCharacter} = require '../events'
 Speed = require '../models/speed'
-defaults = require '../defaults'
+Timer = require '../models/timer'
+Defaults = require '../defaults'
 
-module.exports = class Setup
+{keyCodeControl, gamepadButtonControl} = Defaults
+
+module.exports = class SetupView
   # Template helpers
   template: require '../templates/setup'
   eventCharacter: eventCharacter
@@ -24,7 +27,7 @@ module.exports = class Setup
     @players = {}
     for i in [1..numPlayers]
       playerName = 'P'+i
-      @players[playerName] = defaults playerName
+      @players[playerName] = Defaults.player playerName
     return
   render: ->
     # Setup the sound
@@ -43,6 +46,9 @@ module.exports = class Setup
       playerEl = @el.querySelector "[name=#{playerName}]"
       (playerEl.querySelector "[name=level]").value = player.level
       (playerEl.querySelector "[id=speed-#{player.speed}]").checked = true
+      # Set all of the button labels to the corresponding mapped input
+      for buttonEl in (playerEl.querySelectorAll '.controls button')
+        @updateButtonFromControl buttonEl
     @el
   destroy: ->
     # Stop the music
@@ -51,9 +57,7 @@ module.exports = class Setup
     if @el?
       @unregisterEventHandlers()
       # Cancel binding-in-progress
-      if @bindButtonEl?
-        @unbindControl @bindButtonEl
-        delete @bindButtonEl
+      @cleanupBindControl() if @bindButtonEl?
       # Clean up the DOM
       @el.parentNode?.removeChild @el
       delete @el
@@ -126,25 +130,68 @@ module.exports = class Setup
       @unbindControl @bindButtonEl
     else
       window.addEventListener 'keydown', @handleKeyBind, false
+      @startGamepadBindTimer()
     @bindButtonEl = buttonEl
+    return
+  cleanupBindControl: ->
+    window.removeEventListener 'keydown', @handleKeyBind, false
+    if @bindControllerTimerRef?
+      Timer.stop Timer.REQUEST_FRAME, @bindControllerTimerRef
+      delete @bindControllerTimerRef
+    @unbindControl @bindButtonEl
+    delete @bindButtonEl
     return
   unbindControl: (buttonEl) ->
     buttonEl.className = ''
+    @updateButtonFromControl buttonEl
+    return
+  updateButtonFromControl: (buttonEl) ->
     player = @players[buttonEl.form.name]
-    controlName = buttonEl.name
-    keyCode = player.controls[controlName]
-    buttonEl.innerText = eventCharacter keyCode
+    controlInfo = player.controls[buttonEl.name]
+    buttonEl.innerText =
+      switch controlInfo.type
+        when 'keyCode'
+          eventCharacter controlInfo.keyCode
+        when 'gamepadButton'
+          "P#{controlInfo.gamepadIndex + 1} B#{controlInfo.buttonIndex}"
+        else
+          "unbound"
     return
   handleKeyBind: (event) =>
     return unless (buttonEl = @bindButtonEl)?
     keyCode = event.keyCode ? event.which
     unless 'esc' is eventCharacter keyCode
       player = @players[buttonEl.form.name]
-      controlName = buttonEl.name
-      player.controls[controlName] = keyCode
-    window.removeEventListener 'keydown', @handleKeyBind, false
-    @unbindControl buttonEl
-    delete @bindButtonEl
+      boundControl = keyCodeControl keyCode
+      player.controls[buttonEl.name] = boundControl
+    @cleanupBindControl()
+    return
+  startGamepadBindTimer: ->
+    if @app.isGamepadSupported
+      # Listen for button presses on gamepads
+      timerType = Timer.REQUEST_FRAME
+      timerRate = (1000 / 30) # 30hz
+      @bindGamepadRef = Timer.start timerType, @handleGamepadBind, timerRate
+    return
+  handleGamepadBind: =>
+    return unless (buttonEl = @bindButtonEl)?
+    bindGamepadIndex = null
+    bindButtonIndex = null
+    for gamepad in navigator.getGamepads() when gamepad?.connected
+      if bindGamepadIndex? and bindButtonIndex?
+        break
+      for button, buttonIndex in gamepad.buttons
+        if button.pressed or button.value > 0
+          bindGamepadIndex = gamepad.index
+          bindButtonIndex = buttonIndex
+          break
+    if bindGamepadIndex? and bindButtonIndex?
+      player = @players[buttonEl.form.name]
+      boundControl = gamepadButtonControl bindGamepadIndex, bindButtonIndex
+      player.controls[buttonEl.name] = boundControl
+      @cleanupBindControl()
+    else
+      @startGamepadBindTimer()
     return
   formSubmitted: (event) =>
     formEl = event.target

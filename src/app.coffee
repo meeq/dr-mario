@@ -1,5 +1,5 @@
-Setup = require './views/setup'
-Game = require './views/game'
+SetupView = require './views/setup'
+GameView = require './views/game'
 Sound = require './views/sound'
 
 module.exports = class App
@@ -23,7 +23,7 @@ module.exports = class App
     return
   showSetup: ->
     @cleanup()
-    @setup = new Setup
+    @setup = new SetupView
       app: @
       numPlayers: 1
     @baseEl.appendChild @setup.render()
@@ -31,7 +31,7 @@ module.exports = class App
   startGame: (options) ->
     @cleanup()
     options.app = @
-    @game = new Game options
+    @game = new GameView options
     @baseEl.appendChild @game.render()
     @game.unpause()
     return
@@ -50,12 +50,13 @@ module.exports = class App
     @isTouchDevice =
       isAppleMobileDevice or
       isAndroidMobileDevice
+    @isGamepadSupported = navigator.getGamepads?
     if @isTouchDevice
       @disableBodyScrolling()
     if isMozillaFirefox
-      @baseEl.className = "mozilla-firefox"
+      @baseEl.className += " mozilla-firefox"
     else if isGoogleChrome
-      @baseEl.className = "google-chrome"
+      @baseEl.className += " google-chrome"
     return
   disableBodyScrolling: ->
     document.addEventListener 'touchmove', (event) ->

@@ -2,7 +2,7 @@
 Timer = require '../models/timer'
 Player = require './player'
 
-module.exports = class Game
+module.exports = class GameView
   events:
     'keydown': 'handleKeyDown'
     'keyup': 'handleKeyUp'
@@ -81,6 +81,9 @@ module.exports = class Game
     now = Timer.now()
     deltaTicks = (now - @lastTick) / @tickRate | 0
     if deltaTicks and deltaTicks <= @tickEpsilon
+      # Update the player input from gamepad state
+      for player in @players
+        player.handleGamepad()
       # Update the player states
       for tick in [0...deltaTicks]
         for player in @players
