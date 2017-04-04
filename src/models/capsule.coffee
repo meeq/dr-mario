@@ -59,11 +59,30 @@ module.exports = class Capsule
     return
   rotate: (direction) ->
     @flip @fallingBuffer, direction
+    didRotateSuccessfully = true # Assume it worked unless it didn't
     if @checkCollision()
-      # TODO Wall kicks
-      @flip @fallingBuffer, Direction.reverse direction
-    else
+      # Wall kicks
+      topLeftCell = @fallingBuffer.get 0, 0
+      isHorizontalToVerticalRotation = not Cell.isEmpty topLeftCell
+      if isHorizontalToVerticalRotation
+        if not @checkCollision @x + 1, @y # Kick right
+          @x += 1
+        else if not @checkCollision @x, @y + 1 # Kick down
+          @y += 1
+        else if not @checkCollision @x + 1, @y + 1 # Kick down and right
+          @x += 1
+          @y += 1
+        else
+          didRotateSuccessfully = false
+      else # Vertical-to-Horizontal Rotation
+        if not @checkCollision @x - 1, @y # Kick left
+          @x -= 1
+        else
+          didRotateSuccessfully = false
+    if didRotateSuccessfully
       @game.playerDidRotateCapsule @player
+    else
+      @flip @fallingBuffer, Direction.reverse direction
     return
   swapHold: ->
     swapBuffer = @fallingBuffer
