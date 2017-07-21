@@ -1,0 +1,20 @@
+CACHE MANIFEST
+#ver:4/3/2017, 10:35:15 PM
+#plugin:4.6.2
+
+CACHE:
+../sounds/chill.mp3
+../sounds/defeat.mp3
+../sounds/fever.mp3
+../sounds/game-over.mp3
+../sounds/match-over.mp3
+../sounds/menu.mp3
+../sounds/setup.mp3
+../sounds/victory.mp3
+../main.36f94eef02ba946c2681.js
+../main.2b385a9d6bafdba57b7f25c649196d33.css
+../favicon.ico
+../
+
+NETWORK:
+*
