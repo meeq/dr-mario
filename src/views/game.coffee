@@ -39,7 +39,7 @@ module.exports = class GameView
     @sound?.stopLast()
     @sound?.stopLoop()
     # Stop timer
-    @pause()
+    @pause false
     # Clean up view
     @el?.parentNode?.removeChild @el
     delete @el
@@ -57,8 +57,8 @@ module.exports = class GameView
     @lastTick ?= Timer.now()
     @clockRef = Timer.start @clockType, @loop, @tickRate
     return
-  pause: ->
-    @sound?.play 'pause'
+  pause: (playSound = true)->
+    @sound?.play 'pause' if playSound
     @paused = true
     @lastTick = null
     Timer.stop @clockType, @clockRef if @clockRef?
@@ -93,11 +93,12 @@ module.exports = class GameView
         player.update()
       @lastTick = now
     # Schedule the next loop
-    @unpause() unless Timer.isRepeating @clockType
+    unless Timer.isRepeating @clockType
+      @unpause() unless @paused
     return
   handleVisibilityChange: (event) =>
     if document.hidden
-      @pause() unless @paused
+      @pause false unless @paused
       @sound?.stopLoop()
     else
       @sound?.play @music unless @music is 'quiet'
@@ -161,6 +162,7 @@ module.exports = class GameView
   playerDidEndGame: (player, isVictory) ->
     @sound?.stopLoop()
     if isVictory
+      @pause false
       console.log 'You win!'
       # TODO Show Next / Setup buttons
       @sound?.play 'victory'
